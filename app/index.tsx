@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { useRouter, router } from "expo-router";
+import {  router } from "expo-router";
 
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import "../global.css";
 
 
