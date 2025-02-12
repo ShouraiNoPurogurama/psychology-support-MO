@@ -16,11 +16,15 @@ export const Footer: React.FC = () => {
 
                 <MaterialIcons name="home" size={30} color={pathname === "/home" ? "black" : "white"} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/userChat")} style={styles.button}>
-                <MaterialIcons name="chat" size={30} color="white" />
+            <TouchableOpacity 
+            onPress={() => pathname!=="/user/userChat" && router.push("/user/userChat")} 
+            style={styles.button}>
+                <MaterialIcons name="chat" size={30} color={pathname=== "/user/userChat" ? "black":"white"} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/task")} style={styles.button}>
-                <MaterialIcons name="task" size={30} color="white" />
+            <TouchableOpacity 
+            onPress={() => pathname!=="/user/userTask"&& router.push("/user/userTask")} 
+            style={styles.button}>
+                <MaterialIcons name="task" size={30} color={pathname==="/user/userTask"?"black": "white"} />
             </TouchableOpacity>
         </View>
     );
