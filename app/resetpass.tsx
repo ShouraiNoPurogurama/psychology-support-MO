@@ -23,13 +23,15 @@ export default function Register() {
             <Text style={styles.buttonText}>Send OTP</Text>
           </TouchableOpacity>
         </View>
-        <TextInput style={styles.input} placeholder="Enter Your Password" />
+        <TextInput style={styles.input} placeholder="Enter Your New Password" />
+        <TextInput style={styles.input} placeholder="Confirm Your New Password" />
         <TouchableOpacity onPress={() => router.push("/login")} style={styles.button}>
-          <Text style={styles.buttonText}>Sign Up</Text>
+          <Text style={styles.buttonText}>Reset password</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text style={{ color: "blue", fontSize: 18 }}>Already have an account? Login</Text>
-        </TouchableOpacity>
+        <View style={styles.loginTextContainer}>
+                  <Text style={styles.loginText}>Don't have an account? </Text>
+                  <Text style={styles.loginLink} onPress={() => router.push("/register")}>Register</Text>
+                </View>
       </View>
     </View>
   );
@@ -78,10 +80,12 @@ const styles = StyleSheet.create({
   },
   otpButton: {
     backgroundColor: '#AF93D2',
-    paddingVertical: 15,
+    paddingVertical: 10, // Adjusted to match the input field height
     paddingHorizontal: 20,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center', // Center the text vertically
+    height: 48, // Ensure the height matches the input field
   },
   button: {
     backgroundColor: '#AF93D2',
@@ -94,5 +98,18 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  }
+  },
+
+  loginTextContainer: {
+    flexDirection: 'row',
+    marginTop: 15,
+  },
+  loginText: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  loginLink: {
+    fontSize: 16,
+    color: 'blue',
+  },
 });
