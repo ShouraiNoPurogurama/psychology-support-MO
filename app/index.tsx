@@ -1,7 +1,9 @@
 import { router } from "expo-router";
-
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import React from "react";
+import { Text, View, TouchableOpacity } from 'react-native';
 import "../global.css";
+
+import "../doctor/doctorHome";
 
 
 export default function App() {
@@ -11,6 +13,9 @@ export default function App() {
         <Text className="italic text-3xl font-semibold  " >Welcome to our app</Text>
         <TouchableOpacity onPress={() => router.push("/login")}>
           <Text style={{ color: "blue", fontSize: 18 }}>Go to Login Page</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/doctorHome")}>
+          <Text style={{ color: "blue", fontSize: 18 }}>Go to Doctor Page</Text>
         </TouchableOpacity>
       </View>
 

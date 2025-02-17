@@ -18,9 +18,10 @@ export default function Register() {
         <TouchableOpacity onPress={() => router.push("/login")} style={styles.button}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <Text className="text-center mt-4 text-gray-500">
-        Already have an account? <Text className="text-blue-700" onPress={() => router.push("/login")}>Login</Text>
-        </Text>
+        <View style={styles.loginTextContainer}>
+          <Text style={styles.loginText}>Already have an account? </Text>
+          <Text style={styles.loginLink} onPress={() => router.push("/login")}>Login</Text>
+        </View>
       </View>
     </View>
   );
@@ -69,5 +70,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  }
+  },
+  loginTextContainer: {
+    flexDirection: 'row',
+    marginTop: 15,
+  },
+  loginText: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  loginLink: {
+    fontSize: 16,
+    color: 'blue',
+  },
 });
