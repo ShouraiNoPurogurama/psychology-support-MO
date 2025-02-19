@@ -3,7 +3,6 @@ import React from "react";
 import { Text, View, TouchableOpacity } from 'react-native';
 import "../global.css";
 
-import "../doctor/doctorHome";
 
 
 export default function App() {
@@ -14,7 +13,7 @@ export default function App() {
         <TouchableOpacity onPress={() => router.push("/login")}>
           <Text style={{ color: "blue", fontSize: 18 }}>Go to Login Page</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/doctorHome")}>
+        <TouchableOpacity onPress={() => router.push("/doctor/doctorHome")}>
           <Text style={{ color: "blue", fontSize: 18 }}>Go to Doctor Page</Text>
         </TouchableOpacity>
       </View>

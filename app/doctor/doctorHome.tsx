@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Footer } from '../../component/doctorFooter';
+import React from 'react';
+
 
 export default function Home() {
     return (
@@ -19,7 +21,7 @@ export default function Home() {
                     </TouchableOpacity>
                 </View>
             </View>
-            <Footer />
+            <Footer/>
         </>
     );
 }

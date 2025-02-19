@@ -11,10 +11,12 @@ export default function Register() {
       <Text style={styles.title}>EmoEase</Text>
       <View style={styles.formContainer}>
         <Text style={styles.heading}>Sign Up</Text>
-        <TextInput style={styles.input} placeholder="Enter Your Username" />
+        <TextInput style={styles.input} placeholder="Enter Your Full name" />
+        <TextInput style={styles.input} placeholder="Enter Your Gender" />
         <TextInput style={styles.input} placeholder="Enter Your Email" />
         <TextInput style={styles.input} placeholder="Enter Your Phone Number" />
         <TextInput style={styles.input} placeholder="Enter Your Password" />
+        <TextInput style={styles.input} placeholder="Confirm Your Password" />
         <TouchableOpacity onPress={() => router.push("/login")} style={styles.button}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>

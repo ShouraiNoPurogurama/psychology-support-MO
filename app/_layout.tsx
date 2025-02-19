@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import React from "react";
 
 export default function RootLayout() {
   return (
@@ -11,6 +12,7 @@ export default function RootLayout() {
       <Stack.Screen name="register" />
       <Stack.Screen name="home" />
       <Stack.Screen name="resetpass" />
+      <Stack.Screen name="doctor/doctorHome" />
     </Stack>
   );
 }
