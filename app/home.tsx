@@ -3,6 +3,7 @@ import "../global.css";
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { Footer } from '../component/Footer';
+import React from 'react';
 
 
 

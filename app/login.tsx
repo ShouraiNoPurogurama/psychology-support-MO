@@ -7,7 +7,6 @@ import {
   Image,
 } from "react-native";
 import "../global.css";
-import { useState } from "react";
 import { router } from "expo-router";
 import React from "react";
 import * as Google from 'expo-auth-session/providers/google';
@@ -31,26 +30,24 @@ export default function Login() {
   }, [response]);
 
   return (
-    <View className="flex-2 mt-48  justify-center items-center ">
-      <Text className="text-4xl font-extrabold text-[#AF93D2]">EmoEase</Text>
-      <View className="items-center ">
-        <Text className="text-2xl font-extrabold m-4">Login</Text>
-        <Text className="text-2xl font-extrabold">Welcome Back</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>EmoEase</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Login</Text>
+        <Text style={styles.headerText}>Welcome Back</Text>
       </View>
-      <View className="w-80 mt-5 space-y-4  ">
+      <View style={styles.form}>
         <TextInput
-          className="border-2 rounded-md  py-3 text-gray-500 w-full focus:border-black mt-6 px-4"
+          style={styles.input}
           placeholder="Enter Your Username / Email"
         />
         <TextInput
-          className="border-2 rounded-md  py-3 text-gray-500 w-full focus:border-black mt-6 px-4 "
+          style={styles.input}
           placeholder="Enter Your Password"
           secureTextEntry={true}
         />
         <TouchableOpacity onPress={() => router.push("/resetpass")}>
-          <Text className="justify-center rounded-md text-blue-700 w-ful mt-1 px-1 ">
-            Forget Password?
-          </Text>
+          <Text style={styles.linkText}>Forget Password?</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push("/login")}>
@@ -68,8 +65,8 @@ export default function Login() {
           </Text>
         </TouchableOpacity>
 
-        <Text className="text-center mt-4 text-gray-500">
-          Don't have an account? <Text className="text-blue-700" onPress={() => router.push("/register")}>Register</Text>
+        <Text style={styles.footerText}>
+          Don't have an account? <Text style={styles.linkText} onPress={() => router.push("/register")}>Register</Text>
         </Text>
       </View>
     </View>
