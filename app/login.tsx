@@ -12,13 +12,18 @@ import React from "react";
 import * as Google from 'expo-auth-session/providers/google';
 import { useEffect } from 'react';
 import * as WebBrowser from 'expo-web-browser';
+import '../assets' ; // Import the Google logo
 
-WebBrowser.maybeCompleteAuthSession();
+const GoogleLogo = require('../assets/Google.jpg'); // Assign the Google logo to a variable
 
+WebBrowser.maybeCompleteAuthSession(); // Ensure to clear any existing auth sessions
+
+// The Login component
 export default function Login() {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: 'YOUR_ANDROID_CLIENT_ID',
+    androidClientId: 'AIzaSyCA1ck7cua4ewWBYpqagjBDyIyR8XJVoWA',
     webClientId: '398851471046-f7p7vh7ncamknt4shpolr7kqrevfmeue.apps.googleusercontent.com',
+    clientId: '',
   });
 
   useEffect(() => {
@@ -26,10 +31,12 @@ export default function Login() {
       const { authentication } = response;
       // Handle successful authentication here
       console.log(authentication);
+      router.push("/home");
     }
   }, [response]);
 
   return (
+    
     <View style={styles.container}>
       <Text style={styles.title}>EmoEase</Text>
       <View style={styles.header}>
@@ -50,24 +57,23 @@ export default function Login() {
           <Text style={styles.linkText}>Forget Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/login")}>
+        <TouchableOpacity onPress={() => router.push("/home")}>
           <Text style={styles.loginButton}>Login</Text>
         </TouchableOpacity>
+
+        <Text style={styles.footerText}>
+          Don't have an account? <Text style={styles.linkText} onPress={() => router.push("/register")}>Register</Text>
+        </Text>
 
         <TouchableOpacity
           disabled={!request}
           onPress={() => {
             promptAsync();
           }}
+          style={styles.googleButtonContainer}
         >
-          <Text style={[styles.googleButton, !request && styles.disabledButton]}>
-            Login with Google
-          </Text>
+          <Image source={GoogleLogo} style={styles.googleLogo} />
         </TouchableOpacity>
-
-        <Text style={styles.footerText}>
-          Don't have an account? <Text style={styles.linkText} onPress={() => router.push("/register")}>Register</Text>
-        </Text>
       </View>
     </View>
   );
@@ -96,6 +102,7 @@ const styles = StyleSheet.create({
   form: {
     width: '80%',
     marginTop: 20,
+    alignItems: 'center', 
   },
   input: {
     borderWidth: 2,
@@ -114,17 +121,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#AF93D2',
     color: 'white',
     paddingVertical: 16,
+    paddingHorizontal: 100,
     textAlign: 'center',
     borderRadius: 8,
     marginTop: 28,
   },
-  googleButton: {
-    backgroundColor: '#4285F4',
-    color: 'white',
-    paddingVertical: 16,
-    textAlign: 'center',
-    borderRadius: 8,
-    marginTop: 28,
+  googleButtonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4285F4', 
+    borderRadius: 50, 
+    width: 50, 
+    height: 50, 
+    marginTop: 16, 
+  },
+  googleLogo: {
+    width: 50,
+    height: 50,
   },
   disabledButton: {
     backgroundColor: '#A0A0A0',
@@ -134,4 +147,5 @@ const styles = StyleSheet.create({
     marginTop: 16,
     color: 'gray',
   },
+
 });
