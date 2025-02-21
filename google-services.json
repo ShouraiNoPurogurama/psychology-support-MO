@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "499049811436",
+    "project_id": "emoeaseapp",
+    "storage_bucket": "emoeaseapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499049811436:android:d6a95119af2f047bd304c9",
+        "android_client_info": {
+          "package_name": "com.minhtrung187.psychologysupportMO"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0teDhKX4768ULg7lg17wxLnfnBfmVzi4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
