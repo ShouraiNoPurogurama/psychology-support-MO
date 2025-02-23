@@ -12,16 +12,15 @@ import React from "react";
 import * as Google from 'expo-auth-session/providers/google';
 import { useEffect } from 'react';
 import * as WebBrowser from 'expo-web-browser';
-import '../assets' ; // Import the Google logo
+import '../assets/Google.jpg' ;
 
-const GoogleLogo = require('../assets/Google.jpg'); // Assign the Google logo to a variable
+const GoogleLogo = require('../assets/Google.jpg');
 
-WebBrowser.maybeCompleteAuthSession(); // Ensure to clear any existing auth sessions
+WebBrowser.maybeCompleteAuthSession();
 
-// The Login component
 export default function Login() {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: 'AIzaSyCA1ck7cua4ewWBYpqagjBDyIyR8XJVoWA',
+    androidClientId: '',
     webClientId: '398851471046-f7p7vh7ncamknt4shpolr7kqrevfmeue.apps.googleusercontent.com',
     clientId: '',
   });
@@ -36,7 +35,6 @@ export default function Login() {
   }, [response]);
 
   return (
-    
     <View style={styles.container}>
       <Text style={styles.title}>EmoEase</Text>
       <View style={styles.header}>
@@ -147,5 +145,4 @@ const styles = StyleSheet.create({
     marginTop: 16,
     color: 'gray',
   },
-
 });
