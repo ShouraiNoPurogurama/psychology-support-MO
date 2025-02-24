@@ -18,19 +18,23 @@ const GoogleLogo = require('../assets/Google.jpg');
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function Login() {
+export default function Login(): React.JSX.Element {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: '',
+    androidClientId: '398851471046-50fp4bk04q6kse6cbmroop1568ona7sr.apps.googleusercontent.com',
     webClientId: '398851471046-f7p7vh7ncamknt4shpolr7kqrevfmeue.apps.googleusercontent.com',
-    clientId: '',
   });
 
   useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      // Handle successful authentication here
-      console.log(authentication);
-      router.push("/home");
+    if (response) {
+      console.log('Google login response:', response);
+      if (response.type === 'success') {
+        const { authentication } = response;
+        // Handle successful authentication here
+        console.log('Authentication successful:', authentication);
+        router.push("/home");
+      } else {
+        console.log('Authentication failed:', response);
+      }
     }
   }, [response]);
 
