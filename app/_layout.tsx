@@ -13,6 +13,9 @@ export default function RootLayout() {
       <Stack.Screen name="home" />
       <Stack.Screen name="resetpass" />
       <Stack.Screen name="doctor/doctorHome" />
+      <Stack.Screen name="doctor/doctorAppointments" />
+      <Stack.Screen name="doctor/appointmentDetails" />
+      <Stack.Screen name="doctor/chatList" />
     </Stack>
   );
 }

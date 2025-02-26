@@ -1,18 +1,11 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  Image,
-} from "react-native";
-import "../global.css";
 import { router } from "expo-router";
 import React from "react";
 import * as Google from 'expo-auth-session/providers/google';
 import { useEffect } from 'react';
+import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import '../assets/Google.jpg' ;
+import '../assets/Google.jpg';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
 
 const GoogleLogo = require('../assets/Google.jpg');
 
@@ -20,7 +13,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function Login(): React.JSX.Element {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: '398851471046-50fp4bk04q6kse6cbmroop1568ona7sr.apps.googleusercontent.com',
+    androidClientId: '398851471046-27k27bpi63vn7roon2g1phl00d6a2jn6.apps.googleusercontent.com',
     webClientId: '398851471046-f7p7vh7ncamknt4shpolr7kqrevfmeue.apps.googleusercontent.com',
   });
 

@@ -5,21 +5,35 @@ import { router, usePathname } from "expo-router";
 
 export const Footer: React.FC = () => {
     const pathname = usePathname();
+    console.log('Current pathname:', pathname); // Debugging line
 
     return (
         <View style={styles.footerContainer}>
             <TouchableOpacity
-                onPress={() => pathname !== "/doctor/doctorHome" && router.push("/doctor/doctorHome")}
+                onPress={() => {
+                    if (pathname !== "/doctor/doctorHome") {
+                        console.log('Navigating to /doctor/doctorHome'); // Debugging line
+                        router.push("/doctor/doctorHome");
+                    }
+                }}
                 style={styles.button}
                 disabled={pathname === "/doctor/doctorHome"}
+                accessibilityLabel="Home"
             >
-
                 <MaterialIcons name="home" size={30} color={pathname === "/doctor/doctorHome" ? "black" : "white"} />
             </TouchableOpacity>
+            
             <TouchableOpacity 
-            onPress={() => pathname!=="/user/userChat" && router.push("/doctor/doctorChat")} 
-            style={styles.button}>
-                <MaterialIcons name="chat" size={30} color={pathname=== "/doctor/doctorChat" ? "black":"white"} />
+                onPress={() => {
+                    if (pathname !== "/doctor/chatList") {
+                        console.log('Navigating to /doctor/chatList'); // Debugging line
+                        router.push("/doctor/chatList");
+                    }
+                }} 
+                style={styles.button}
+                accessibilityLabel="Chat"
+            >
+                <MaterialIcons name="chat" size={30} color={pathname === "/doctor/chatList" ? "black" : "white"} />
             </TouchableOpacity>
         </View>
     );
