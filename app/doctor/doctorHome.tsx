@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Footer } from '../../component/doctorFooter';
 import React from 'react';
-
+import { router } from 'expo-router';
 
 export default function Home() {
     return (
@@ -10,7 +10,7 @@ export default function Home() {
                 <Text style={styles.title}>EmoEase</Text>
                 <View style={styles.content}>
                     <Text style={styles.heading}>Welcome, Doctor</Text>
-                    <TouchableOpacity style={styles.button} onPress={() => console.log('Appointment Request')}>
+                    <TouchableOpacity style={styles.button} onPress={() => router.push('/doctor/doctorAppointments')}>
                         <Text style={styles.buttonText}>Appointment Request</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.button} onPress={() => console.log('My Patients')}>

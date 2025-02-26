@@ -1,31 +1,33 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  Image,
-} from "react-native";
-import "../global.css";
 import { router } from "expo-router";
 import React from "react";
 import * as Google from 'expo-auth-session/providers/google';
 import { useEffect } from 'react';
+import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import '../assets/Google.jpg';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
+
+const GoogleLogo = require('../assets/Google.jpg');
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function Login() {
+export default function Login(): React.JSX.Element {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: 'YOUR_ANDROID_CLIENT_ID',
+    androidClientId: '398851471046-27k27bpi63vn7roon2g1phl00d6a2jn6.apps.googleusercontent.com',
     webClientId: '398851471046-f7p7vh7ncamknt4shpolr7kqrevfmeue.apps.googleusercontent.com',
   });
 
   useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      // Handle successful authentication here
-      console.log(authentication);
+    if (response) {
+      console.log('Google login response:', response);
+      if (response.type === 'success') {
+        const { authentication } = response;
+        // Handle successful authentication here
+        console.log('Authentication successful:', authentication);
+        router.push("/home");
+      } else {
+        console.log('Authentication failed:', response);
+      }
     }
   }, [response]);
 
@@ -50,24 +52,23 @@ export default function Login() {
           <Text style={styles.linkText}>Forget Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/login")}>
+        <TouchableOpacity onPress={() => router.push("/home")}>
           <Text style={styles.loginButton}>Login</Text>
         </TouchableOpacity>
+
+        <Text style={styles.footerText}>
+          Don't have an account? <Text style={styles.linkText} onPress={() => router.push("/register")}>Register</Text>
+        </Text>
 
         <TouchableOpacity
           disabled={!request}
           onPress={() => {
             promptAsync();
           }}
+          style={styles.googleButtonContainer}
         >
-          <Text style={[styles.googleButton, !request && styles.disabledButton]}>
-            Login with Google
-          </Text>
+          <Image source={GoogleLogo} style={styles.googleLogo} />
         </TouchableOpacity>
-
-        <Text style={styles.footerText}>
-          Don't have an account? <Text style={styles.linkText} onPress={() => router.push("/register")}>Register</Text>
-        </Text>
       </View>
     </View>
   );
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
   form: {
     width: '80%',
     marginTop: 20,
+    alignItems: 'center', 
   },
   input: {
     borderWidth: 2,
@@ -114,17 +116,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#AF93D2',
     color: 'white',
     paddingVertical: 16,
+    paddingHorizontal: 100,
     textAlign: 'center',
     borderRadius: 8,
     marginTop: 28,
   },
-  googleButton: {
-    backgroundColor: '#4285F4',
-    color: 'white',
-    paddingVertical: 16,
-    textAlign: 'center',
-    borderRadius: 8,
-    marginTop: 28,
+  googleButtonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4285F4', 
+    borderRadius: 50, 
+    width: 50, 
+    height: 50, 
+    marginTop: 16, 
+  },
+  googleLogo: {
+    width: 50,
+    height: 50,
   },
   disabledButton: {
     backgroundColor: '#A0A0A0',
