@@ -13,7 +13,7 @@ export default function Home() {
                     <TouchableOpacity style={styles.button} onPress={() => router.push('/doctor/doctorAppointments')}>
                         <Text style={styles.buttonText}>Appointment Request</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => console.log('My Patients')}>
+                    <TouchableOpacity style={styles.button} onPress={() => router.push('/doctor/doctorPatients')}>
                         <Text style={styles.buttonText}>My Patients</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.button} onPress={() => console.log('My Schedule')}>

@@ -16,8 +16,6 @@ export default function AppointmentDetails() {
                     <Text style={styles.age}>{age} Years, {gender}</Text>
                 </View>
                 <View style={styles.infoContainer}>
-                    <Text style={styles.label}>Appointment Date & Time</Text>
-                    <Text style={styles.info}>{date} - {time}</Text>
                     <Text style={styles.label}>Email</Text>
                     <Text style={styles.info}>{email}</Text>
                     <Text style={styles.label}>Phone</Text>
@@ -26,6 +24,8 @@ export default function AppointmentDetails() {
                     <Text style={styles.info}>{dob}</Text>
                     <Text style={styles.label}>Test Result</Text>
                     <Text style={styles.info}>{testResult}</Text>
+                    <Text style={styles.label}>Appointment Date & Time</Text>
+                    <Text style={styles.info}>{date} - {time}</Text>
                     <Text style={styles.label}>Google Meet Link</Text>
                     <TouchableOpacity onPress={() => {
                         if (typeof meetingUrl === 'string') {
@@ -39,10 +39,10 @@ export default function AppointmentDetails() {
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.declineButton}>
-                        <Text style={styles.buttonText}>Decline ❌</Text>
+                        <Text style={styles.buttonText}>Decline</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.confirmButton}>
-                        <Text style={styles.buttonText}>Confirm ✅</Text>
+                        <Text style={styles.buttonText}>Confirm</Text>
                     </TouchableOpacity>
                 </View>
             </View>
