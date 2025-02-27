@@ -17,8 +17,7 @@ const appointments = [
     name: "Jack Trinh",
     gender: "Male",
     age: 28,
-    date: "2025-02-27",
-    time: "7:00-7:30",
+    dob: "15 March 1996",
     avatar: "https://via.placeholder.com/50",
   },
   {
@@ -26,8 +25,7 @@ const appointments = [
     name: "Jack Tran",
     gender: "Female",
     age: 23,
-    date: "2025-02-27",
-    time: "8:00-8:30",
+    dob: "20 July 2001",
     avatar: "https://via.placeholder.com/50",
   },
   {
@@ -35,8 +33,7 @@ const appointments = [
     name: "Jack Phuong",
     gender: "Male",
     age: 27,
-    date: "2025-02-27",
-    time: "9:00-9:30",
+    dob: "5 May 1997",
     avatar: "https://via.placeholder.com/50",
   },
   {
@@ -44,8 +41,7 @@ const appointments = [
     name: "Jack Tuan",
     gender: "Male",
     age: 28,
-    date: "2025-02-27",
-    time: "10:00-10:30",
+    dob: "10 October 1996",
     avatar: "https://via.placeholder.com/50",
   },
   {
@@ -53,8 +49,7 @@ const appointments = [
     name: "Jack BoCon",
     gender: "Female",
     age: 42,
-    date: "2025-02-27",
-    time: "11:00-11:30",
+    dob: "12 December 1982",
     avatar: "https://via.placeholder.com/50",
   },
   {
@@ -62,8 +57,7 @@ const appointments = [
     name: "Jack BoVo",
     gender: "Male",
     age: 35,
-    date: "2025-02-27",
-    time: "12:00-12:30",
+    dob: "8 August 1989",
     avatar: "https://via.placeholder.com/50",
   },
 ];
@@ -76,7 +70,7 @@ export default function DoctorAppointments() {
           <TouchableOpacity onPress={() => router.back()}>
             <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
           </TouchableOpacity>
-          <Text style={styles.header}>Appointment Requests</Text>
+          <Text style={styles.header}>Patients</Text>
         </View>
         <FlatList
           data={appointments}
@@ -85,24 +79,21 @@ export default function DoctorAppointments() {
             <View style={styles.item}>
               <Image source={{ uri: item.avatar }} style={styles.avatar} />
               <View style={styles.info}>
-                <Text style={styles.name}>
-                  {item.name} ({item.gender}, {item.age})
-                </Text>
-                <Text style={styles.time}>
-                  {item.date} | {item.time}
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.details}>
+                  {item.gender}, {item.age}
                 </Text>
               </View>
               <TouchableOpacity
                 style={styles.detailButton}
                 onPress={() =>
                   router.push({
-                    pathname: "/doctor/appointmentDetails",
+                    pathname: "/doctor/patientDetails",
                     params: {
                       name: item.name,
                       gender: item.gender,
                       age: item.age,
-                      date: item.date,
-                      time: item.time,
+                      dob: item.dob, // ✅ Truyền thêm ngày sinh
                       avatar: item.avatar,
                     },
                   })
@@ -157,7 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  time: {
+  details: {
     fontSize: 14,
     color: "#555",
   },
