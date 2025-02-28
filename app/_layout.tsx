@@ -22,6 +22,9 @@ export default function RootLayout() {
       <Stack.Screen name="doctor/chatDetails" />
       <Stack.Screen name="doctor/doctorPatients" />
       <Stack.Screen name="doctor/patientDetails" />
+      <Stack.Screen name="doctor/medicalRecordDetails" />
+
+      {/* Patient Screens */}
     </Stack>
   );
 }

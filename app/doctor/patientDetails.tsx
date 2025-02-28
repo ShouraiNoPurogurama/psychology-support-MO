@@ -84,13 +84,20 @@ export default function PatientProfile() {
           </Text>
         </View>
         <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Medical Records</Text>
+        <Text style={styles.header}>Medical Records</Text>
           {patientData.medicalRecords.map((record) => (
             <View key={record.id} style={styles.recordItem}>
               <Text style={styles.recordText}>
                 {record.title} - {record.date}
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push({
+                    pathname: "/doctor/medicalRecordDetails",
+                    params: { id: record.id },
+                  })
+                }
+              >
                 <Text style={styles.buttonText}>{">"}</Text>
               </TouchableOpacity>
             </View>
