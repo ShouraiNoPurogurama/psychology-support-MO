@@ -21,7 +21,7 @@ const appointments = [
     age: 28,
     date: "2025-02-27",
     time: "7:00-7:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "2",
@@ -30,7 +30,7 @@ const appointments = [
     age: 23,
     date: "2025-02-27",
     time: "8:00-8:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "3",
@@ -39,7 +39,7 @@ const appointments = [
     age: 27,
     date: "2025-02-27",
     time: "9:00-9:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "4",
@@ -48,7 +48,7 @@ const appointments = [
     age: 28,
     date: "2025-02-27",
     time: "10:00-10:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "5",
@@ -57,7 +57,7 @@ const appointments = [
     age: 42,
     date: "2025-02-27",
     time: "11:00-11:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "6",
@@ -66,7 +66,7 @@ const appointments = [
     age: 35,
     date: "2025-02-27",
     time: "12:00-12:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
 ];
 
@@ -92,7 +92,17 @@ export default function DoctorAppointments() {
   );
 }
 
-const AppointmentCard = ({ item }) => {
+interface Appointment {
+  id: string;
+  name: string;
+  gender: string;
+  age: number;
+  date: string;
+  time: string;
+  avatar: string;
+}
+
+const AppointmentCard = ({ item }: { item: Appointment }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
