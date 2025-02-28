@@ -9,8 +9,9 @@ import {
 } from "react-native";
 import { Footer } from "../../component/doctorFooter";
 import { router, useLocalSearchParams } from "expo-router";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
+import { DoctorHeader } from "../../component/doctorHeader";
 
 export default function AppointmentDetails() {
   const params = useLocalSearchParams();
@@ -34,17 +35,23 @@ export default function AppointmentDetails() {
 
   return (
     <View style={styles.wrapper}>
+      <DoctorHeader />
+ 
+      <View style={styles.headerContainer}>
+      <TouchableOpacity
+  onPress={() => router.back()}
+  activeOpacity={0.7}
+  style={{ marginLeft: 10 }} // Dịch sang phải 10px
+>
+  <FontAwesome5 name="arrow-left" size={22} color="#4B3F72" light />
+</TouchableOpacity>
+<Text style={styles.header}>Appointment Details</Text>
+      </View>
+
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <FontAwesome name="arrow-left" size={22} color="#888" />
-          </TouchableOpacity>
-          <Text style={styles.header}>Appointment Details</Text>
-        </View>
-
         <View style={styles.sectionContainer}>
           <View style={styles.detailsContainer}>
             <Image source={{ uri: patientData.avatar }} style={styles.avatar} />
@@ -58,19 +65,19 @@ export default function AppointmentDetails() {
         <View style={styles.sectionContainer}>
           <Text style={styles.header}>Contact Information</Text>
           <View style={styles.row}>
-            <FontAwesome
+            <FontAwesome5
               name="envelope"
               size={18}
-              color="#555"
+              color="#4B3F72"
               style={styles.icon}
             />
             <Text style={styles.info}>{patientData.email}</Text>
           </View>
           <View style={styles.row}>
-            <FontAwesome
+            <FontAwesome5
               name="phone"
               size={18}
-              color="#555"
+              color="#4B3F72"
               style={styles.icon}
             />
             <Text style={styles.info}>{patientData.phone}</Text>
@@ -98,10 +105,10 @@ export default function AppointmentDetails() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.declineButton}>
+          <TouchableOpacity style={styles.declineButton} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Decline</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.confirmButton}>
+          <TouchableOpacity style={styles.confirmButton} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Confirm</Text>
           </TouchableOpacity>
         </View>
@@ -114,20 +121,23 @@ export default function AppointmentDetails() {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
+    backgroundColor: "#F7F6FB",
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 50,
+    paddingTop: 10,
     paddingHorizontal: 20,
   },
   sectionContainer: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 15,
     marginBottom: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   headerContainer: {
     flexDirection: "row",
@@ -135,9 +145,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   header: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#AF93D2",
+    color: "#4B3F72",
     marginLeft: 10,
   },
   detailsContainer: {
@@ -148,6 +158,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "#AF93D2",
     marginBottom: 10,
   },
   name: {
@@ -161,7 +173,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#999",
+    color: "#777",
     marginTop: 10,
   },
   info: {
@@ -186,7 +198,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   confirmButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#2ECC71",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 10,

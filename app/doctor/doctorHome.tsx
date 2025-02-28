@@ -1,32 +1,66 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { Footer } from "../../component/doctorFooter";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import React from "react";
-import { router } from "expo-router";
+import { DoctorHeader } from "../../component/doctorHeader";
+import { Footer } from "../../component/doctorFooter";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+
+const avatarUrl =
+  "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577";
+const bannerUrl =
+  "https://file.hstatic.net/200000256325/article/auc1576544994_a7cc6e2aaa604d3c86351b929f853a9e.jpg";
+const doctorName = "Dr. John Doe";
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <>
+      <DoctorHeader avatarUrl={avatarUrl} />
       <View style={styles.container}>
-        <Text style={styles.title}>EmoEase</Text>
-        <View style={styles.content}>
-          <Text style={styles.heading}>Welcome, Doctor</Text>
+        {/* Avatar + Chào đón */}
+        <View style={styles.profileSection}>
+          <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+          <Text style={styles.title}>Welcome, {doctorName}</Text>
+        </View>
+
+        {/* Hình ảnh minh họa với hiệu ứng gradient */}
+        <View style={styles.bannerContainer}>
+          <Image source={{ uri: bannerUrl }} style={styles.banner} />
+          <LinearGradient
+            colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.5)"]}
+            style={styles.bannerOverlay}
+          />
+        </View>
+
+        {/* Nút điều hướng */}
+        <View style={styles.cardContainer}>
           <TouchableOpacity
-            style={styles.button}
+            style={styles.card}
+            activeOpacity={0.8}
             onPress={() => router.push("/doctor/doctorAppointments")}
           >
-            <Text style={styles.buttonText}>Appointment Request</Text>
+            <MaterialIcons name="event" size={32} color="#AF93D2" />
+            <Text style={styles.cardText}>Appointment Request</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-            style={styles.button}
+            style={styles.card}
+            activeOpacity={0.8}
             onPress={() => router.push("/doctor/doctorPatients")}
           >
-            <Text style={styles.buttonText}>My Patients</Text>
+            <MaterialIcons name="group" size={32} color="#AF93D2" />
+            <Text style={styles.cardText}>My Patients</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-            style={styles.button}
+            style={styles.card}
+            activeOpacity={0.8}
             onPress={() => console.log("My Schedule")}
           >
-            <Text style={styles.buttonText}>My Schedule</Text>
+            <MaterialIcons name="schedule" size={32} color="#AF93D2" />
+            <Text style={styles.cardText}>My Schedule</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -38,37 +72,72 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F7F6FB",
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 50,
+    paddingTop: 20,
+  },
+  profileSection: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  avatar: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 2,
+    borderColor: "#AF93D2",
+    marginBottom: 10,
   },
   title: {
-    fontSize: 48,
-    fontWeight: "bold",
-    color: "#AF93D2",
-    marginBottom: 20,
-  },
-  content: {
-    width: "80%",
-    alignItems: "center",
-  },
-  heading: {
     fontSize: 24,
     fontWeight: "bold",
+    color: "#4B3F72",
+  },
+  bannerContainer: {
+    width: "90%",
+    alignItems: "center",
+    borderRadius: 10,
+    overflow: "hidden",
     marginBottom: 20,
   },
-  button: {
-    backgroundColor: "#AF93D2",
+  banner: {
     width: "100%",
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 15,
+    height: 160,
+    borderRadius: 10,
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
+  bannerOverlay: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
+  cardContainer: {
+    width: "90%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+  },
+  card: {
+    width: "45%",
+    backgroundColor: "white",
+    borderRadius: 15,
+    paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 15,
+    elevation: 5, // Shadow Android
+    shadowColor: "#000", // Shadow iOS
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    transform: [{ scale: 1 }],
+  },
+  cardText: {
+    marginTop: 10,
+    fontSize: 15,
     fontWeight: "bold",
+    color: "#4B3F72",
   },
 });
+
