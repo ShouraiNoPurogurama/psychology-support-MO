@@ -106,10 +106,10 @@ export default function AppointmentDetails() {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.declineButton} activeOpacity={0.8}>
-            <Text style={styles.buttonText}>Decline</Text>
+            <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.confirmButton} activeOpacity={0.8}>
-            <Text style={styles.buttonText}>Confirm</Text>
+            <Text style={styles.buttonText}>Complete</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

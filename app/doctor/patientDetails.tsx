@@ -19,7 +19,8 @@ export default function PatientProfile() {
     name: name || "Unknown",
     gender: gender || "Unknown",
     age: age || "Unknown",
-    avatar: typeof avatar === "string" ? avatar : "https://via.placeholder.com/100",
+    avatar:
+      typeof avatar === "string" ? avatar : "https://via.placeholder.com/100",
     dob: dob || "Unknown",
     email: "johndoe@example.com",
     phone: "+123456789",
@@ -36,21 +37,22 @@ export default function PatientProfile() {
     <View style={styles.wrapper}>
       <DoctorHeader />
       <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
-          </TouchableOpacity>
-          <Text style={styles.header}>Patient Profile</Text>
-        </View>
+        <TouchableOpacity onPress={() => router.back()}>
+          <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
+        </TouchableOpacity>
+        <Text style={styles.header}>Patient Profile</Text>
+      </View>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        
         <View style={styles.sectionContainer}>
           <View style={styles.profileContainer}>
             <Image source={{ uri: patientData.avatar }} style={styles.avatar} />
             <Text style={styles.name}>{patientData.name}</Text>
-            <Text style={styles.gender}>{patientData.gender}, {patientData.age}</Text>
+            <Text style={styles.gender}>
+              {patientData.gender}, {patientData.age}
+            </Text>
             <Text style={styles.dob}>{patientData.dob}</Text>
           </View>
         </View>
@@ -81,7 +83,7 @@ export default function PatientProfile() {
           </Text>
         </View>
         <View style={styles.sectionContainer}>
-        <Text style={styles.headerSection}>Medical Records</Text>
+          <Text style={styles.headerSection}>Medical Records</Text>
           {patientData.medicalRecords.map((record) => (
             <View key={record.id} style={styles.recordItem}>
               <Text style={styles.recordText}>

@@ -21,7 +21,8 @@ const appointments = [
     age: 28,
     date: "2025-02-27",
     time: "7:00-7:30",
-    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "2",
@@ -30,7 +31,8 @@ const appointments = [
     age: 23,
     date: "2025-02-27",
     time: "8:00-8:30",
-    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "3",
@@ -39,7 +41,8 @@ const appointments = [
     age: 27,
     date: "2025-02-27",
     time: "9:00-9:30",
-    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "4",
@@ -48,7 +51,8 @@ const appointments = [
     age: 28,
     date: "2025-02-27",
     time: "10:00-10:30",
-    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "5",
@@ -57,7 +61,8 @@ const appointments = [
     age: 42,
     date: "2025-02-27",
     time: "11:00-11:30",
-    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "6",
@@ -66,7 +71,8 @@ const appointments = [
     age: 35,
     date: "2025-02-27",
     time: "12:00-12:30",
-    avatar: "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
 ];
 
@@ -120,7 +126,9 @@ const AppointmentCard = ({ item }: { item: Appointment }) => {
   };
 
   return (
-    <Animated.View style={[styles.item, { transform: [{ scale: scaleValue }] }]}>
+    <Animated.View
+      style={[styles.item, { transform: [{ scale: scaleValue }] }]}
+    >
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
       <View style={styles.info}>
         <Text style={styles.name}>

@@ -57,7 +57,7 @@ export default function Home() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => console.log("My Schedule")}
+            onPress={() => router.push("/doctor/doctorSchedule")}
           >
             <MaterialIcons name="schedule" size={32} color="#AF93D2" />
             <Text style={styles.cardText}>My Schedule</Text>
@@ -140,4 +140,3 @@ const styles = StyleSheet.create({
     color: "#4B3F72",
   },
 });
-

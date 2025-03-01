@@ -1,5 +1,11 @@
 // MedicalRecordDetails.tsx
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -7,7 +13,16 @@ import { router, useLocalSearchParams } from "expo-router";
 export default function MedicalRecordDetails() {
   const { id } = useLocalSearchParams() as { id?: string };
 
-  const medicalRecords: { [key: string]: { title: string; date: string; diagnosis: string; treatment: string; doctor: string; notes: string } } = {
+  const medicalRecords: {
+    [key: string]: {
+      title: string;
+      date: string;
+      diagnosis: string;
+      treatment: string;
+      doctor: string;
+      notes: string;
+    };
+  } = {
     "1": {
       title: "Medical Record 1",
       date: "10 Jan 2024",
@@ -37,9 +52,15 @@ export default function MedicalRecordDetails() {
 
   return (
     <View style={styles.wrapper}>
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
           </TouchableOpacity>
           <Text style={styles.header}>Medical Record Details</Text>

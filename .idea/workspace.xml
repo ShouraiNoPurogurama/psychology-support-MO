@@ -18,12 +18,10 @@
   <component name="ChangeListManager">
     <list default="true" id="180213db-7765-4c3a-b4cf-a5c13d0254e7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/doctor/appointmentDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctor/appointmentDetails.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/doctor/doctorAppointments.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctor/doctorAppointments.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/doctor/doctorHome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctor/doctorHome.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/doctor/doctorPatients.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctor/doctorPatients.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/component/doctorFooter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/doctorFooter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/doctor/updateProfile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctor/updateProfile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

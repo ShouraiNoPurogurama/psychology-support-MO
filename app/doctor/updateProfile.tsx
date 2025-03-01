@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import { useLocalSearchParams, router } from "expo-router";
@@ -43,7 +44,6 @@ export default function UpdateProfile() {
   );
 
   const handleSave = () => {
-    // Gửi dữ liệu cập nhật đến server hoặc lưu vào state
     console.log("Updated Profile:", {
       name,
       specialty,
@@ -55,73 +55,86 @@ export default function UpdateProfile() {
       certificates,
       avatar,
     });
-    router.back(); // Quay lại màn hình trước đó
+    router.back();
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Edit Profile</Text>
+      {/* Phần thông tin có thể cuộn */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.header}>Edit Profile</Text>
 
-      <Image source={{ uri: avatar }} style={styles.avatar} />
+        <Image source={{ uri: avatar }} style={styles.avatar} />
 
-      <Text style={styles.label}>Name</Text>
-      <TextInput style={styles.input} value={name} onChangeText={setName} />
+        <Text style={styles.label}>Name</Text>
+        <TextInput style={styles.input} value={name} onChangeText={setName} />
 
-      <Text style={styles.label}>Specialty</Text>
-      <TextInput
-        style={styles.input}
-        value={specialty}
-        onChangeText={setSpecialty}
-      />
+        <Text style={styles.label}>Specialty</Text>
+        <TextInput
+          style={styles.input}
+          value={specialty}
+          onChangeText={setSpecialty}
+        />
 
-      <Text style={styles.label}>Experience (years)</Text>
-      <TextInput
-        style={styles.input}
-        value={experience}
-        onChangeText={setExperience}
-        keyboardType="numeric"
-      />
+        <Text style={styles.label}>Experience (years)</Text>
+        <TextInput
+          style={styles.input}
+          value={experience}
+          onChangeText={setExperience}
+          keyboardType="numeric"
+        />
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
 
-      <Text style={styles.label}>Phone</Text>
-      <TextInput
-        style={styles.input}
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
-      />
+        <Text style={styles.label}>Phone</Text>
+        <TextInput
+          style={styles.input}
+          value={phone}
+          onChangeText={setPhone}
+          keyboardType="phone-pad"
+        />
 
-      <Text style={styles.label}>Address</Text>
-      <TextInput
-        style={styles.input}
-        value={address}
-        onChangeText={setAddress}
-      />
+        <Text style={styles.label}>Address</Text>
+        <TextInput
+          style={styles.input}
+          value={address}
+          onChangeText={setAddress}
+        />
 
-      <Text style={styles.label}>Workplace</Text>
-      <TextInput
-        style={styles.input}
-        value={workplace}
-        onChangeText={setWorkplace}
-      />
+        <Text style={styles.label}>Workplace</Text>
+        <TextInput
+          style={styles.input}
+          value={workplace}
+          onChangeText={setWorkplace}
+        />
 
-      <Text style={styles.label}>Certificates</Text>
-      <TextInput
-        style={styles.input}
-        value={certificates}
-        onChangeText={setCertificates}
-      />
+        <Text style={styles.label}>Certificates</Text>
+        <TextInput
+          style={styles.input}
+          value={certificates}
+          onChangeText={setCertificates}
+        />
+      </ScrollView>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save Changes</Text>
-      </TouchableOpacity>
+      {/* Nút Save & Cancel cố định ở dưới */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.buttonText}>Save Changes</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.buttonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -130,7 +143,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  scrollContainer: {
     padding: 20,
+    paddingBottom: 100, // Tránh bị che bởi nút
   },
   header: {
     fontSize: 24,
@@ -162,12 +178,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: "#f9f9f9",
   },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   saveButton: {
     backgroundColor: "#6A8CAF",
-    padding: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 8,
+    flex: 1,
+    marginRight: 10,
     alignItems: "center",
-    marginTop: 20,
+  },
+  cancelButton: {
+    backgroundColor: "#D9534F",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 10,
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",
