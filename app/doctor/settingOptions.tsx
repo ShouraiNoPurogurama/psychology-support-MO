@@ -7,9 +7,21 @@ export default function SettingOptions() {
   const router = useRouter();
 
   const settings = [
-    { name: "Profile Settings", route: "/doctor/profileSettings", icon: "person" },
-    { name: "Notifications", route: "/doctor/notificationSettings", icon: "notifications" },
-    { name: "Privacy & Security", route: "/doctor/securitySettings", icon: "lock" },
+    {
+      name: "Profile Settings",
+      route: "/doctor/profileSettings",
+      icon: "person",
+    },
+    {
+      name: "Notifications",
+      route: "/doctor/notificationSettings",
+      icon: "notifications",
+    },
+    {
+      name: "Privacy & Security",
+      route: "/doctor/securitySettings",
+      icon: "lock",
+    },
     { name: "About App", route: "/doctor/about", icon: "info" },
   ];
 
@@ -17,7 +29,10 @@ export default function SettingOptions() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.replace("/doctor/doctorHome")} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.replace("/doctor/doctorHome")}
+          style={styles.backButton}
+        >
           <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Settings</Text>
@@ -32,7 +47,12 @@ export default function SettingOptions() {
             onPress={() => router.push(item.route)}
           >
             <View style={styles.iconTextContainer}>
-              <MaterialIcons name={item.icon as any} size={24} color="#AF93D2" style={styles.icon} />
+              <MaterialIcons
+                name={item.icon as any}
+                size={24}
+                color="#AF93D2"
+                style={styles.icon}
+              />
               <Text style={styles.settingText}>{item.name}</Text>
             </View>
             <MaterialIcons name="chevron-right" size={24} color="#666" />
@@ -87,5 +107,3 @@ const styles = StyleSheet.create({
     color: "#333",
   },
 });
-
-

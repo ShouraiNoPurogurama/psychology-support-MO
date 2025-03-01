@@ -3,6 +3,21 @@ import React from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
+const doctorInfo = {
+  name: "Dr. Nguyen Van Minh",
+  specialty: "Clinical Psychology",
+  experience: 10,
+  rating: 4.8,
+  totalReviews: 120,
+  patientsTreated: 350,
+  phone: "0987654321",
+  email: "minh.nguyen@hospital.com",
+  address: "123 ABC Street, District 1, Ho Chi Minh City",
+  certificates: "Psychology Certification - University of Medicine and Pharmacy",
+  workplace: "Central Mental Health Hospital",
+  avatar: "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577",
+};
+
 export const DoctorHeader: React.FC<{ avatarUrl?: string }> = ({ avatarUrl }) => {
   return (
     <View style={styles.headerContainer}>
@@ -13,9 +28,11 @@ export const DoctorHeader: React.FC<{ avatarUrl?: string }> = ({ avatarUrl }) =>
       </TouchableOpacity>
 
       {/* Góc phải: Avatar bác sĩ */}
-      <TouchableOpacity onPress={() => router.push("/doctor/profile")}>
+      <TouchableOpacity
+        onPress={() => router.push({ pathname: "/doctor/doctorProfile", params: doctorInfo })}
+      >
         <Image
-          source={{ uri: avatarUrl || "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577" }} 
+          source={{ uri: avatarUrl || doctorInfo.avatar }}
           style={styles.avatar}
         />
       </TouchableOpacity>
