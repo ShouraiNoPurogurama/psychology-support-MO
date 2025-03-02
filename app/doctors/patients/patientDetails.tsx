@@ -37,8 +37,13 @@ export default function PatientProfile() {
     <View style={styles.wrapper}>
       <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={24} color="#6C63FF" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
         </TouchableOpacity>
         <Text style={styles.header}>Patient Profile</Text>
       </View>
@@ -58,35 +63,58 @@ export default function PatientProfile() {
         </View>
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>
-            <FontAwesome5 name="address-book" size={24} color="#6C63FF" /> Contact Information
+            <FontAwesome5 name="address-book" size={24} color="#6C63FF" />{" "}
+            Contact Information
           </Text>
           <View style={styles.iconRow}>
-            <FontAwesome5 name="envelope" size={18} color="#6C63FF" style={styles.icon} />
+            <FontAwesome5
+              name="envelope"
+              size={18}
+              color="#6C63FF"
+              style={styles.icon}
+            />
             <Text style={styles.info}>{patientData.email}</Text>
           </View>
           <View style={styles.iconRow}>
-            <FontAwesome5 name="phone" size={18} color="#6C63FF" style={styles.icon} />
+            <FontAwesome5
+              name="phone"
+              size={18}
+              color="#6C63FF"
+              style={styles.icon}
+            />
             <Text style={styles.info}>{patientData.phone}</Text>
           </View>
         </View>
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>
-            <FontAwesome5 name="heartbeat" size={24} color="#6C63FF" /> Health Condition
+            <FontAwesome5 name="heartbeat" size={24} color="#6C63FF" /> Health
+            Condition
           </Text>
           <Text style={styles.subHeader}>Medical History</Text>
-          <Text style={styles.info}>{patientData.medicalHistory || "No medical history available"}</Text>
+          <Text style={styles.info}>
+            {patientData.medicalHistory || "No medical history available"}
+          </Text>
           <Text style={styles.subHeader}>Allergies</Text>
-          <Text style={styles.info}>{patientData.allergies || "No allergies reported"}</Text>
+          <Text style={styles.info}>
+            {patientData.allergies || "No allergies reported"}
+          </Text>
           <Text style={styles.subHeader}>Personality Traits</Text>
-          <Text style={styles.info}>{patientData.personalityTraits || "No personality traits reported"}</Text>
+          <Text style={styles.info}>
+            {patientData.personalityTraits || "No personality traits reported"}
+          </Text>
         </View>
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>
-            <FontAwesome5 name="file-medical" size={24} color="#6C63FF" /> Medical Records
+            <FontAwesome5 name="file-medical" size={24} color="#6C63FF" />{" "}
+            Medical Records
           </Text>
           {patientData.medicalRecords.map((record) => (
             <View key={record.id} style={styles.recordItem}>
-              <Text style={styles.recordText} numberOfLines={1} ellipsizeMode="tail">
+              <Text
+                style={styles.recordText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {record.title} - {record.date}
               </Text>
               <TouchableOpacity
@@ -125,7 +153,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#6C63FF",
-    marginLeft: 15,
+    marginLeft: 40,
   },
   container: {
     flex: 1,
@@ -142,6 +170,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     shadowColor: "#000",
     elevation: 4,
+  },
+  backButton: {
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
   },
   profileContainer: {
     alignItems: "center",

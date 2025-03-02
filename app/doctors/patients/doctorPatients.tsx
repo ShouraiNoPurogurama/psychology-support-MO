@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import React from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { DoctorHeader } from "../../../component/doctorHeader";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const appointments = [
   {
@@ -106,8 +107,13 @@ export default function DoctorPatients() {
     <>
       <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={24} color="#4B3F72" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
         </TouchableOpacity>
         <Text style={styles.header}>Patients</Text>
       </View>
@@ -154,7 +160,7 @@ export default function DoctorPatients() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F6FB", 
+    backgroundColor: "#F7F6FB",
     paddingTop: 20,
     paddingHorizontal: 20,
   },
@@ -168,7 +174,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "#4B3F72",
-    marginLeft: 10, 
+    marginLeft: 40,
   },
   item: {
     flexDirection: "row",
@@ -182,6 +188,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+  },
+  backButton: {
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
   },
   avatar: {
     width: 60,
@@ -204,7 +224,7 @@ const styles = StyleSheet.create({
     color: "#777",
   },
   detailButton: {
-    backgroundColor: "#4CAF50", 
+    backgroundColor: "#4CAF50",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 15,

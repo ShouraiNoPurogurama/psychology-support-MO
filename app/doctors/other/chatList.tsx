@@ -10,7 +10,7 @@ import {
 import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 
 const chatData = [
   {
@@ -41,10 +41,12 @@ export default function ChatList() {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
-            onPress={() => router.push("/doctors/doctorHome")}
+            onPress={() => router.back()}
             style={styles.backButton}
           >
-            <FontAwesome name="arrow-left" size={20} color="#888" />
+            <View style={styles.backButtonContent}>
+              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+            </View>
           </TouchableOpacity>
           <Text style={styles.header}>Chat</Text>
           <FontAwesome
@@ -108,13 +110,24 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    padding: 5,
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
   },
   header: {
     fontSize: 30,
     fontWeight: "bold",
     color: "#AF93D2",
-    marginLeft: 10,
+    marginLeft: 50,
   },
   searchBar: {
     backgroundColor: "#F2F2F2",

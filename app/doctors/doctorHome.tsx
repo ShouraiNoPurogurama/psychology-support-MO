@@ -6,12 +6,16 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
-
 const avatarUrl =
   "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577";
+
 const bannerUrl =
   "https://file.hstatic.net/200000256325/article/auc1576544994_a7cc6e2aaa604d3c86351b929f853a9e.jpg";
-const doctorName = "Dr. John Doe";
+
+const bottomBannerImage =
+  "https://png.pngtree.com/png-clipart/20190614/original/pngtree-background-of-cartoon-doctor-characters-png-image_3709009.jpg";
+
+const doctorName = "Dr. Nguyen Van Minh";
 
 export default function Home() {
   const router = useRouter();
@@ -20,13 +24,12 @@ export default function Home() {
     <>
       <DoctorHeader avatarUrl={avatarUrl} />
       <View style={styles.container}>
- 
         <View style={styles.profileSection}>
           <Image source={{ uri: avatarUrl }} style={styles.avatar} />
           <Text style={styles.title}>Welcome, {doctorName}</Text>
         </View>
 
-
+        {/* Banner chính */}
         <View style={styles.bannerContainer}>
           <Image source={{ uri: bannerUrl }} style={styles.banner} />
           <LinearGradient
@@ -35,12 +38,14 @@ export default function Home() {
           />
         </View>
 
-
+        {/* Các thẻ chức năng */}
         <View style={styles.cardContainer}>
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => router.push("/doctors/appointments/doctorAppointments")}
+            onPress={() =>
+              router.push("/doctors/appointments/doctorAppointments")
+            }
           >
             <MaterialIcons name="event" size={32} color="#AF93D2" />
             <Text style={styles.cardText}>Appointment Request</Text>
@@ -58,11 +63,45 @@ export default function Home() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => router.push("/doctors/workingSchedules/doctorSchedules")}
+            onPress={() =>
+              router.push("/doctors/workingSchedules/doctorSchedules")
+            }
           >
             <MaterialIcons name="schedule" size={32} color="#AF93D2" />
             <Text style={styles.cardText}>My Schedule</Text>
           </TouchableOpacity>
+
+          {/* Lịch sử khám bệnh */}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.8}
+            onPress={() =>
+              router.push("/doctors/treatmentHistory/doctorTreatmentHistory")
+            }
+          >
+            <MaterialIcons name="history" size={32} color="#AF93D2" />
+            <Text style={styles.cardText}>Treatment History</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.bottomBannerContainer}>
+          <View style={styles.imageWrapper}>
+            <Image
+              source={{ uri: bottomBannerImage }}
+              style={styles.bottomBannerImage}
+            />
+            <LinearGradient
+              colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.5)"]}
+              style={styles.bottomBannerOverlay}
+            />
+          </View>
+
+          <View style={styles.bottomBannerTextContainer}>
+            <Text style={styles.bannerTitle}>Your dedication saves lives</Text>
+            <Text style={styles.bannerSubtitle}>
+              Keep making a difference every day!
+            </Text>
+          </View>
         </View>
       </View>
       <Footer />
@@ -138,5 +177,46 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     color: "#4B3F72",
+  },
+  bottomBannerContainer: {
+    flexDirection: "row",
+    width: "90%",
+    backgroundColor: "#AF93D2",
+    borderRadius: 10,
+    overflow: "hidden",
+    marginTop: 20,
+  },
+  imageWrapper: {
+    flex: 1,
+    position: "relative",
+  },
+  bottomBannerImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  bottomBannerOverlay: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.3)", // Hiệu ứng tối nhẹ
+  },
+  bottomBannerTextContainer: {
+    flex: 1,
+    padding: 15,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  bannerTitle: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  bannerSubtitle: {
+    color: "white",
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 5,
   },
 });

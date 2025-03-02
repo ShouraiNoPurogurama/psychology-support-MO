@@ -41,10 +41,11 @@ export default function AppointmentDetails() {
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}
-          activeOpacity={0.7}
-          style={{ marginLeft: 10 }}
+          style={styles.backButton}
         >
-          <FontAwesome5 name="arrow-left" size={22} color="#4B3F72" light />
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
         </TouchableOpacity>
         <Text style={styles.header}>Appointment Details</Text>
       </View>
@@ -149,7 +150,21 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "#4B3F72",
-    marginLeft: 10,
+    marginLeft: 50,
+  },
+  backButton: {
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
   },
   detailsContainer: {
     alignItems: "center",

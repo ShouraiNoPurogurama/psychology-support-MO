@@ -5,6 +5,7 @@ import {
   FlatList,
   StyleSheet,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { DoctorHeader } from "../../../component/doctorHeader";
@@ -108,22 +109,19 @@ export default function DoctorSchedule() {
     <>
       <DoctorHeader />
       <View style={styles.container}>
-        {/* Header */}
         <View style={styles.headerContainer}>
-          <Pressable
+          <TouchableOpacity
             onPress={() => router.back()}
-            style={({ pressed }) => [
-              styles.backButton,
-              { opacity: pressed ? 0.5 : 1 }, // Hiệu ứng mờ khi nhấn
-            ]}
+            style={styles.backButton}
           >
-            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-          </Pressable>
+            <View style={styles.backButtonContent}>
+              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+            </View>
+          </TouchableOpacity>
 
           <Text style={styles.headerTitle}>Working Schedule</Text>
         </View>
 
-        {/* Calendar */}
         <View style={styles.calendarContainer}>
           <Calendar
             current={today}
@@ -156,7 +154,6 @@ export default function DoctorSchedule() {
           />
         </View>
 
-        {/* Appointment List */}
         <Text style={styles.title}>
           {patients.length > 0
             ? `Patients scheduled on ${formatDate(selectedDate)}`
@@ -169,7 +166,7 @@ export default function DoctorSchedule() {
           renderItem={({ item }) => (
             <Pressable
               style={styles.patientItem}
-              onPress={() => handleAppointmentPress(item)}
+              onTouchStart={() => handleAppointmentPress(item)}
             >
               <Text style={styles.patientName}>{item.name}</Text>
               <Text style={styles.patientTime}>{item.time}</Text>
@@ -198,8 +195,18 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    left: 10, // Căn lề trái
-    padding: 10,
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.05)",
   },
   headerTitle: {
     flex: 1,

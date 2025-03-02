@@ -13,7 +13,7 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState, useEffect, useRef } from "react";
 
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { Footer } from "../../../component/doctorFooter";
 
 export default function ChatScreen() {
@@ -70,7 +70,9 @@ export default function ChatScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <FontAwesome name="arrow-left" size={20} color="#fff" />
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
         </TouchableOpacity>
         <Image
           source={{ uri: Array.isArray(avatar) ? avatar[0] : avatar }}
@@ -128,8 +130,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#AF93D2",
   },
   backButton: {
-    padding: 5,
-    marginRight: 10,
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.05)",
   },
   avatar: {
     width: 40,
