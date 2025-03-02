@@ -12,6 +12,7 @@ import { router } from "expo-router";
 import React, { useRef } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { DoctorHeader } from "../../../component/doctorHeader";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const appointments = [
   {
@@ -81,8 +82,13 @@ export default function DoctorAppointments() {
     <>
       <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-          <MaterialIcons name="arrow-back" size={28} color="#6D5BA5" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
         </TouchableOpacity>
         <Text style={styles.header}>Appointment Requests</Text>
       </View>
@@ -181,8 +187,23 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#4B3F72",
-    marginLeft: 15,
+    marginLeft: 35,
   },
+  backButton: {
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
+  },
+
   item: {
     flexDirection: "row",
     alignItems: "center",
@@ -190,7 +211,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     backgroundColor: "white",
-    elevation: 4, 
+    elevation: 4,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 5,

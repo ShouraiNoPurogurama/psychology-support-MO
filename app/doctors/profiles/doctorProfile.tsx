@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React from "react";
 
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { DoctorHeader } from "../../../component/doctorHeader";
 import { Footer } from "../../../component/doctorFooter";
@@ -37,8 +37,13 @@ export default function DoctorProfile() {
     <View style={styles.wrapper}>
       <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
         </TouchableOpacity>
         <Text style={styles.header}>Doctor Profile</Text>
       </View>
@@ -47,7 +52,6 @@ export default function DoctorProfile() {
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-       
         <View style={styles.sectionContainer}>
           <View style={styles.profileContainer}>
             <Image
@@ -63,7 +67,6 @@ export default function DoctorProfile() {
           </View>
         </View>
 
-        
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>Contact Information</Text>
           <View style={styles.iconRow}>
@@ -76,7 +79,6 @@ export default function DoctorProfile() {
           </View>
         </View>
 
-       
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>Statistics</Text>
           <Text style={styles.statText}>
@@ -87,7 +89,6 @@ export default function DoctorProfile() {
           </Text>
         </View>
 
-       
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>Additional Information</Text>
           <Text style={styles.info}>🏥 {doctor.workplace}</Text>
@@ -95,12 +96,14 @@ export default function DoctorProfile() {
           <Text style={styles.info}>📍 {doctor.address}</Text>
         </View>
 
-       
         <View style={styles.sectionContainer}>
           <TouchableOpacity
             style={styles.editButton}
             onPress={() =>
-              router.push({ pathname: "/doctors/profiles/updateProfile", params: doctor })
+              router.push({
+                pathname: "/doctors/profiles/updateProfile",
+                params: doctor,
+              })
             }
           >
             <Text style={styles.buttonText}>✏️ Edit Profile</Text>
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#AF93D2",
-    marginLeft: 8,
+    marginLeft: 50,
     flex: 1,
   },
   headerSection: {
@@ -152,6 +155,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#AF93D2",
     marginBottom: 10,
+  },
+  backButton: {
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
   },
   profileContainer: {
     alignItems: "center",

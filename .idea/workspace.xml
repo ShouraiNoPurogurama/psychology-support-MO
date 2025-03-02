@@ -16,7 +16,11 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="180213db-7765-4c3a-b4cf-a5c13d0254e7" name="Changes" comment="" />
+    <list default="true" id="180213db-7765-4c3a-b4cf-a5c13d0254e7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/doctors/workingSchedules/doctorSchedules.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctors/workingSchedules/doctorSchedules.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
