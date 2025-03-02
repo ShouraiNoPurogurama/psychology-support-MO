@@ -19,13 +19,13 @@ export default function Home() {
     <>
       <DoctorHeader avatarUrl={avatarUrl} />
       <View style={styles.container}>
-        {/* Avatar + Chào đón */}
+ 
         <View style={styles.profileSection}>
           <Image source={{ uri: avatarUrl }} style={styles.avatar} />
           <Text style={styles.title}>Welcome, {doctorName}</Text>
         </View>
 
-        {/* Hình ảnh minh họa với hiệu ứng gradient */}
+
         <View style={styles.bannerContainer}>
           <Image source={{ uri: bannerUrl }} style={styles.banner} />
           <LinearGradient
@@ -34,7 +34,7 @@ export default function Home() {
           />
         </View>
 
-        {/* Nút điều hướng */}
+
         <View style={styles.cardContainer}>
           <TouchableOpacity
             style={styles.card}
