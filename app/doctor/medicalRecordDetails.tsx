@@ -1,4 +1,3 @@
-// MedicalRecordDetails.tsx
 import {
   View,
   Text,
@@ -7,22 +6,13 @@ import {
   ScrollView,
 } from "react-native";
 import React from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 export default function MedicalRecordDetails() {
   const { id } = useLocalSearchParams() as { id?: string };
 
-  const medicalRecords: {
-    [key: string]: {
-      title: string;
-      date: string;
-      diagnosis: string;
-      treatment: string;
-      doctor: string;
-      notes: string;
-    };
-  } = {
+  const medicalRecords = {
     "1": {
       title: "Medical Record 1",
       date: "10 Jan 2024",
@@ -30,14 +20,12 @@ export default function MedicalRecordDetails() {
       treatment: "Prescribed medication and lifestyle changes",
       doctor: "Dr. John Smith",
       notes: "Regular blood pressure checks recommended.",
-    },
-    "2": {
-      title: "Medical Record 2",
-      date: "15 Feb 2024",
-      diagnosis: "Diabetes",
-      treatment: "Insulin therapy and diet control",
-      doctor: "Dr. Alice Brown",
-      notes: "Monitor blood sugar levels daily.",
+      physicalSymptoms: ["Fatigue", "Dizziness"],
+      mentalDisorders: ["Anxiety Disorder"],
+      therapeuticActivities: ["Meditation", "Cognitive Behavioral Therapy"],
+      physicalActivities: ["Jogging", "Yoga"],
+      foodPreferences: ["Like: Vegetables", "Dislike: Fast Food"],
+      entertainmentPreferences: ["Like: Reading", "Neutral: Movies"],
     },
   };
 
@@ -48,6 +36,12 @@ export default function MedicalRecordDetails() {
     treatment: "N/A",
     doctor: "N/A",
     notes: "No details available.",
+    physicalSymptoms: [],
+    mentalDisorders: [],
+    therapeuticActivities: [],
+    physicalActivities: [],
+    foodPreferences: [],
+    entertainmentPreferences: [],
   };
 
   return (
@@ -61,26 +55,55 @@ export default function MedicalRecordDetails() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
+            <MaterialIcons name="arrow-back" size={24} color="#6C63FF" />
           </TouchableOpacity>
           <Text style={styles.header}>Medical Record Details</Text>
         </View>
 
-        <View style={styles.sectionContainer}>
+        <View style={styles.card}>
           <Text style={styles.title}>{record.title}</Text>
           <Text style={styles.date}>{record.date}</Text>
 
-          <Text style={styles.label}>Diagnosis</Text>
-          <Text style={styles.info}>{record.diagnosis}</Text>
+          {[
+            {
+              icon: "notes-medical",
+              label: "Diagnosis",
+              value: record.diagnosis,
+            },
+            { icon: "pills", label: "Treatment", value: record.treatment },
+            { icon: "user-md", label: "Doctor", value: record.doctor },
+            { icon: "clipboard-list", label: "Notes", value: record.notes },
+          ].map((item, index) => (
+            <View style={styles.section} key={index}>
+              <FontAwesome5 name={item.icon} size={18} color="#6C63FF" />
+              <Text style={styles.label}>{item.label}</Text>
+              <Text style={styles.info}>{item.value}</Text>
+            </View>
+          ))}
 
-          <Text style={styles.label}>Treatment</Text>
-          <Text style={styles.info}>{record.treatment}</Text>
-
-          <Text style={styles.label}>Doctor</Text>
-          <Text style={styles.info}>{record.doctor}</Text>
-
-          <Text style={styles.label}>Notes</Text>
-          <Text style={styles.info}>{record.notes}</Text>
+          {[
+            { title: "Physical Symptoms", data: record.physicalSymptoms },
+            { title: "Mental Disorders", data: record.mentalDisorders },
+            {
+              title: "Therapeutic Activities",
+              data: record.therapeuticActivities,
+            },
+            { title: "Physical Activities", data: record.physicalActivities },
+            { title: "Food Preferences", data: record.foodPreferences },
+            {
+              title: "Entertainment Preferences",
+              data: record.entertainmentPreferences,
+            },
+          ].map((section, index) => (
+            <View key={index}>
+              <Text style={styles.sectionTitle}>{section.title}</Text>
+              {section.data.map((item, subIndex) => (
+                <Text key={subIndex} style={styles.info}>
+                  - {item}
+                </Text>
+              ))}
+            </View>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -93,7 +116,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
     paddingTop: 50,
     paddingHorizontal: 20,
   },
@@ -106,36 +129,54 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   header: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#AF93D2",
-    marginLeft: 8,
-  },
-  sectionContainer: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 15,
-    backgroundColor: "#f9f9f9",
-  },
-  title: {
     fontSize: 22,
     fontWeight: "bold",
+    color: "#6C63FF",
+    marginLeft: 8,
+  },
+  card: {
+    borderRadius: 12,
+    padding: 20,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
     color: "#333",
+    textAlign: "center",
   },
   date: {
     fontSize: 16,
     color: "#666",
+    textAlign: "center",
     marginBottom: 10,
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
   },
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#999",
-    marginTop: 10,
+    color: "#333",
+    marginLeft: 8,
+    flex: 1,
   },
   info: {
     fontSize: 16,
-    color: "#333",
+    color: "#555",
+    flex: 2,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#6C63FF",
+    marginTop: 15,
   },
 });

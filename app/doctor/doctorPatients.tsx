@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    alignItems: "center",
     marginBottom: 20,
     paddingHorizontal: 15,
   },
