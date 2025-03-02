@@ -5,12 +5,13 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 export default function MedicalRecordDetails() {
   const { id } = useLocalSearchParams() as { id?: string };
+  const [showMore, setShowMore] = useState(false);
 
   const medicalRecords: Record<string, { 
     title: string;
@@ -41,7 +42,7 @@ export default function MedicalRecordDetails() {
       entertainmentPreferences: ["Like: Reading", "Neutral: Movies"],
     },
   };
-  
+
   const record = medicalRecords[id ?? ""] || {
     title: "Unknown Record",
     date: "N/A",
@@ -73,16 +74,13 @@ export default function MedicalRecordDetails() {
           <Text style={styles.header}>Medical Record Details</Text>
         </View>
 
+        {/* Thông tin chính trong cùng một border */}
         <View style={styles.card}>
           <Text style={styles.title}>{record.title}</Text>
           <Text style={styles.date}>{record.date}</Text>
 
-          {[
-            {
-              icon: "notes-medical",
-              label: "Diagnosis",
-              value: record.diagnosis,
-            },
+          {[ 
+            { icon: "notes-medical", label: "Diagnosis", value: record.diagnosis },
             { icon: "pills", label: "Treatment", value: record.treatment },
             { icon: "user-md", label: "Doctor", value: record.doctor },
             { icon: "clipboard-list", label: "Notes", value: record.notes },
@@ -93,103 +91,65 @@ export default function MedicalRecordDetails() {
               <Text style={styles.info}>{item.value}</Text>
             </View>
           ))}
-
-          {[
-            { title: "Physical Symptoms", data: record.physicalSymptoms },
-            { title: "Mental Disorders", data: record.mentalDisorders },
-            {
-              title: "Therapeutic Activities",
-              data: record.therapeuticActivities,
-            },
-            { title: "Physical Activities", data: record.physicalActivities },
-            { title: "Food Preferences", data: record.foodPreferences },
-            {
-              title: "Entertainment Preferences",
-              data: record.entertainmentPreferences,
-            },
-          ].map((section, index) => (
-            <View key={index}>
-              <Text style={styles.sectionTitle}>{section.title}</Text>
-              {section.data.map((item, subIndex) => (
-                <Text key={subIndex} style={styles.info}>
-                  - {item}
-                </Text>
-              ))}
-            </View>
-          ))}
         </View>
+
+        {/* Nút Show more */}
+        {!showMore && (
+          <TouchableOpacity onPress={() => setShowMore(true)} style={styles.showMoreButton}>
+            <Text style={styles.showMoreText}>Show more</Text>
+            <FontAwesome5 name="chevron-down" size={14} color="#6C63FF" />
+          </TouchableOpacity>
+        )}
+
+        {/* Các danh mục chi tiết */}
+        {showMore && (
+          <>
+            {[
+              { title: "Physical Symptoms", icon: "stethoscope", data: record.physicalSymptoms },
+              { title: "Mental Disorders", icon: "brain", data: record.mentalDisorders },
+              { title: "Therapeutic Activities", icon: "spa", data: record.therapeuticActivities },
+              { title: "Physical Activities", icon: "running", data: record.physicalActivities },
+              { title: "Food Preferences", icon: "utensils", data: record.foodPreferences },
+              { title: "Entertainment Preferences", icon: "music", data: record.entertainmentPreferences },
+            ].map((section, index) => (
+              <View key={index} style={styles.borderBox}>
+                <View style={styles.sectionHeader}>
+                  <FontAwesome5 name={section.icon} size={18} color="#6C63FF" />
+                  <Text style={styles.sectionTitle}>{section.title}</Text>
+                </View>
+                {section.data.map((item, subIndex) => (
+                  <Text key={subIndex} style={styles.info}>{item}</Text>
+                ))}
+              </View>
+            ))}
+
+            {/* Nút Show less */}
+            <TouchableOpacity onPress={() => setShowMore(false)} style={styles.showMoreButton}>
+              <Text style={styles.showMoreText}>Show less</Text>
+              <FontAwesome5 name="chevron-up" size={14} color="#6C63FF" />
+            </TouchableOpacity>
+          </>
+        )}
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    paddingTop: 50,
-    paddingHorizontal: 20,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  backButton: {
-    padding: 5,
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#6C63FF",
-    marginLeft: 8,
-  },
-  card: {
-    borderRadius: 12,
-    padding: 20,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
-  },
-  date: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  section: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 8,
-    flex: 1,
-  },
-  info: {
-    fontSize: 16,
-    color: "#555",
-    flex: 2,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#6C63FF",
-    marginTop: 15,
-  },
+  wrapper: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#f5f5f5", paddingTop: 50, paddingHorizontal: 20 },
+  headerContainer: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
+  backButton: { padding: 5 },
+  header: { fontSize: 22, fontWeight: "bold", color: "#6C63FF", marginLeft: 8 },
+  card: { borderRadius: 12, padding: 20, backgroundColor: "#fff", shadowColor: "#000", elevation: 5 },
+  title: { fontSize: 24, fontWeight: "bold", color: "#333", textAlign: "center" },
+  date: { fontSize: 16, color: "#666", textAlign: "center", marginBottom: 10 },
+  section: { flexDirection: "row", alignItems: "center", marginTop: 10 },
+  label: { fontSize: 16, fontWeight: "bold", color: "#333", marginLeft: 8, flex: 1 },
+  info: { fontSize: 16, color: "#555", flex: 2 },
+  showMoreButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 15 },
+  showMoreText: { fontSize: 16, color: "#6C63FF", marginRight: 5 },
+  borderBox: { borderWidth: 1, borderColor: "#6C63FF", borderRadius: 8, padding: 10, marginTop: 10 },
+  sectionHeader: { flexDirection: "row", alignItems: "center", marginBottom: 5 },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#6C63FF", marginLeft: 8 },
 });
