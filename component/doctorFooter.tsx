@@ -1,14 +1,16 @@
 import { TouchableOpacity, View, StyleSheet } from "react-native";
 import React from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { router, usePathname } from "expo-router";
+import { useRouter, usePathname } from "expo-router";
 
 export const Footer: React.FC = () => {
+    const router = useRouter();
     const pathname = usePathname();
     console.log('Current pathname:', pathname); // Debugging line
 
     return (
         <View style={styles.footerContainer}>
+            {/* Home Button */}
             <TouchableOpacity
                 onPress={() => {
                     if (pathname !== "/doctor/doctorHome") {
@@ -22,7 +24,8 @@ export const Footer: React.FC = () => {
             >
                 <MaterialIcons name="home" size={30} color={pathname === "/doctor/doctorHome" ? "black" : "white"} />
             </TouchableOpacity>
-            
+
+            {/* Chat Button */}
             <TouchableOpacity 
                 onPress={() => {
                     if (pathname !== "/doctor/chatList") {
@@ -34,6 +37,20 @@ export const Footer: React.FC = () => {
                 accessibilityLabel="Chat"
             >
                 <MaterialIcons name="chat" size={30} color={pathname === "/doctor/chatList" ? "black" : "white"} />
+            </TouchableOpacity>
+
+            {/* Settings Button */}
+            <TouchableOpacity 
+                onPress={() => {
+                    if (pathname !== "/doctor/settingOptions") {
+                        console.log('Navigating to /doctor/settingOptions'); // Debugging line
+                        router.push("/doctor/settingOptions");
+                    }
+                }} 
+                style={styles.button}
+                accessibilityLabel="Settings"
+            >
+                <MaterialIcons name="settings" size={30} color={pathname === "/doctor/settingOptions" ? "black" : "white"} />
             </TouchableOpacity>
         </View>
     );

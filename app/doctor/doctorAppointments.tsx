@@ -5,11 +5,13 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Animated,
 } from "react-native";
 import { Footer } from "../../component/doctorFooter";
 import { router } from "expo-router";
-import React from "react";
+import React, { useRef } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { DoctorHeader } from "../../component/doctorHeader";
 
 const appointments = [
   {
@@ -19,7 +21,8 @@ const appointments = [
     age: 28,
     date: "2025-02-27",
     time: "7:00-7:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "2",
@@ -28,7 +31,8 @@ const appointments = [
     age: 23,
     date: "2025-02-27",
     time: "8:00-8:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "3",
@@ -37,7 +41,8 @@ const appointments = [
     age: 27,
     date: "2025-02-27",
     time: "9:00-9:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "4",
@@ -46,7 +51,8 @@ const appointments = [
     age: 28,
     date: "2025-02-27",
     time: "10:00-10:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "5",
@@ -55,7 +61,8 @@ const appointments = [
     age: 42,
     date: "2025-02-27",
     time: "11:00-11:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
   {
     id: "6",
@@ -64,54 +71,26 @@ const appointments = [
     age: 35,
     date: "2025-02-27",
     time: "12:00-12:30",
-    avatar: "https://via.placeholder.com/50",
+    avatar:
+      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
   },
 ];
 
 export default function DoctorAppointments() {
   return (
     <>
+      <DoctorHeader />
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
+          <MaterialIcons name="arrow-back" size={28} color="#6D5BA5" />
+        </TouchableOpacity>
+        <Text style={styles.header}>Appointment Requests</Text>
+      </View>
       <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
-          </TouchableOpacity>
-          <Text style={styles.header}>Appointment Requests</Text>
-        </View>
         <FlatList
           data={appointments}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Image source={{ uri: item.avatar }} style={styles.avatar} />
-              <View style={styles.info}>
-                <Text style={styles.name}>
-                  {item.name} ({item.gender}, {item.age})
-                </Text>
-                <Text style={styles.time}>
-                  {item.date} | {item.time}
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.detailButton}
-                onPress={() =>
-                  router.push({
-                    pathname: "/doctor/appointmentDetails",
-                    params: {
-                      name: item.name,
-                      gender: item.gender,
-                      age: item.age,
-                      date: item.date,
-                      time: item.time,
-                      avatar: item.avatar,
-                    },
-                  })
-                }
-              >
-                <Text style={styles.statusText}>Detail</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          renderItem={({ item }) => <AppointmentCard item={item} />}
         />
       </View>
       <Footer />
@@ -119,56 +98,138 @@ export default function DoctorAppointments() {
   );
 }
 
+interface Appointment {
+  id: string;
+  name: string;
+  gender: string;
+  age: number;
+  date: string;
+  time: string;
+  avatar: string;
+}
+
+const AppointmentCard = ({ item }: { item: Appointment }) => {
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.97,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return (
+    <Animated.View
+      style={[styles.item, { transform: [{ scale: scaleValue }] }]}
+    >
+      <Image source={{ uri: item.avatar }} style={styles.avatar} />
+      <View style={styles.info}>
+        <Text style={styles.name}>
+          {item.name} ({item.gender}, {item.age})
+        </Text>
+        <Text style={styles.time}>
+          {item.date} | {item.time}
+        </Text>
+      </View>
+      <TouchableOpacity
+        style={styles.detailButton}
+        activeOpacity={0.7}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={() =>
+          router.push({
+            pathname: "/doctor/appointmentDetails",
+            params: {
+              name: item.name,
+              gender: item.gender,
+              age: item.age,
+              date: item.date,
+              time: item.time,
+              avatar: item.avatar,
+            },
+          })
+        }
+      >
+        <Text style={styles.statusText}>Detail</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 50,
+    backgroundColor: "#F7F6FB",
     paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginTop: 15,
+    paddingHorizontal: 20,
+    marginBottom: 10,
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
-    marginLeft: 10,
+    color: "#4B3F72",
+    marginLeft: 15,
   },
   item: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 15,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: "#F5F5F5",
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "white",
+    elevation: 4, // Shadow Android
+    shadowColor: "#000", // Shadow iOS
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 55,
+    height: 55,
+    borderRadius: 27.5,
+    borderWidth: 2,
+    borderColor: "#AF93D2",
     marginRight: 15,
   },
   info: {
     flex: 1,
   },
   name: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "bold",
+    color: "#333",
   },
   time: {
     fontSize: 14,
-    color: "#555",
+    color: "#777",
   },
   detailButton: {
-    backgroundColor: "#AF93D2",
+    backgroundColor: "#6D5BA5",
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 15,
+    borderRadius: 20,
+    elevation: 2,
+    shadowColor: "#6D5BA5",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
   statusText: {
-    color: "#fff",
+    color: "white",
     fontWeight: "bold",
+    fontSize: 14,
   },
 });
