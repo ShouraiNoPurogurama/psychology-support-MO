@@ -1,16 +1,14 @@
-import React, { useState } from "react";
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
-import { Calendar } from "react-native-calendars";
+import React from "react";
+import { router } from "expo-router";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { DoctorHeader } from "../../../component/doctorHeader";
-import { Footer } from "../../../component/doctorFooter";
-import { useRouter } from "expo-router";
-import { FontAwesome5 } from "@expo/vector-icons";
 
 type HistoryRecord = {
   id: number;
@@ -19,9 +17,7 @@ type HistoryRecord = {
   diagnosis: string;
 };
 
-type HistoryRecords = {
-  [date: string]: HistoryRecord[];
-};
+type HistoryRecords = Record<string, HistoryRecord[]>;
 
 const historyRecords: HistoryRecords = {
   "2025-02-25": [
@@ -49,105 +45,78 @@ const historyRecords: HistoryRecords = {
 };
 
 export default function DoctorHistory() {
-  const today = new Date().toISOString().split("T")[0];
-  const [selectedDate, setSelectedDate] = useState(today);
-  const [history, setHistory] = useState(historyRecords[today] || []);
-  const router = useRouter();
-
-  // Tạo object để đánh dấu ngày có lịch sử điều trị
-  const markedDates = Object.keys(historyRecords).reduce((acc, date) => {
-    acc[date] = { marked: true, dotColor: "#D9534F", selectedColor: "#6A8CAF" };
-    return acc;
-  }, {} as Record<string, any>);
-
-  // Đánh dấu ngày được chọn
-  markedDates[selectedDate] = { selected: true, selectedColor: "#6A8CAF" };
-
-  const handleDateChange = (day: { dateString: string }) => {
-    setSelectedDate(day.dateString);
-    setHistory(historyRecords[day.dateString] || []);
-  };
-
   return (
     <>
       <DoctorHeader />
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.headerContainer}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <View style={styles.backButtonContent}>
-              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Treatment History</Text>
-        </View>
 
-        {/* Calendar */}
-        <View style={styles.calendarContainer}>
-          <Calendar
-            current={today}
-            markedDates={markedDates}
-            onDayPress={handleDateChange}
-            theme={{
-              selectedDayBackgroundColor: "#6A8CAF",
-              todayTextColor: "#D9534F",
-              arrowColor: "#6A8CAF",
-            }}
-          />
-        </View>
-
-        <Text style={styles.title}>History on {selectedDate}</Text>
-
-        {/* Lịch sử điều trị */}
-        <FlatList
-          data={history}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.historyItem}
-              onPress={() =>
-                router.push({
-                  pathname: "/doctors/history/details",
-                  params: {
-                    patientName: item.patientName,
-                    symptoms: item.symptoms,
-                    diagnosis: item.diagnosis,
-                    date: selectedDate,
-                  },
-                })
-              }
-            >
-              <Text style={styles.patientName}>{item.patientName}</Text>
-              <Text style={styles.symptoms}>Symptoms: {item.symptoms}</Text>
-              <Text style={styles.diagnosis}>Diagnosis: {item.diagnosis}</Text>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={
-            <Text style={styles.noDataText}>No records for this date</Text>
-          }
-        />
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
+        </TouchableOpacity>
+        <Text style={styles.header}>Treatment History</Text>
       </View>
-      <Footer />
+
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {Object.entries(historyRecords).map(([date, records]) => (
+          <View key={date} style={styles.historySection}>
+            <Text style={styles.date}>{date}</Text>
+            {records.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.historyItem}
+                activeOpacity={0.7}
+                onPress={() =>
+                  router.push({
+                    pathname: "/doctors/medicalRecords/medicalRecordDetails",
+                    params: { id: item.id.toString() },
+                  })
+                }
+              >
+                <View style={styles.iconContainer}>
+                  <MaterialIcons name="person" size={30} color="#6C63FF" />
+                </View>
+                <View style={styles.infoContainer}>
+                  <Text style={styles.patientName}>{item.patientName}</Text>
+                  <Text style={styles.symptoms}>🩺 Symptoms: {item.symptoms}</Text>
+                  <Text style={styles.diagnosis}>📋 Diagnosis: {item.diagnosis}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#F7F6FB",
-  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-    position: "relative",
-    paddingVertical: 10,
+    justifyContent: "center", 
+    paddingHorizontal: 15,
+    marginTop: 10,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#f9f9f9",
+    padding: 20,
+  },
+  scrollContainer: {
+    paddingBottom: 100,
+    paddingHorizontal: 15,
+  },
+  header: {
+    flex: 1, 
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#6C63FF",
+    textAlign: "center",
   },
   backButton: {
     position: "absolute",
@@ -162,49 +131,47 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 22,
-    backgroundColor: "rgba(0,0,0,0.05)",
   },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#6A8CAF",
+  historySection: {
+    marginBottom: 15,
   },
-  calendarContainer: {
-    backgroundColor: "#FFF",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 20,
-    elevation: 5,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  title: {
+  date: {
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 20,
+    color: "#444",
     marginBottom: 10,
-    textAlign: "center",
-    color: "#6A8CAF",
+    marginLeft: 5,
   },
   historyItem: {
-    backgroundColor: "#FFF",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 15,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#DDD",
-    elevation: 4,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 4,
+    elevation: 3,
+    marginBottom: 10,
+  },
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#E3E1FD",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
+  },
+  infoContainer: {
+    flex: 1,
   },
   patientName: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
+    marginBottom: 2,
   },
   symptoms: {
     fontSize: 14,
@@ -212,13 +179,8 @@ const styles = StyleSheet.create({
   },
   diagnosis: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "#444",
-  },
-  noDataText: {
-    textAlign: "center",
-    fontSize: 16,
-    color: "#999",
-    marginTop: 20,
+    color: "#666",
+    fontStyle: "italic",
   },
 });
+
