@@ -9,21 +9,24 @@ export const Footer: React.FC = () => {
     return (
         <View style={styles.footerContainer}>
             <TouchableOpacity
-                onPress={() => pathname !== "/home" && router.push("/home")}
+                onPress={() => pathname !== "/user/home" && router.push("/user/home")}
                 style={styles.button}
-                disabled={pathname === "/home"}
+                disabled={pathname === "/user/home"}
             >
-
-                <MaterialIcons name="home" size={30} color={pathname === "/home" ? "black" : "white"} />
+                <MaterialIcons name="home" size={30} color={pathname === "/user/home" ? "black" : "white"} />
             </TouchableOpacity>
-            <TouchableOpacity 
-            onPress={() => pathname!=="/user/userChat" && router.push("/user/userChat")} 
-            style={styles.button}>
+            <TouchableOpacity  
+                onPress={() => pathname!=="/user/userChat" && router.push("/user/userChat")} 
+                style={styles.button}
+                disabled={pathname === "/user/userChat"}
+                >
                 <MaterialIcons name="chat" size={30} color={pathname=== "/user/userChat" ? "black":"white"} />
             </TouchableOpacity>
             <TouchableOpacity 
             onPress={() => pathname!=="/user/userTask"&& router.push("/user/userTask")} 
-            style={styles.button}>
+            style={styles.button}
+            disabled={pathname === "/user/userTask"}
+            >
                 <MaterialIcons name="task" size={30} color={pathname==="/user/userTask"?"black": "white"} />
             </TouchableOpacity>
         </View>
@@ -34,6 +37,8 @@ const styles = StyleSheet.create({
     footerContainer: {
         position: "absolute",
         bottom: 0,
+        left: 0,
+        right: 0,
         width: "100%",
         flexDirection: "row",
         justifyContent: "space-around",
