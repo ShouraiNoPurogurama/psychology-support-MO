@@ -12,7 +12,29 @@ import { Footer } from "../../component/doctorFooter";
 import { router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 
-const appointments = {
+type Appointment = {
+  id: number;
+  name: string;
+  time: string;
+  gender: string;
+  age: number;
+  phone: string;
+  email: string;
+};
+
+type Appointments = {
+  [date: string]: Appointment[];
+};
+
+type DayObject = {
+  dateString: string;
+  day: number;
+  month: number;
+  year: number;
+  timestamp: number;
+};
+
+const appointments: Appointments = {
   "2025-03-01": [
     {
       id: 1,
@@ -48,14 +70,14 @@ const appointments = {
 
 export default function DoctorSchedule() {
   const today = new Date().toISOString().split("T")[0];
-  const [selectedDate, setSelectedDate] = useState(today);
-  const [patients, setPatients] = useState(appointments[today] || []);
+  const [selectedDate, setSelectedDate] = useState<string>(today);
+  const [patients, setPatients] = useState<Appointment[]>(appointments[today] || []);
 
   useEffect(() => {
     setPatients(appointments[selectedDate] || []);
   }, [selectedDate]);
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const [year, month, day] = dateString.split("-");
     return `${day}-${month}-${year}`;
   };
@@ -63,9 +85,9 @@ export default function DoctorSchedule() {
   const markedDates = Object.keys(appointments).reduce((acc, date) => {
     acc[date] = { marked: true, dotColor: "red", selectedColor: "red" };
     return acc;
-  }, {});
+  }, {} as { [key: string]: { marked: boolean; dotColor: string; selectedColor: string } });
 
-  const handleAppointmentPress = (patient) => {
+  const handleAppointmentPress = (patient: Appointment) => {
     router.push({
       pathname: "/doctor/scheduleAppointment",
       params: {
@@ -108,7 +130,7 @@ export default function DoctorSchedule() {
               textDayFontSize: 18,
             },
           }}
-          onDayPress={(day) => setSelectedDate(day.dateString)}
+          onDayPress={(day: DayObject) => setSelectedDate(day.dateString)}
           theme={{
             selectedDayBackgroundColor: "#6A8CAF",
             todayTextColor: "#D9534F",
