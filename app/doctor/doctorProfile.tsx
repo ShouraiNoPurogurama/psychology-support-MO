@@ -46,7 +46,7 @@ export default function DoctorProfile() {
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {/* Khu vực 1 - Ảnh đại diện & Thông tin cơ bản */}
+       
         <View style={styles.sectionContainer}>
           <View style={styles.profileContainer}>
             <Image
@@ -62,7 +62,7 @@ export default function DoctorProfile() {
           </View>
         </View>
 
-        {/* Khu vực 2 - Thông tin liên hệ */}
+        
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>Contact Information</Text>
           <View style={styles.iconRow}>
@@ -75,7 +75,7 @@ export default function DoctorProfile() {
           </View>
         </View>
 
-        {/* Khu vực 3 - Thống kê */}
+       
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>Statistics</Text>
           <Text style={styles.statText}>
@@ -86,7 +86,7 @@ export default function DoctorProfile() {
           </Text>
         </View>
 
-        {/* Khu vực 4 - Thông tin bổ sung */}
+       
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>Additional Information</Text>
           <Text style={styles.info}>🏥 {doctor.workplace}</Text>
@@ -94,7 +94,7 @@ export default function DoctorProfile() {
           <Text style={styles.info}>📍 {doctor.address}</Text>
         </View>
 
-        {/* Khu vực 5 - Hành động */}
+       
         <View style={styles.sectionContainer}>
           <TouchableOpacity
             style={styles.editButton}

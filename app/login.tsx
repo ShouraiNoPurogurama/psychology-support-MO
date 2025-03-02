@@ -52,8 +52,10 @@ export default function Login(): React.JSX.Element {
           <Text style={styles.linkText}>Forget Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/home")}>
-          <Text style={styles.loginButton}>Login</Text>
+        <TouchableOpacity onPress={() => router.push("/createProfile")}>
+          <Text className=" rounded-md  py-4 text-white w-ful mt-7 px-4 text-center bg-[#AF93D2]">
+            Login
+          </Text>
         </TouchableOpacity>
 
         <Text style={styles.footerText}>
