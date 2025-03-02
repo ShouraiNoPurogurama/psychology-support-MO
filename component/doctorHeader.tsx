@@ -29,7 +29,7 @@ export const DoctorHeader: React.FC<{ avatarUrl?: string }> = ({ avatarUrl }) =>
 
       {/* Góc phải: Avatar bác sĩ */}
       <TouchableOpacity
-        onPress={() => router.push({ pathname: "/doctor/profiles/doctorProfile", params: doctorInfo })}
+        onPress={() => router.push({ pathname: "/doctors/profiles/doctorProfile", params: doctorInfo })}
       >
         <Image
           source={{ uri: avatarUrl || doctorInfo.avatar }}

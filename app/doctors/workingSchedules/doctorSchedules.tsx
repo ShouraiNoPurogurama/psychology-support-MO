@@ -4,6 +4,7 @@ import {
   Text,
   FlatList,
   StyleSheet,
+  Pressable,
   TouchableOpacity,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
@@ -113,41 +114,45 @@ export default function DoctorSchedule() {
             onPress={() => router.back()}
             style={styles.backButton}
           >
-            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+            <View style={styles.backButtonContent}>
+              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+            </View>
           </TouchableOpacity>
 
           <Text style={styles.headerTitle}>Working Schedule</Text>
         </View>
 
-        <Calendar
-          current={today}
-          markedDates={{
-            ...markedDates,
-            [selectedDate]: {
-              selected: true,
-              selectedColor: "#6A8CAF",
-              marked: !!appointments[selectedDate],
-              dotColor: "red",
-            },
-            [today]: {
-              selected: true,
-              selectedColor: "#D9534F",
-              textDayFontWeight: "bold",
-              textDayFontSize: 18,
-            },
-          }}
-          onDayPress={(day: DayObject) => setSelectedDate(day.dateString)}
-          theme={{
-            selectedDayBackgroundColor: "#6A8CAF",
-            todayTextColor: "#D9534F",
-            arrowColor: "#6A8CAF",
-            textMonthFontSize: 26,
-            textMonthFontWeight: "bold",
-            textDayHeaderFontSize: 14,
-            textDayHeaderFontWeight: "bold",
-            textDayHeaderColor: "#000",
-          }}
-        />
+        <View style={styles.calendarContainer}>
+          <Calendar
+            current={today}
+            markedDates={{
+              ...markedDates,
+              [selectedDate]: {
+                selected: true,
+                selectedColor: "#6A8CAF",
+                marked: !!appointments[selectedDate],
+                dotColor: "red",
+              },
+              [today]: {
+                selected: true,
+                selectedColor: "#D9534F",
+                textDayFontWeight: "bold",
+                textDayFontSize: 18,
+              },
+            }}
+            onDayPress={(day: DayObject) => setSelectedDate(day.dateString)}
+            theme={{
+              selectedDayBackgroundColor: "#6A8CAF",
+              todayTextColor: "#D9534F",
+              arrowColor: "#6A8CAF",
+              textMonthFontSize: 20,
+              textMonthFontWeight: "bold",
+              textDayHeaderFontSize: 14,
+              textDayHeaderFontWeight: "bold",
+              textDayHeaderColor: "#000",
+            }}
+          />
+        </View>
 
         <Text style={styles.title}>
           {patients.length > 0
@@ -159,13 +164,13 @@ export default function DoctorSchedule() {
           data={patients}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity
+            <Pressable
               style={styles.patientItem}
-              onPress={() => handleAppointmentPress(item)}
+              onTouchStart={() => handleAppointmentPress(item)}
             >
               <Text style={styles.patientName}>{item.name}</Text>
               <Text style={styles.patientTime}>{item.time}</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         />
       </View>
@@ -190,8 +195,18 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    left: 0,
-    padding: 10,
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.05)",
   },
   headerTitle: {
     flex: 1,
@@ -200,10 +215,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#6A8CAF",
   },
+  calendarContainer: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    overflow: "hidden",
+    marginBottom: 20,
+  },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginTop: 20,
     marginBottom: 10,
     textAlign: "center",
     color: "#6A8CAF",

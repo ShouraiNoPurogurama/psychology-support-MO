@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 export default function SettingOptions() {
   const router = useRouter();
@@ -27,18 +27,18 @@ export default function SettingOptions() {
 
   return (
     <View style={styles.container}>
-    
       <View style={styles.headerContainer}>
         <TouchableOpacity
-          onPress={() => router.replace("/doctors/doctorHome")}
+          onPress={() => router.back()}
           style={styles.backButton}
         >
-          <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
         </TouchableOpacity>
         <Text style={styles.headerText}>Settings</Text>
       </View>
 
-     
       <View style={styles.settingsList}>
         {settings.map((item, index) => (
           <TouchableOpacity
@@ -76,13 +76,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    padding: 5,
+    position: "absolute",
+    left: 10,
+    top: "50%",
+    transform: [{ translateY: -22 }],
+    zIndex: 10,
+  },
+  backButtonContent: {
+    width: 44,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.05)",
   },
   headerText: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#AF93D2",
-    marginLeft: 10,
+    marginLeft: 60,
   },
   settingsList: {
     marginTop: 10,
