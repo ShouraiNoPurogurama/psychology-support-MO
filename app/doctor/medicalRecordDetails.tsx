@@ -12,7 +12,20 @@ import { router, useLocalSearchParams } from "expo-router";
 export default function MedicalRecordDetails() {
   const { id } = useLocalSearchParams() as { id?: string };
 
-  const medicalRecords = {
+  const medicalRecords: Record<string, { 
+    title: string;
+    date: string;
+    diagnosis: string;
+    treatment: string;
+    doctor: string;
+    notes: string;
+    physicalSymptoms: string[];
+    mentalDisorders: string[];
+    therapeuticActivities: string[];
+    physicalActivities: string[];
+    foodPreferences: string[];
+    entertainmentPreferences: string[];
+  }> = {
     "1": {
       title: "Medical Record 1",
       date: "10 Jan 2024",
@@ -28,7 +41,7 @@ export default function MedicalRecordDetails() {
       entertainmentPreferences: ["Like: Reading", "Neutral: Movies"],
     },
   };
-
+  
   const record = medicalRecords[id ?? ""] || {
     title: "Unknown Record",
     date: "N/A",
