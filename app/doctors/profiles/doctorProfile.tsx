@@ -7,10 +7,11 @@ import {
   ScrollView,
 } from "react-native";
 import React from "react";
-import { Footer } from "../../component/doctorFooter";
+
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { DoctorHeader } from "../../component/doctorHeader";
+import { DoctorHeader } from "../../../component/doctorHeader";
+import { Footer } from "../../../component/doctorFooter";
 
 export default function DoctorProfile() {
   const params = useLocalSearchParams();
@@ -99,7 +100,7 @@ export default function DoctorProfile() {
           <TouchableOpacity
             style={styles.editButton}
             onPress={() =>
-              router.push({ pathname: "/doctor/updateProfile", params: doctor })
+              router.push({ pathname: "/doctors/profiles/updateProfile", params: doctor })
             }
           >
             <Text style={styles.buttonText}>✏️ Edit Profile</Text>

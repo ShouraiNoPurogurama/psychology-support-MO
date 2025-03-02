@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { Footer } from "../../component/doctorFooter";
+import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
@@ -41,7 +41,7 @@ export default function ChatList() {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
-            onPress={() => router.push("/doctor/doctorHome")}
+            onPress={() => router.push("/doctors/doctorHome")}
             style={styles.backButton}
           >
             <FontAwesome name="arrow-left" size={20} color="#888" />
@@ -70,7 +70,7 @@ export default function ChatList() {
               style={styles.chatItem}
               onPress={() =>
                 router.push({
-                  pathname: "/doctor/chatDetails",
+                  pathname: "/doctors/other/chatDetails",
                   params: {
                     id: item.id,
                     name: item.name,

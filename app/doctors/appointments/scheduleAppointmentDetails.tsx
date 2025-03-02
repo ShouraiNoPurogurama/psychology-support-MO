@@ -7,11 +7,12 @@ import {
   ScrollView,
   Linking,
 } from "react-native";
-import { Footer } from "../../component/doctorFooter";
+
 import { router, useLocalSearchParams } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
-import { DoctorHeader } from "../../component/doctorHeader";
+import { DoctorHeader } from "../../../component/doctorHeader";
+import { Footer } from "../../../component/doctorFooter";
 
 export default function AppointmentDetails() {
   const params = useLocalSearchParams();
@@ -41,7 +42,7 @@ export default function AppointmentDetails() {
         <TouchableOpacity
           onPress={() => router.back()}
           activeOpacity={0.7}
-          style={{ marginLeft: 10 }} // Dịch sang phải 10px
+          style={{ marginLeft: 10 }}
         >
           <FontAwesome5 name="arrow-left" size={22} color="#4B3F72" light />
         </TouchableOpacity>

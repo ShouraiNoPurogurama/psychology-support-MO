@@ -9,28 +9,28 @@ export default function SettingOptions() {
   const settings = [
     {
       name: "Profile Settings",
-      route: "/doctor/profileSettings",
+      route: "/doctors/profileSettings",
       icon: "person",
     },
     {
       name: "Notifications",
-      route: "/doctor/notificationSettings",
+      route: "/doctors/notificationSettings",
       icon: "notifications",
     },
     {
       name: "Privacy & Security",
-      route: "/doctor/securitySettings",
+      route: "/doctors/securitySettings",
       icon: "lock",
     },
-    { name: "About App", route: "/doctor/about", icon: "info" },
+    { name: "About App", route: "/doctors/about", icon: "info" },
   ];
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+    
       <View style={styles.headerContainer}>
         <TouchableOpacity
-          onPress={() => router.replace("/doctor/doctorHome")}
+          onPress={() => router.replace("/doctors/doctorHome")}
           style={styles.backButton}
         >
           <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
@@ -38,7 +38,7 @@ export default function SettingOptions() {
         <Text style={styles.headerText}>Settings</Text>
       </View>
 
-      {/* Settings List */}
+     
       <View style={styles.settingsList}>
         {settings.map((item, index) => (
           <TouchableOpacity

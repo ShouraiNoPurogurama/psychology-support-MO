@@ -6,6 +6,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
+
 const avatarUrl =
   "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577";
 const bannerUrl =
@@ -39,7 +40,7 @@ export default function Home() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => router.push("/doctor/doctorAppointments")}
+            onPress={() => router.push("/doctors/appointments/doctorAppointments")}
           >
             <MaterialIcons name="event" size={32} color="#AF93D2" />
             <Text style={styles.cardText}>Appointment Request</Text>
@@ -48,7 +49,7 @@ export default function Home() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => router.push("/doctor/doctorPatients")}
+            onPress={() => router.push("/doctors/patients/doctorPatients")}
           >
             <MaterialIcons name="group" size={32} color="#AF93D2" />
             <Text style={styles.cardText}>My Patients</Text>
@@ -57,7 +58,7 @@ export default function Home() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => router.push("/doctor/doctorSchedule")}
+            onPress={() => router.push("/doctors/workingSchedules/doctorSchedules")}
           >
             <MaterialIcons name="schedule" size={32} color="#AF93D2" />
             <Text style={styles.cardText}>My Schedule</Text>
@@ -126,8 +127,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 15,
-    elevation: 5, // Shadow Android
-    shadowColor: "#000", // Shadow iOS
+    elevation: 5,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 5,

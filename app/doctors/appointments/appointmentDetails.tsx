@@ -7,11 +7,11 @@ import {
   ScrollView,
   Linking,
 } from "react-native";
-import { Footer } from "../../component/doctorFooter";
+import { Footer } from "../../../component/doctorFooter";
 import { router, useLocalSearchParams } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
-import { DoctorHeader } from "../../component/doctorHeader";
+import { DoctorHeader } from "../../../component/doctorHeader";
 
 export default function AppointmentDetails() {
   const params = useLocalSearchParams();

@@ -13,44 +13,44 @@ export const Footer: React.FC = () => {
             {/* Home Button */}
             <TouchableOpacity
                 onPress={() => {
-                    if (pathname !== "/doctor/doctorHome") {
-                        console.log('Navigating to /doctor/doctorHome'); // Debugging line
-                        router.push("/doctor/doctorHome");
+                    if (pathname !== "/doctors/doctorHome") {
+                        console.log('Navigating to /doctors/doctorHome'); // Debugging line
+                        router.push("/doctors/doctorHome");
                     }
                 }}
                 style={styles.button}
-                disabled={pathname === "/doctor/doctorHome"}
+                disabled={pathname === "/doctors/doctorHome"}
                 accessibilityLabel="Home"
             >
-                <MaterialIcons name="home" size={30} color={pathname === "/doctor/doctorHome" ? "black" : "white"} />
+                <MaterialIcons name="home" size={30} color={pathname === "/doctors/doctorHome" ? "black" : "white"} />
             </TouchableOpacity>
 
             {/* Chat Button */}
             <TouchableOpacity 
                 onPress={() => {
-                    if (pathname !== "/doctor/chatList") {
-                        console.log('Navigating to /doctor/chatList'); // Debugging line
-                        router.push("/doctor/chatList");
+                    if (pathname !== "/doctors/other/chatList") {
+                        console.log('Navigating to /doctors/other/chatList'); // Debugging line
+                        router.push("/doctors/other/chatList");
                     }
                 }} 
                 style={styles.button}
                 accessibilityLabel="Chat"
             >
-                <MaterialIcons name="chat" size={30} color={pathname === "/doctor/chatList" ? "black" : "white"} />
+                <MaterialIcons name="chat" size={30} color={pathname === "/doctors/other/chatList" ? "black" : "white"} />
             </TouchableOpacity>
 
             {/* Settings Button */}
             <TouchableOpacity 
                 onPress={() => {
-                    if (pathname !== "/doctor/settingOptions") {
-                        console.log('Navigating to /doctor/settingOptions'); // Debugging line
-                        router.push("/doctor/settingOptions");
+                    if (pathname !== "/doctors/other/settingOptions") {
+                        console.log('Navigating to /doctors/other/settingOptions'); // Debugging line
+                        router.push("/doctors/other/settingOptions");
                     }
                 }} 
                 style={styles.button}
                 accessibilityLabel="Settings"
             >
-                <MaterialIcons name="settings" size={30} color={pathname === "/doctor/settingOptions" ? "black" : "white"} />
+                <MaterialIcons name="settings" size={30} color={pathname === "/doctors/other/settingOptions" ? "black" : "white"} />
             </TouchableOpacity>
         </View>
     );

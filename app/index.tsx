@@ -1,9 +1,7 @@
 import { router } from "expo-router";
-
-// import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import "../global.css";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet,Text, View, Alert, TouchableOpacity } from "react-native";
 import  messaging, { registerDeviceForRemoteMessages }  from "@react-native-firebase/messaging";
 import React, {useEffect} from "react"; 
 
@@ -81,7 +79,7 @@ export default function App() {
           <TouchableOpacity onPress={() => router.push("/login")}>
             <Text style={{ color: "blue", fontSize: 18 }}>Go to Login Page</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push("/doctor/doctorHome")}>
+          <TouchableOpacity onPress={() => router.push("/doctors/doctorHome")}>
             <Text style={{ color: "blue", fontSize: 18 }}>Go to Doctor Page</Text>
           </TouchableOpacity>
         </View>

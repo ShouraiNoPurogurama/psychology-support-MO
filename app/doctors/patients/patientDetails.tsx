@@ -7,10 +7,10 @@ import {
   ScrollView,
 } from "react-native";
 import React from "react";
-import { Footer } from "../../component/doctorFooter";
+import { Footer } from "../../../component/doctorFooter";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { DoctorHeader } from "../../component/doctorHeader";
+import { DoctorHeader } from "../../../component/doctorHeader";
 
 export default function PatientProfile() {
   const { name, gender, age, avatar, dob } = useLocalSearchParams();
@@ -93,7 +93,7 @@ export default function PatientProfile() {
                 style={styles.detailButton}
                 onPress={() =>
                   router.push({
-                    pathname: "/doctor/medicalRecordDetails",
+                    pathname: "/doctors/medicalRecords/medicalRecordDetails",
                     params: { id: record.id },
                   })
                 }

@@ -6,11 +6,11 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
-import { Footer } from "../../component/doctorFooter";
+import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import React from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { DoctorHeader } from "../../component/doctorHeader";
+import { DoctorHeader } from "../../../component/doctorHeader";
 
 const appointments = [
   {
@@ -129,7 +129,7 @@ export default function DoctorPatients() {
                 style={styles.detailButton}
                 onPress={() =>
                   router.push({
-                    pathname: "/doctor/patientDetails",
+                    pathname: "/doctors/patients/patientDetails",
                     params: {
                       name: item.name,
                       gender: item.gender,
@@ -154,12 +154,13 @@ export default function DoctorPatients() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F6FB", // Nền sáng nhẹ
+    backgroundColor: "#F7F6FB", 
     paddingTop: 20,
     paddingHorizontal: 20,
   },
   headerContainer: {
     flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
     paddingHorizontal: 15,
   },
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "#4B3F72",
-    marginLeft: 10, // Giữ header căn trái
+    marginLeft: 10, 
   },
   item: {
     flexDirection: "row",
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginRight: 15,
     borderWidth: 2,
-    borderColor: "#AF93D2", // Viền tím nhẹ
+    borderColor: "#AF93D2",
   },
   info: {
     flex: 1,
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
     color: "#777",
   },
   detailButton: {
-    backgroundColor: "#4CAF50", // Chuyển thành màu xanh lá
+    backgroundColor: "#4CAF50", 
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 15,

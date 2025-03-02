@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { DoctorHeader } from "../../component/doctorHeader";
-import { Footer } from "../../component/doctorFooter";
+import { DoctorHeader } from "../../../component/doctorHeader";
+import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 
@@ -71,7 +71,9 @@ const appointments: Appointments = {
 export default function DoctorSchedule() {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string>(today);
-  const [patients, setPatients] = useState<Appointment[]>(appointments[today] || []);
+  const [patients, setPatients] = useState<Appointment[]>(
+    appointments[today] || []
+  );
 
   useEffect(() => {
     setPatients(appointments[selectedDate] || []);
@@ -89,7 +91,7 @@ export default function DoctorSchedule() {
 
   const handleAppointmentPress = (patient: Appointment) => {
     router.push({
-      pathname: "/doctor/scheduleAppointment",
+      pathname: "/doctors/appointments/scheduleAppointmentDetails",
       params: {
         name: patient.name,
         age: patient.age.toString(),
@@ -106,12 +108,16 @@ export default function DoctorSchedule() {
     <>
       <DoctorHeader />
       <View style={styles.container}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-        </TouchableOpacity>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Working Schedule</Text>
+        </View>
 
         <Calendar
           current={today}
@@ -174,10 +180,25 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
-  backButton: {
+  headerContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 10,
+    position: "relative",
+    paddingVertical: 10,
+  },
+  backButton: {
+    position: "absolute",
+    left: 0,
+    padding: 10,
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#6A8CAF",
   },
   title: {
     fontSize: 18,

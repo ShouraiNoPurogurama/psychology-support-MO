@@ -7,11 +7,11 @@ import {
   StyleSheet,
   Animated,
 } from "react-native";
-import { Footer } from "../../component/doctorFooter";
+import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import React, { useRef } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { DoctorHeader } from "../../component/doctorHeader";
+import { DoctorHeader } from "../../../component/doctorHeader";
 
 const appointments = [
   {
@@ -145,7 +145,7 @@ const AppointmentCard = ({ item }: { item: Appointment }) => {
         onPressOut={handlePressOut}
         onPress={() =>
           router.push({
-            pathname: "/doctor/appointmentDetails",
+            pathname: "/doctors/appointments/appointmentDetails",
             params: {
               name: item.name,
               gender: item.gender,

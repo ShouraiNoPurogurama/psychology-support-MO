@@ -12,8 +12,9 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState, useEffect, useRef } from "react";
-import { Footer } from "../../component/doctorFooter";
+
 import { FontAwesome } from "@expo/vector-icons";
+import { Footer } from "../../../component/doctorFooter";
 
 export default function ChatScreen() {
   const { id, name, avatar } = useLocalSearchParams();
