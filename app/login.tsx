@@ -37,7 +37,7 @@ export default function Login() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/home")}>
+        <TouchableOpacity onPress={() => router.push("/createProfile")}>
           <Text className=" rounded-md  py-4 text-white w-ful mt-7 px-4 text-center bg-[#AF93D2]">
             Login
           </Text>
