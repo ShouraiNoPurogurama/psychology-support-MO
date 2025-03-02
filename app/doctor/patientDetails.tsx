@@ -10,6 +10,7 @@ import React from "react";
 import { Footer } from "../../component/doctorFooter";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import { DoctorHeader } from "../../component/doctorHeader";
 
 export default function PatientProfile() {
   const { name, gender, age, avatar, dob } = useLocalSearchParams();
@@ -18,7 +19,8 @@ export default function PatientProfile() {
     name: name || "Unknown",
     gender: gender || "Unknown",
     age: age || "Unknown",
-    avatar: avatar || "https://via.placeholder.com/100",
+    avatar:
+      typeof avatar === "string" ? avatar : "https://via.placeholder.com/100",
     dob: dob || "Unknown",
     email: "johndoe@example.com",
     phone: "+123456789",
@@ -33,32 +35,29 @@ export default function PatientProfile() {
 
   return (
     <View style={styles.wrapper}>
+      <DoctorHeader />
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
+        </TouchableOpacity>
+        <Text style={styles.header}>Patient Profile</Text>
+      </View>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <MaterialIcons name="arrow-back" size={24} color="#AF93D2" />
-          </TouchableOpacity>
-          <Text style={styles.header}>Patient Profile</Text>
-          <MaterialIcons
-            name="person"
-            size={24}
-            color="#AF93D2"
-            style={styles.personIcon}
-          />
-        </View>
         <View style={styles.sectionContainer}>
           <View style={styles.profileContainer}>
-            {/* <Image source={{ uri: patientData.avatar }} style={styles.avatar} /> */}
+            <Image source={{ uri: patientData.avatar }} style={styles.avatar} />
             <Text style={styles.name}>{patientData.name}</Text>
-            <Text style={styles.gender}>{patientData.gender}</Text>
+            <Text style={styles.gender}>
+              {patientData.gender}, {patientData.age}
+            </Text>
             <Text style={styles.dob}>{patientData.dob}</Text>
           </View>
         </View>
         <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Contact Information</Text>
+          <Text style={styles.headerSection}>Contact Information</Text>
           <View style={styles.iconRow}>
             <MaterialIcons name="email" size={20} color="#999" />
             <Text style={styles.info}>{patientData.email}</Text>
@@ -69,7 +68,7 @@ export default function PatientProfile() {
           </View>
         </View>
         <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Health condition</Text>
+          <Text style={styles.headerSection}>Health Condition</Text>
           <Text style={styles.label}>Medical History</Text>
           <Text style={styles.info}>
             {patientData.medicalHistory || "No medical history available"}
@@ -84,14 +83,22 @@ export default function PatientProfile() {
           </Text>
         </View>
         <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Medical Records</Text>
+          <Text style={styles.headerSection}>Medical Records</Text>
           {patientData.medicalRecords.map((record) => (
             <View key={record.id} style={styles.recordItem}>
               <Text style={styles.recordText}>
                 {record.title} - {record.date}
               </Text>
-              <TouchableOpacity>
-                <Text style={styles.buttonText}>{">"}</Text>
+              <TouchableOpacity
+                style={styles.detailButton}
+                onPress={() =>
+                  router.push({
+                    pathname: "/doctor/medicalRecordDetails",
+                    params: { id: record.id },
+                  })
+                }
+              >
+                <Text style={styles.statusText}>Detail</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -120,17 +127,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: "#f9f9f9",
   },
-
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 10,
   },
   header: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#AF93D2",
-    marginLeft: 8,
+    flex: 1,
+  },
+  headerSection: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#AF93D2",
+    marginBottom: 10,
   },
   profileContainer: {
     alignItems: "center",
@@ -169,10 +182,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  buttonText: {
-    color: "#333",
+  detailButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 15,
+  },
+  statusText: {
+    color: "#fff",
     fontWeight: "bold",
-    fontSize: 16,
   },
   iconRow: {
     flexDirection: "row",
@@ -188,8 +206,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     marginTop: 5,
-  },
-  personIcon: {
-    marginLeft: 8,
   },
 });
