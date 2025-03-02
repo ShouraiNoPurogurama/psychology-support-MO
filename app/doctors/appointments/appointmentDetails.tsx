@@ -100,7 +100,7 @@ export default function AppointmentDetails() {
           <Text style={styles.info}>
             {patientData.date} - {patientData.time}
           </Text>
-          <Text style={styles.label}>Doctor's Google Meet Link</Text>
+          <Text style={styles.label}>Meet Link</Text>
           <TouchableOpacity onPress={() => Linking.openURL(doctorMeetingUrl)}>
             <Text style={[styles.info, styles.link]}>{doctorMeetingUrl}</Text>
           </TouchableOpacity>
