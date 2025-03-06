@@ -8,6 +8,8 @@ import {
 import React, { useState } from "react";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import { DoctorHeader } from "../../../component/doctorHeader";
+import { Footer } from "../../../component/doctorFooter";
 
 export default function MedicalRecordDetails() {
   const { id } = useLocalSearchParams() as { id?: string };
@@ -62,12 +64,9 @@ export default function MedicalRecordDetails() {
   };
 
   return (
-    <View style={styles.wrapper}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
-        <View style={styles.headerContainer}>
+    <>
+    <DoctorHeader />
+    <View style={styles.headerContainer}>
           <TouchableOpacity
             onPress={() => router.back()}
             style={styles.backButton}
@@ -78,7 +77,11 @@ export default function MedicalRecordDetails() {
           </TouchableOpacity>
           <Text style={styles.header}>Medical Record Details</Text>
         </View>
-
+    <View style={styles.wrapper}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
         {/* Thông tin chính */}
         <View style={styles.card}>
           <Text style={styles.title}>{record.title}</Text>
@@ -181,6 +184,8 @@ export default function MedicalRecordDetails() {
         )}
       </ScrollView>
     </View>
+    <Footer />
+    </>
   );
 }
 
@@ -214,7 +219,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#6C63FF",
+    color: "#4B3F72",
     marginLeft: 50,
   },
   card: {

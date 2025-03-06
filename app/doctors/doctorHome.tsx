@@ -4,12 +4,11 @@ import { DoctorHeader } from "../../component/doctorHeader";
 import { Footer } from "../../component/doctorFooter";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 
 const avatarUrl =
   "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577";
 
-const bannerUrl =
+const topBannerImage =
   "https://file.hstatic.net/200000256325/article/auc1576544994_a7cc6e2aaa604d3c86351b929f853a9e.jpg";
 
 const bottomBannerImage =
@@ -31,11 +30,7 @@ export default function Home() {
 
         {/* Banner chính */}
         <View style={styles.bannerContainer}>
-          <Image source={{ uri: bannerUrl }} style={styles.banner} />
-          <LinearGradient
-            colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.5)"]}
-            style={styles.bannerOverlay}
-          />
+          <Image source={{ uri: topBannerImage }} style={styles.banner} />
         </View>
 
         {/* Các thẻ chức năng */}
@@ -84,15 +79,12 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
+        {/* Banner cuối */}
         <View style={styles.bottomBannerContainer}>
           <View style={styles.imageWrapper}>
             <Image
               source={{ uri: bottomBannerImage }}
               style={styles.bottomBannerImage}
-            />
-            <LinearGradient
-              colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.5)"]}
-              style={styles.bottomBannerOverlay}
             />
           </View>
 
@@ -146,12 +138,6 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 10,
   },
-  bannerOverlay: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    borderRadius: 10,
-  },
   cardContainer: {
     width: "90%",
     flexDirection: "row",
@@ -194,12 +180,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "cover",
-  },
-  bottomBannerOverlay: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.3)", // Hiệu ứng tối nhẹ
   },
   bottomBannerTextContainer: {
     flex: 1,

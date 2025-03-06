@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { DoctorHeader } from "../../../component/doctorHeader";
+import { Footer } from "../../../component/doctorFooter";
 
 export default function SettingOptions() {
   const router = useRouter();
@@ -9,7 +11,7 @@ export default function SettingOptions() {
   const settings = [
     {
       name: "Profile Settings",
-      route: "/doctors/profileSettings",
+      route: "/doctors/profiles/updateProfile",
       icon: "person",
     },
     {
@@ -26,6 +28,8 @@ export default function SettingOptions() {
   ];
 
   return (
+    <>
+    <DoctorHeader />
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity
@@ -60,6 +64,8 @@ export default function SettingOptions() {
         ))}
       </View>
     </View>
+    <Footer />
+    </>
   );
 }
 
@@ -68,12 +74,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 20,
   },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+    marginRight: 70,
   },
   backButton: {
     position: "absolute",

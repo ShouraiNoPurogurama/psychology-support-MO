@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6C63FF",
+    color: "#4B3F72",
     marginLeft: 40,
   },
   container: {
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     borderWidth: 1,
-    borderColor: "#6C63FF",
+    borderColor: "#4B3F72",
     borderRadius: 12,
     padding: 15,
     marginBottom: 20,
@@ -209,13 +209,13 @@ const styles = StyleSheet.create({
   headerSection: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#6C63FF",
+    color: "#4B3F72",
     marginBottom: 10,
   },
   subHeader: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#6C63FF",
+    color: "#4B3F72",
     marginTop: 10,
   },
   info: {
