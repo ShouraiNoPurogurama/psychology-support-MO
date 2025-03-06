@@ -2,6 +2,7 @@ import { router } from "expo-router";
 
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { Footer } from '../../component/Footer';
+import React from 'react';
 
 
 export default function userChat() {

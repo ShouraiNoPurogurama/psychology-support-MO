@@ -4,6 +4,7 @@ import { Footer } from '../../component/Footer';
 import { Student_Header } from '../../component/Student_Header';
 import '../../assets/images/HomeScreen.png';
 import '../../assets/images/Doctor.jpg';
+import React from 'react';
 
 const { width: screenWidth } = Dimensions.get('window');
 const HomeScreenImage= require("../../assets/images/HomeScreen.png");
