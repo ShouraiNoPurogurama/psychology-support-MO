@@ -24,7 +24,7 @@ export default function Login(): React.JSX.Element {
         const { authentication } = response;
         // Handle successful authentication here
         console.log('Authentication successful:', authentication);
-        router.push("/home");
+        router.push("/createProfile");
       } else {
         console.log('Authentication failed:', response);
       }

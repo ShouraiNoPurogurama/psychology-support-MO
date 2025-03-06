@@ -7,7 +7,6 @@ import {
   ScrollView,
 } from "react-native";
 import React from "react";
-
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { DoctorHeader } from "../../../component/doctorHeader";
@@ -17,11 +16,10 @@ export default function DoctorProfile() {
   const params = useLocalSearchParams();
 
   const doctor = {
+    id: params.id || "",
     name: params.name || "Doctor not updated",
     specialty: params.specialty || "Specialty not updated",
     experience: params.experience || "0",
-    rating: params.rating || "0",
-    totalReviews: params.totalReviews || "0",
     patientsTreated: params.patientsTreated || "0",
     phone: params.phone || "Not updated",
     email: params.email || "Not updated",
@@ -37,10 +35,7 @@ export default function DoctorProfile() {
     <View style={styles.wrapper}>
       <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <View style={styles.backButtonContent}>
             <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
           </View>
@@ -84,9 +79,6 @@ export default function DoctorProfile() {
           <Text style={styles.statText}>
             👩‍⚕️ {doctor.patientsTreated} Patients Treated
           </Text>
-          <Text style={styles.statText}>
-            ⭐ {doctor.rating} ({doctor.totalReviews} Reviews)
-          </Text>
         </View>
 
         <View style={styles.sectionContainer}>
@@ -102,14 +94,21 @@ export default function DoctorProfile() {
             onPress={() =>
               router.push({
                 pathname: "/doctors/profiles/updateProfile",
-                params: doctor,
+                params: {
+                  id: doctor.id,
+                  name: doctor.name,
+                  specialty: doctor.specialty,
+                  experience: doctor.experience,
+                  email: doctor.email,
+                  phone: doctor.phone,
+                  address: doctor.address,
+                  workplace: doctor.workplace,
+                  certificates: doctor.certificates,
+                },
               })
             }
           >
             <Text style={styles.buttonText}>✏️ Edit Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.logoutButton}>
-            <Text style={styles.buttonText}>🚪 Logout</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -120,111 +119,29 @@ export default function DoctorProfile() {
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 50,
-    paddingHorizontal: 20,
-  },
-  sectionContainer: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    backgroundColor: "#f9f9f9",
-  },
+  wrapper: { flex: 1, backgroundColor: "#F7F8FC" },
+  container: { flex: 1 },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
+    padding: 15,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#AF93D2",
-    marginLeft: 50,
-    flex: 1,
-  },
-  headerSection: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#AF93D2",
-    marginBottom: 10,
-  },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    top: "50%",
-    transform: [{ translateY: -22 }],
-    zIndex: 10,
-  },
-  backButtonContent: {
-    width: 44,
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 22,
-  },
-  profileContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  avatar: {
-    width: "50%",
-    height: undefined,
-    aspectRatio: 1,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  specialty: {
-    fontSize: 16,
-    color: "#666",
-  },
-  experience: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 5,
-  },
-  statText: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 5,
-  },
-  info: {
-    fontSize: 16,
-    color: "#333",
-    marginLeft: 10,
-  },
-  iconRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  editButton: {
-    backgroundColor: "#6A8CAF",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  logoutButton: {
-    backgroundColor: "#7A5C91",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  backButton: { padding: 10 },
+  backButtonContent: { flexDirection: "row", alignItems: "center" },
+  header: { flex: 1, textAlign: "center", fontSize: 20, fontWeight: "bold", color: "#6A8CAF" },
+  sectionContainer: { backgroundColor: "#fff", padding: 20, marginVertical: 5, borderRadius: 10 },
+  profileContainer: { alignItems: "center", marginBottom: 20 },
+  avatar: { width: 100, height: 100, borderRadius: 50, marginBottom: 10 },
+  name: { fontSize: 22, fontWeight: "bold", color: "#333" },
+  specialty: { fontSize: 16, color: "#777" },
+  experience: { fontSize: 14, color: "#555", marginTop: 5 },
+  headerSection: { fontSize: 18, fontWeight: "bold", marginBottom: 10, color: "#444" },
+  iconRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  info: { fontSize: 16, marginLeft: 10, color: "#333" },
+  statText: { fontSize: 16, color: "#555" },
+  editButton: { backgroundColor: "#6A8CAF", padding: 12, borderRadius: 8, alignItems: "center" },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });

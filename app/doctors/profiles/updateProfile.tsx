@@ -4,135 +4,99 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Image,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { useLocalSearchParams, router } from "expo-router";
 
 export default function UpdateProfile() {
   const params = useLocalSearchParams();
+  console.log("Received params:", params);
 
-  const [name, setName] = useState(
-    typeof params.name === "string" ? params.name : ""
-  );
-  const [specialty, setSpecialty] = useState(
-    typeof params.specialty === "string" ? params.specialty : ""
-  );
-  const [experience, setExperience] = useState(
-    typeof params.experience === "string" ? params.experience : ""
-  );
-  const [email, setEmail] = useState(
-    typeof params.email === "string" ? params.email : ""
-  );
-  const [phone, setPhone] = useState(
-    typeof params.phone === "string" ? params.phone : ""
-  );
-  const [address, setAddress] = useState(
-    typeof params.address === "string" ? params.address : ""
-  );
-  const [workplace, setWorkplace] = useState(
-    typeof params.workplace === "string" ? params.workplace : ""
-  );
-  const [certificates, setCertificates] = useState(
-    typeof params.certificates === "string" ? params.certificates : ""
-  );
-  const [avatar, setAvatar] = useState(
-    typeof params.avatar === "string"
-      ? params.avatar
-      : "https://via.placeholder.com/150"
-  );
+  const doctorId = params.id;
+  const [name, setName] = useState<string>(Array.isArray(params.name) ? params.name[0] : params.name || "");
+  const [specialty, setSpecialty] = useState<string>(Array.isArray(params.specialty) ? params.specialty[0] : params.specialty || "");
+  const [experience, setExperience] = useState<string>(Array.isArray(params.experience) ? params.experience[0] : params.experience || "0");
+  const [email, setEmail] = useState<string>(Array.isArray(params.email) ? params.email[0] : params.email || "");
+  const [phone, setPhone] = useState<string>(Array.isArray(params.phone) ? params.phone[0] : params.phone || "");
+  const [address, setAddress] = useState<string>(Array.isArray(params.address) ? params.address[0] : params.address || "");
+  const [workplace, setWorkplace] = useState(params.workplace || "");
+  const [certificates, setCertificates] = useState<string>(Array.isArray(params.certificates) ? params.certificates[0] : params.certificates || "");
 
-  const handleSave = () => {
-    console.log("Updated Profile:", {
-      name,
-      specialty,
-      experience,
-      email,
-      phone,
-      address,
-      workplace,
-      certificates,
-      avatar,
-    });
-    router.back();
+  const handleSave = async () => {
+    if (!doctorId) {
+      Alert.alert("Error", "Doctor ID is missing.");
+      return;
+    }
+
+    const apiUrl = `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/doctors/${doctorId}`;
+    const payload = {
+      doctorProfileUpdate: {
+        fullName: name,
+        gender: "Male", // Cứng giá trị
+        contactInfo: {
+          address: address,
+          phoneNumber: phone,
+          email: email,
+        },
+      },
+      specialtyIds: ["3fa85f64-5717-4562-b3fc-2c963f66afa6"],
+      qualifications: certificates,
+      yearsOfExperience: parseInt(experience as string) || 0,
+      bio: workplace,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      Alert.alert("Success", "Profile updated successfully.");
+      router.push("/doctors/profiles");
+    } catch (error) {
+      Alert.alert("Error", (error as Error).message);
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Phần thông tin có thể cuộn */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.header}>Edit Profile</Text>
-
-        <Image source={{ uri: avatar }} style={styles.avatar} />
 
         <Text style={styles.label}>Name</Text>
         <TextInput style={styles.input} value={name} onChangeText={setName} />
 
         <Text style={styles.label}>Specialty</Text>
-        <TextInput
-          style={styles.input}
-          value={specialty}
-          onChangeText={setSpecialty}
-        />
+        <TextInput style={styles.input} value={specialty} onChangeText={setSpecialty} />
 
         <Text style={styles.label}>Experience (years)</Text>
-        <TextInput
-          style={styles.input}
-          value={experience}
-          onChangeText={setExperience}
-          keyboardType="numeric"
-        />
+        <TextInput style={styles.input} value={experience} onChangeText={setExperience} keyboardType="numeric" />
 
         <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" />
 
         <Text style={styles.label}>Phone</Text>
-        <TextInput
-          style={styles.input}
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-        />
+        <TextInput style={styles.input} value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
 
         <Text style={styles.label}>Address</Text>
-        <TextInput
-          style={styles.input}
-          value={address}
-          onChangeText={setAddress}
-        />
-
-        <Text style={styles.label}>Workplace</Text>
-        <TextInput
-          style={styles.input}
-          value={workplace}
-          onChangeText={setWorkplace}
-        />
+        <TextInput style={styles.input} value={address} onChangeText={setAddress} />
 
         <Text style={styles.label}>Certificates</Text>
-        <TextInput
-          style={styles.input}
-          value={certificates}
-          onChangeText={setCertificates}
-        />
+        <TextInput style={styles.input} value={certificates} onChangeText={setCertificates} />
       </ScrollView>
 
-      {/* Nút Save & Cancel cố định ở dưới */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.buttonText}>Save Changes</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -146,7 +110,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    paddingBottom: 100, // Tránh bị che bởi nút
+    paddingBottom: 100,
   },
   header: {
     fontSize: 24,
