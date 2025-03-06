@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from "rea
 import { Footer } from "../../component/Footer";
 import { Student_Header } from "../../component/Student_Header";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
 
 export default function ConfirmAppointment() {
     const { date, time, doctorId } = useLocalSearchParams();
