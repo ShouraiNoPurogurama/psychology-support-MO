@@ -40,4 +40,5 @@ yarn-error.*
 
 # Ignore Gradle build output directory
 build
+emoeaseapp-df4e2-firebase-adminsdk-fbsvc-a8b11aea48.json
 google-services.json
