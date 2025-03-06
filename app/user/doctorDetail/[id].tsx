@@ -7,6 +7,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useState } from "react";
 import BookingModal from "../../../component/BookingModal";
 import { blue } from "react-native-reanimated/lib/typescript/Colors";
+import React from "react";
 
 
 const doctors = [
@@ -79,7 +80,7 @@ const doctors = [
         id: 6,
         name: "Thanh Dat",
         fee: 240000,
-        rating: 4.7,
+        rating: 4.8,
         image: "https://luxclinic.vn/wp-content/uploads/2024/07/bac-Phuong-1.jpg",
         specialty: "Dermatology",
         qualifications: "MD, MSc",
