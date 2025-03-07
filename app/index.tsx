@@ -1,12 +1,31 @@
 import { router } from "expo-router";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import "../global.css";
 import { StatusBar } from "expo-status-bar";
 import  messaging, { registerDeviceForRemoteMessages }  from "@react-native-firebase/messaging";
 import React, {useEffect} from "react"; 
 
 
+
+
+
 export default function App() {
+  
+//   useEffect(() => {
+//     const fetchFCMToken = async () => {
+//       try {
+//         await messaging().registerDeviceForRemoteMessages();
+//         const token = await messaging().getToken();
+//         console.log("FCM Token:", token);
+//       } catch (error) {
+//         console.error("Error fetching FCM Token:", error);
+//       }
+//     };
+  
+//     fetchFCMToken(); 
+//   }, []);
+  
+  
 //   const requestUserPermission = async () => {
 //     const authStatus = await messaging().requestPermission();
 //     const enabled =
@@ -66,12 +85,18 @@ export default function App() {
 //   checkPermissionAndToken();
 //   },[]);
 
+
+
     // return (
     //   <View style={styles.container}>
     //       <Text> FCM Tutorial </Text>
     //       <StatusBar style="auto"/>
     //   </View>
     // );
+
+
+
+    
     return (
       <>
         <View className='flex-1 justify-center items-center bg-slate-400 ' >
@@ -88,3 +113,11 @@ export default function App() {
   
     );
   }
+function initializeApp(firebaseConfig: any) {
+  throw new Error("Function not implemented.");
+}
+
+function getApps() {
+  throw new Error("Function not implemented.");
+}
+

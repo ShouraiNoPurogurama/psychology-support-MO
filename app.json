@@ -21,8 +21,15 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.minhtrung187.psychologysupportMO"
+      "package": "com.minhtrung187.psychologysupportMO",
+      "permissions": [],
+      "expo": {
+        "compileSdkVersion": 34,
+        "targetSdkVersion": 34,
+        "minSdkVersion": 24
+      }
     },
+
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -36,6 +43,6 @@
       "eas": {
         "projectId": "92cd6d5e-f807-4bbc-bda7-f4d98116b30a"
       }
-        }
+    }
   }
 }
