@@ -6,6 +6,8 @@ import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import '../assets/Google.jpg';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
+import {jwtDecode} from "jwt-decode";
+
 
 const GoogleLogo = require('../assets/Google.jpg');
 
@@ -63,8 +65,30 @@ export default function Login(): React.JSX.Element {
       console.log('API Response:', data);
 
       if (response.ok) {
-        Alert.alert('Success', 'Login successful');
-        router.push("/home");
+        const token = data.token;  // Lấy token từ API response
+  
+        if (!token) {
+          Alert.alert("Error", "No token received");
+          return;
+        }
+  
+        try {
+          const decoded: any = jwtDecode(token);
+          console.log("Decoded Token:", decoded);
+          
+          const userRole = decoded.role; 
+  
+          Alert.alert('Success', 'Login successful');
+  
+          if (userRole === "User") {
+            router.push("createProfile");  
+          } else if(userRole == "doctor") {
+            router.push("/doctors/doctorHome");  
+          }
+        } catch (decodeError) {
+          console.error("JWT Decode Error:", decodeError);
+          Alert.alert("Error", "Invalid token format");
+        }
       } else {
         Alert.alert('Error', data.message || 'Login failed');
         console.error('Login failed:', data);
@@ -105,14 +129,14 @@ export default function Login(): React.JSX.Element {
         <TouchableOpacity onPress={() => router.push("/resetpass")}>
           <Text style={styles.linkText}>Forget Password?</Text>
         </TouchableOpacity>
-{/* 
+
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity> */}
-
-        <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
+
+        {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity> */}
 
 
         <Text style={styles.footerText}>
