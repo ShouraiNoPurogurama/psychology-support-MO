@@ -82,7 +82,7 @@ export default function Login(): React.JSX.Element {
   
           if (userRole === "User") {
             router.push("createProfile");  
-          } else if(userRole == "doctor") {
+          } else if(userRole == "Doctor") {
             router.push("/doctors/doctorHome");  
           }
         } catch (decodeError) {
