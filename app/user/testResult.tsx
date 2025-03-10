@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-nati
 import { Footer } from '../../component/Footer';
 import { Student_Header } from "../../component/Student_Header";
 import { Ionicons } from '@expo/vector-icons';
+import React from "react";
 
 
 type EvaluationType = 'stress' | 'anxiety' | 'depression';

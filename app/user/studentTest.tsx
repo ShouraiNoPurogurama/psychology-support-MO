@@ -1,26 +1,80 @@
 import { router } from "expo-router";
-
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Footer } from '../../component/Footer';
 import { Student_Header } from "../../component/Student_Header";
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import React from "react";
+import axios from "axios";  
 
 
 export default function studentTest() {
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await axios.get(
+          "https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/test-questions/8fc88dbb-daee-4b17-9eca-de6cfe886097",
+          {
+            params: { PageIndex: 0, PageSize: 21 }, 
+            headers:{
+              'Content-Type':'application/json'
+            }
+          }
+        );
+
+        console.log("Fetched data:", response.data);  
+        const testData = response.data?.testQuestions?.data;
+        if (!testData || testData.length === 0) {
+          throw new Error("No questions found");
+        }
+        if (!testData || !Array.isArray(testData)) {
+          throw new Error("Invalid API response");
+        }
+
+
+        setQuestions(testData);
+      } catch (err) {
+        console.error("Error fetching questions:", err);
+        setError("Failed to load questions. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#6B21A8" style={{ marginTop: 50 }} />;
+  }
+
+  if (error) {
+    return <Text style={{ textAlign: "center", marginTop: 50, color: "red" }}>{error}</Text>;
+  }
+
+  if (!questions || questions.length === 0) {
+    return <Text style={{ textAlign: "center", marginTop: 50 }}>No questions available.</Text>;
+  }
+
+  const currentQuestion = questions[currentIndex];
 
   return (
     <>
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
-        <View className='justify-center items-center mt-7' >
-          <Text style={{ marginTop: 50, fontSize: 27, fontWeight: "800", color: "#AF93D2" }} >MENTAL HEALTH TEST</Text>
-          <Text className="mt-2 text-gray-500">Question 1 of 21</Text>
+        <View className='justify-center items-center mt-7'>
+          <Text style={styles.title}>MENTAL HEALTH TEST</Text>
+          <Text className="mt-2 text-gray-500">Question {currentIndex + 1} of {questions?.length}</Text>
+          
           <View style={styles.questionBox}>
-            <Text style={styles.questionText}>
-              I experienced breathing difficulty (e.g. excessively rapid breathing,
-              breathlessness in the absence of physical exertion)          </Text>
+            <Text style={styles.questionText}>{currentQuestion?.content || "No content available"}</Text>
           </View>
+          
           <View style={styles.optionsContainer}>
             {['Did not apply to me at all', 'Applied to me to some degree, or some of the time', 'Applied to me to a considerable degree or a good part of time', 'Applied to me very much or most of the time'].map((option, index) => (
               <TouchableOpacity
@@ -33,12 +87,21 @@ export default function studentTest() {
             ))}
           </View>
         </View>
+
         <View style={styles.navigationContainer}>
-          <TouchableOpacity style={styles.startOverButton} onPress={() => setSelectedOption(null)}>
+          <TouchableOpacity style={styles.startOverButton} 
+            onPress={() => {
+              setCurrentIndex(0); 
+              setSelectedOption(null); 
+            }}>
             <Text style={styles.buttonText}>Start Over</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.beforeButton}>
+          <TouchableOpacity 
+            style={[styles.beforeButton, currentIndex === 0 && styles.disabledButton]} 
+            onPress={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+            disabled={currentIndex === 0}
+          >
             <Text style={styles.buttonText}>Before</Text>
           </TouchableOpacity>
 
@@ -46,35 +109,42 @@ export default function studentTest() {
             style={[styles.nextButton, selectedOption === null && styles.disabledButton]}
             onPress={() => {
               if (selectedOption !== null) {
-                router.push("/user/testResult");
+                if (currentIndex < questions.length - 1) {
+                  setCurrentIndex(prev => prev + 1);
+                  setSelectedOption(null);
+                } else {
+                  router.push("/user/testResult");
+                }
               }
             }}
             disabled={selectedOption === null}
-
           >
-            <Text style={styles.buttonText}>Next</Text>
+            <Text style={styles.buttonText}>{currentIndex < questions.length - 1 ? "Next" : "Finish"}</Text>
           </TouchableOpacity>
         </View>
-
       </ScrollView>
 
       <Student_Header />
       <Footer />
     </>
-
-
   );
 }
+
 const styles = StyleSheet.create({
+  title: {
+    marginTop: 80,
+    fontSize: 27,
+    fontWeight: "800",
+    color: "#AF93D2"
+  },
   questionBox: {
-    width: '100%',
+    width: '90%',
     backgroundColor: '#E9D5FF',
     padding: 20,
     borderRadius: 20,
     marginTop: 20,
     borderColor: "black",
     borderWidth: 2
-
   },
   questionText: {
     fontSize: 22,
@@ -99,15 +169,10 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 18,
     textAlign: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignContent: 'center'
-
   },
   selectedOption: {
     backgroundColor: '#A855F7',
     borderColor: '#6B21A8',
-
   },
   navigationContainer: {
     flexDirection: 'row',
@@ -146,6 +211,5 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-})
-
+});
 
