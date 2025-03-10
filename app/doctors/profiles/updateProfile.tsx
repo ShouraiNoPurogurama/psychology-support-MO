@@ -25,16 +25,18 @@ export default function UpdateProfile() {
   const [certificates, setCertificates] = useState<string>(Array.isArray(params.certificates) ? params.certificates[0] : params.certificates || "");
 
   const handleSave = async () => {
+    console.log("handleSave function called");
+
     if (!doctorId) {
       Alert.alert("Error", "Doctor ID is missing.");
       return;
     }
-
+  
     const apiUrl = `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/doctors/${doctorId}`;
     const payload = {
       doctorProfileUpdate: {
         fullName: name,
-        gender: "Male", // Cứng giá trị
+        gender: "Male",
         contactInfo: {
           address: address,
           phoneNumber: phone,
@@ -43,10 +45,10 @@ export default function UpdateProfile() {
       },
       specialtyIds: ["3fa85f64-5717-4562-b3fc-2c963f66afa6"],
       qualifications: certificates,
-      yearsOfExperience: parseInt(experience as string) || 0,
+      yearsOfExperience: parseInt(experience) || 0,
       bio: workplace,
     };
-
+  
     try {
       const response = await fetch(apiUrl, {
         method: "PUT",
@@ -55,13 +57,15 @@ export default function UpdateProfile() {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to update profile");
       }
-
+  
       Alert.alert("Success", "Profile updated successfully.");
-      router.push("/doctors/profiles");
+      console.log("Navigating to:", `/doctors/profiles/doctorProfile`);
+console.log("Doctor ID being passed:", doctorId);
+router.push({ pathname: "/doctors/profiles/doctorProfile", params: { doctorId } });
     } catch (error) {
       Alert.alert("Error", (error as Error).message);
     }

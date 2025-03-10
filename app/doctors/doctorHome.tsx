@@ -19,6 +19,19 @@ const doctorName = "Dr. Nguyen Van Minh";
 export default function Home() {
   const router = useRouter();
 
+  const handleMyPatientsPress = async () => {
+    try {
+      const response = await fetch("https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients?PageIndex=1&PageSize=10");
+      const data = await response.json();
+      router.push({
+        pathname: "/doctors/patients/doctorPatients",
+        params: { patients: JSON.stringify(data) },
+      });
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+    }
+  };
+
   return (
     <>
       <DoctorHeader avatarUrl={avatarUrl} />
@@ -28,12 +41,10 @@ export default function Home() {
           <Text style={styles.title}>Welcome, {doctorName}</Text>
         </View>
 
-        {/* Banner chính */}
         <View style={styles.bannerContainer}>
           <Image source={{ uri: topBannerImage }} style={styles.banner} />
         </View>
 
-        {/* Các thẻ chức năng */}
         <View style={styles.cardContainer}>
           <TouchableOpacity
             style={styles.card}
@@ -49,7 +60,7 @@ export default function Home() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
-            onPress={() => router.push("/doctors/patients/doctorPatients")}
+            onPress={handleMyPatientsPress}
           >
             <MaterialIcons name="group" size={32} color="#AF93D2" />
             <Text style={styles.cardText}>My Patients</Text>
@@ -66,7 +77,6 @@ export default function Home() {
             <Text style={styles.cardText}>My Schedule</Text>
           </TouchableOpacity>
 
-          {/* Lịch sử khám bệnh */}
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.8}
@@ -79,7 +89,6 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        {/* Banner cuối */}
         <View style={styles.bottomBannerContainer}>
           <View style={styles.imageWrapper}>
             <Image

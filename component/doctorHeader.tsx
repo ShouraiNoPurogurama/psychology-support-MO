@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const doctorInfo = {
+  id: "1",
   name: "Dr. Nguyen Van Minh",
   specialty: "Clinical Psychology",
   experience: 10,
