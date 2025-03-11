@@ -111,7 +111,7 @@ export default function Login(): React.JSX.Element {
           Alert.alert('Success', 'Login successful');
 
           if (userRole === "User") {
-            router.push("createProfile");
+            router.push("/user/home");
           } else if (userRole == "Doctor") {
             router.push("/doctors/doctorHome");
           }
