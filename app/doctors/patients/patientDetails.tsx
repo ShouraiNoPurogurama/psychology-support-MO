@@ -34,7 +34,15 @@ export default function PatientProfile() {
   }
 
   const [patientData, setPatientData] = useState<PatientData | null>(null);
+  interface MedicalRecord {
+    id: string;
+    notes: string;
+    createdAt: string;
+  }
+
+  const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRecords, setLoadingRecords] = useState(true);
 
   useEffect(() => {
     async function fetchPatientDetails() {
@@ -58,6 +66,28 @@ export default function PatientProfile() {
 
     fetchPatientDetails();
   }, [id]);
+
+  useEffect(() => {
+    async function fetchMedicalRecords() {
+      if (!id) return;
+      try {
+        const response = await fetch(
+          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/${id}/medical-records?PageIndex=1&PageSize=10&SortBy=CreateAt&SortOrder=asc&Status=Processing`
+        );
+        if (!response.ok) throw new Error("Failed to fetch medical records");
+  
+        const data = await response.json();
+        setMedicalRecords(data.medicalRecords?.data || []);
+      } catch (error) {
+        console.error("Error fetching medical records:", error);
+        setMedicalRecords([]);
+      } finally {
+        setLoadingRecords(false);
+      }
+    }
+    fetchMedicalRecords();
+  }, [id]);
+
 
   if (loading) {
     return (
@@ -128,6 +158,34 @@ export default function PatientProfile() {
             <Text key={index} style={styles.bulletPoint}>• {symptom.name} ({symptom.description})</Text>
           )) || <Text style={styles.info}>No physical symptoms reported</Text>}
         </View>
+        <View style={styles.sectionContainer}>
+  <Text style={styles.headerSection}>
+    <FontAwesome5 name="file-medical" size={20} color="#6C63FF" style={styles.iconSpacing} /> Medical Records
+  </Text>
+  {loadingRecords ? (
+    <ActivityIndicator size="small" color="#6A8CAF" />
+  ) : medicalRecords.length > 0 ? (
+    medicalRecords.map((record) => (
+      <TouchableOpacity
+        key={record.id}
+        style={styles.recordItem}
+        onPress={() =>
+          router.push({
+            pathname: "/doctors/medicalRecords/medicalRecordDetails",
+            params: { id: record.id },
+          })
+        }
+      >
+        <Text style={styles.recordTitle}>{record.notes || "No Notes Available"}</Text>
+        <Text style={styles.recordDate}>
+          Created At: {new Date(record.createdAt).toLocaleDateString()}
+        </Text>
+      </TouchableOpacity>
+    ))
+  ) : (
+    <Text style={styles.info}>No medical records found.</Text>
+  )}
+</View>
       </ScrollView>
       <Footer />
     </View>
@@ -159,8 +217,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     elevation: 4,
   },
-  backButton: { marginRight: 15 },
+  recordItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  recordTitle: { fontSize: 16, fontWeight: "bold", color: "#333" },
+  recordDate: { fontSize: 14, color: "gray" },
   info: { fontSize: 16, color: "#333", marginLeft: 10 },
+  backButton: { marginRight: 15 },
   headerSection: { fontSize: 20, fontWeight: "bold", color: "#4B3F72", marginBottom: 10 },
   subHeader: { fontSize: 18, fontWeight: "bold", color: "#4B3F72", marginTop: 10 },
   bulletPoint: { fontSize: 16, color: "#333", marginLeft: 10, marginVertical: 2 },

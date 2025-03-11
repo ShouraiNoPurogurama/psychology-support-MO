@@ -4,8 +4,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { DoctorHeader } from "../../../component/doctorHeader";
@@ -13,178 +14,102 @@ import { Footer } from "../../../component/doctorFooter";
 
 export default function MedicalRecordDetails() {
   const { id } = useLocalSearchParams() as { id?: string };
-  const [showMore, setShowMore] = useState(false);
+  const [record, setRecord] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const medicalRecords: Record<
-    string,
-    {
-      title: string;
-      date: string;
-      diagnosis: string;
-      treatment: string;
-      doctor: string;
-      notes: string;
-      physicalSymptoms: string[];
-      mentalDisorders: string[];
-      therapeuticActivities: string[];
-      physicalActivities: string[];
-      foodPreferences: string[];
-      entertainmentPreferences: string[];
-    }
-  > = {
-    "1": {
-      title: "Medical Record 1",
-      date: "10 Jan 2024",
-      diagnosis: "Hypertension",
-      treatment: "Prescribed medication and lifestyle changes",
-      doctor: "Dr. John Smith",
-      notes: "Regular blood pressure checks recommended.",
-      physicalSymptoms: ["Fatigue", "Dizziness"],
-      mentalDisorders: ["Anxiety Disorder"],
-      therapeuticActivities: ["Meditation", "Cognitive Behavioral Therapy"],
-      physicalActivities: ["Jogging", "Yoga"],
-      foodPreferences: ["Like: Vegetables", "Dislike: Fast Food"],
-      entertainmentPreferences: ["Like: Reading", "Neutral: Movies"],
-    },
-  };
+  useEffect(() => {
+    if (!id) return;
+    
+    const fetchMedicalRecord = async () => {
+      try {
+        const response = await fetch(
+          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/medical-records/${id}`
+        );
+        const data = await response.json();
 
-  const record = medicalRecords[id ?? ""] || {
-    title: "Unknown Record",
-    date: "N/A",
-    diagnosis: "N/A",
-    treatment: "N/A",
-    doctor: "N/A",
-    notes: "No details available.",
-    physicalSymptoms: [],
-    mentalDisorders: [],
-    therapeuticActivities: [],
-    physicalActivities: [],
-    foodPreferences: [],
-    entertainmentPreferences: [],
-  };
+        if (data?.record) {
+          setRecord(data.record);
+        } else {
+          setError("No record found.");
+        }
+      } catch (err) {
+        setError("Failed to fetch medical record.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMedicalRecord();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#6C63FF" />
+        <Text>Loading medical record...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <>
-    <DoctorHeader />
-    <View style={styles.headerContainer}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <View style={styles.backButtonContent}>
-              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.header}>Medical Record Details</Text>
-        </View>
-    <View style={styles.wrapper}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
-        {/* Thông tin chính */}
-        <View style={styles.card}>
-          <Text style={styles.title}>{record.title}</Text>
-          <Text style={styles.date}>{record.date}</Text>
+      <DoctorHeader />
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <View style={styles.backButtonContent}>
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </View>
+        </TouchableOpacity>
+        <Text style={styles.header}>Medical Record Details</Text>
+      </View>
 
-          {[
-            {
-              icon: "notes-medical",
-              label: "Diagnosis",
-              value: record.diagnosis,
-            },
-            { icon: "pills", label: "Treatment", value: record.treatment },
-            { icon: "user-md", label: "Doctor", value: record.doctor },
-            { icon: "clipboard-list", label: "Notes", value: record.notes },
-          ].map((item, index) => (
-            <View style={styles.section} key={index}>
-              <FontAwesome5 name={item.icon} size={18} color="#6C63FF" />
-              <Text style={styles.label}>{item.label}</Text>
-              <Text style={styles.info}>{item.value}</Text>
-            </View>
-          ))}
-        </View>
+      <View style={styles.wrapper}>
+        <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+          {/* Thông tin chính */}
+          <View style={styles.card}>
+            <Text style={styles.title}>Medical Record</Text>
+            <Text style={styles.date}>{new Date(record.createdAt).toLocaleDateString()}</Text>
 
-        {/* Nút Show more */}
-        {!showMore && (
-          <TouchableOpacity
-            onPress={() => setShowMore(true)}
-            style={styles.showMoreButton}
-          >
-            <Text style={styles.showMoreText}>Show more</Text>
-            <FontAwesome5 name="chevron-down" size={14} color="#6C63FF" />
-          </TouchableOpacity>
-        )}
+            {[
+              { icon: "user-md", label: "Doctor", value: record.doctorProfileId },
+              { icon: "clipboard-list", label: "Notes", value: record.notes || "No notes" },
+              { icon: "clock", label: "Status", value: record.status },
+            ].map((item, index) => (
+              <View style={styles.section} key={index}>
+                <FontAwesome5 name={item.icon} size={18} color="#6C63FF" />
+                <Text style={styles.label}>{item.label}</Text>
+                <Text style={styles.info}>{item.value}</Text>
+              </View>
+            ))}
+          </View>
 
-        {/* Các danh mục chi tiết */}
-        {showMore && (
-          <>
-            {/* Phần Triệu Chứng */}
+          {/* Rối loạn tâm thần */}
+          {record.specificMentalDisorders && record.specificMentalDisorders.length > 0 && (
             <View style={styles.borderBox}>
               <View style={styles.sectionHeader}>
-                <FontAwesome5 name="stethoscope" size={18} color="#6C63FF" />
-                <Text style={styles.sectionTitle}>Symptoms</Text>
+                <FontAwesome5 name="brain" size={18} color="#6C63FF" />
+                <Text style={styles.sectionTitle}>Mental Disorders</Text>
               </View>
-              {[
-                { title: "Physical Symptoms", data: record.physicalSymptoms },
-                { title: "Mental Disorders", data: record.mentalDisorders },
-              ].map((section, index) => (
+              {record.specificMentalDisorders.map((disorder: any, index: number) => (
                 <View key={index} style={styles.innerSection}>
-                  <Text style={styles.innerTitle}>{section.title}</Text>
-                  {section.data.map((item, subIndex) => (
-                    <Text key={subIndex} style={styles.info}>
-                      {item}
-                    </Text>
-                  ))}
+                  <Text style={styles.innerTitle}>{disorder.mentalDisorderName}</Text>
+                  <Text style={styles.info}>{disorder.description}</Text>
                 </View>
               ))}
             </View>
-
-            {/* Phần Phương Pháp Điều Trị */}
-            <View style={styles.borderBox}>
-              <View style={styles.sectionHeader}>
-                <FontAwesome5 name="spa" size={18} color="#6C63FF" />
-                <Text style={styles.sectionTitle}>Treatment Methods</Text>
-              </View>
-              {[
-                {
-                  title: "Therapeutic Activities",
-                  data: record.therapeuticActivities,
-                },
-                {
-                  title: "Physical Activities",
-                  data: record.physicalActivities,
-                },
-                { title: "Food Preferences", data: record.foodPreferences },
-                {
-                  title: "Entertainment Preferences",
-                  data: record.entertainmentPreferences,
-                },
-              ].map((section, index) => (
-                <View key={index} style={styles.innerSection}>
-                  <Text style={styles.innerTitle}>{section.title}</Text>
-                  {section.data.map((item, subIndex) => (
-                    <Text key={subIndex} style={styles.info}>
-                      {item}
-                    </Text>
-                  ))}
-                </View>
-              ))}
-            </View>
-
-            {/* Nút Show less */}
-            <TouchableOpacity
-              onPress={() => setShowMore(false)}
-              style={styles.showMoreButton}
-            >
-              <Text style={styles.showMoreText}>Show less</Text>
-              <FontAwesome5 name="chevron-up" size={14} color="#6C63FF" />
-            </TouchableOpacity>
-          </>
-        )}
-      </ScrollView>
-    </View>
-    <Footer />
+          )}
+        </ScrollView>
+      </View>
+      <Footer />
     </>
   );
 }
@@ -196,6 +121,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     paddingTop: 50,
     paddingHorizontal: 20,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
   },
   headerContainer: {
     flexDirection: "row",
@@ -245,13 +179,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   info: { fontSize: 16, color: "#555", flex: 2 },
-  showMoreButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 15,
-  },
-  showMoreText: { fontSize: 16, color: "#6C63FF", marginRight: 5 },
   borderBox: {
     borderWidth: 1,
     borderColor: "#6C63FF",
