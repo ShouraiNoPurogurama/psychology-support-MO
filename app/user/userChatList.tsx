@@ -46,7 +46,18 @@ export default function userChatList() {
           {chatList.map((chat) => (
             <TouchableOpacity
               key={chat.id}
-              onPress={() => router.push(`/chat/${chat.id}`)}
+              // onPress={() => router.push(`/chat/${chat.id}`)}
+                            onPress={() =>
+                              router.push({
+                                pathname: "/doctors/other/chatDetails",
+                                // params: {
+                                //   id: item.id,
+                                //   name: item.name,
+                                //   avatar: item.avatar,
+                                //   message: item.message,
+                                // },
+                              })
+                            }
               style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' }}
             >
               {chat.avatar ? (
