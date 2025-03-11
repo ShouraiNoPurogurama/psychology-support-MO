@@ -20,10 +20,12 @@
       <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/doctors/other/doctorNotification.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctors/other/doctorNotification.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/doctors/doctorHome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctors/doctorHome.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/doctors/other/doctorNotification.tsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/doctors/patients/doctorPatients.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctors/patients/doctorPatients.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/doctors/profiles/updateProfile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctors/profiles/updateProfile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/doctors/patients/patientDetails.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/doctors/patients/patientDetails.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/doctorHeader.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/component/doctorHeader.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

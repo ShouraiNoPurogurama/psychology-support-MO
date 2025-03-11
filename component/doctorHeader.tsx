@@ -23,7 +23,7 @@ export const DoctorHeader: React.FC<{ avatarUrl?: string }> = ({ avatarUrl }) =>
   return (
     <View style={styles.headerContainer}>
       {/* Góc trái: Thông báo & Tên ứng dụng */}
-      <TouchableOpacity onPress={() => router.push("/doctor/notifications")} style={styles.leftContainer}>
+      <TouchableOpacity onPress={() => router.push("/doctors/other/doctorNotifications")} style={styles.leftContainer}>
         <MaterialIcons name="notifications" size={24} color="white" />
         <Text style={styles.appName}>EmoEase</Text>
       </TouchableOpacity>
