@@ -33,13 +33,20 @@ export const Student_Header: React.FC = () => {
                 <TouchableWithoutFeedback onPress={() => setIsDrawerOpen(false)}>
                     <View style={styles.overlay}>
                         <TouchableWithoutFeedback>
-                            <View style={styles.drawer}>  
+                            <View style={styles.drawer}>
                                 <View style={styles.userInfo}>
                                     <Image source={{ uri: 'https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg' }} style={styles.avatar} />
                                     <Text style={styles.userName}>Minh Trung</Text>
                                     <Text style={styles.userPhone}>+84 785901245</Text>
                                 </View>
-                                <TouchableOpacity style={styles.drawerItem}>
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/userProfile");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
                                     <Ionicons name="person" size={24} color="white" />
                                     <Text style={styles.drawerText}>My Profile</Text>
                                 </TouchableOpacity>
@@ -47,6 +54,50 @@ export const Student_Header: React.FC = () => {
                                 <TouchableOpacity style={styles.drawerItem}>
                                     <Ionicons name="time" size={24} color="white" />
                                     <Text style={styles.drawerText}>Booking History</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/Blog");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
+                                    <Ionicons name="book" size={24} color="white" />
+                                    <Text style={styles.drawerText}>Blog</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/Workshop");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
+                                    <Ionicons name="shapes" size={24} color="white" />
+                                    <Text style={styles.drawerText}>Worshop</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/Shop");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
+                                    <Ionicons name="cart" size={24} color="white" />
+                                    <Text style={styles.drawerText}>Shop</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/Services");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
+                                    <Ionicons name="gift" size={24} color="white" />
+                                    <Text style={styles.drawerText}>Services</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={styles.drawerItem}>
@@ -113,11 +164,13 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     drawer: {
-        width: "60%",
+        width: "52%",
         backgroundColor: "#AF93D2",
         paddingVertical: 40,
         paddingHorizontal: 20,
-        borderRadius: 20
+        borderRadius: 20,
+        height:"100%",
+        gap:10
     },
     userInfo: {
         alignItems: "center",

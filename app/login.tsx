@@ -6,8 +6,10 @@ import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import '../assets/Google.jpg';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+
 
 
 const GoogleLogo = require('../assets/Google.jpg');
@@ -39,10 +41,35 @@ export default function Login(): React.JSX.Element {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isValidEmail = (email: string) => {
+    return /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
+  };
+
+  const isValidPhoneNumber = (phone: string) => {
+    return /^(0|\+84)[1-9][0-9]{8}$/.test(phone);
+  };
+
+
   const handleLogin = async () => {
-    if (!email || !password || !phoneNumber) {
-      Alert.alert('Error', 'Please enter email, phone number and password');
-      console.error('Error', 'Please enter email, phone number and password');
+    if (!identifier || !password) {
+      Alert.alert('Error', 'Please enter your Email or Phone number and Password');
+      console.error('Error', 'Please enter your Email or Phone number and Password');
+
+      return;
+    }
+
+    let loginData: any = { password };
+
+    if (isValidEmail(identifier)) {
+      loginData.email = identifier;
+    } else if (isValidPhoneNumber(identifier)) {
+      loginData.phoneNumber = identifier;
+    } else {
+      Alert.alert("Error", "Please enter a valid Email or Phone number");
+      console.error("Error", "Please enter a valid Email or Phone number");
 
       return;
     }
@@ -55,7 +82,8 @@ export default function Login(): React.JSX.Element {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email, phoneNumber, password }),
+          body: JSON.stringify(loginData),
+
         }
       );
 
@@ -66,26 +94,26 @@ export default function Login(): React.JSX.Element {
       console.log('API Response:', data);
 
       if (response.ok) {
-        const token = data.token;  
-        await AsyncStorage.setItem('authToken',token)
-  
+        const token = data.token;
+        await AsyncStorage.setItem('authToken', token)
+
         if (!token) {
           Alert.alert("Error", "No token received");
           return;
         }
-  
+
         try {
           const decoded: any = jwtDecode(token);
           console.log("Decoded Token:", decoded);
-          
-          const userRole = decoded.role; 
-  
+
+          const userRole = decoded.role;
+
           Alert.alert('Success', 'Login successful');
-  
+
           if (userRole === "User") {
-            router.push("createProfile");  
-          } else if(userRole == "Doctor") {
-            router.push("/doctors/doctorHome");  
+            router.push("createProfile");
+          } else if (userRole == "Doctor") {
+            router.push("/doctors/doctorHome");
           }
         } catch (decodeError) {
           console.error("JWT Decode Error:", decodeError);
@@ -111,23 +139,28 @@ export default function Login(): React.JSX.Element {
       <View style={styles.form}>
         <TextInput
           style={styles.input}
-          placeholder="Enter Your Email"
-          value={email}
-          onChangeText={setEmail}
+          placeholder="Enter Your Email or Phone number"
+          value={identifier}
+          onChangeText={setIdentifier}
+          keyboardType="email-address"
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Your phone number"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Your Password"
-          secureTextEntry={true}
-          value={password}
-          onChangeText={setPassword}
-        />
+
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Enter Your Password"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity onPress={() => router.push("/resetpass")}>
           <Text style={styles.linkText}>Forget Password?</Text>
         </TouchableOpacity>
@@ -162,7 +195,6 @@ export default function Login(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 2,
-    marginTop: 48,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -181,7 +213,7 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '80%',
-    marginTop: 20,
+    marginTop: 10,
     alignItems: 'center',
   },
   input: {
@@ -193,6 +225,20 @@ const styles = StyleSheet.create({
     color: 'gray',
     width: '100%',
   },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    width: '100%',
+  },
+passwordInput: {
+  flex: 1,
+  color: 'gray',
+},
   button: { backgroundColor: '#AF93D2', paddingVertical: 15, width: '100%', borderRadius: 8, alignItems: 'center', marginTop: 20 },
   buttonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
 

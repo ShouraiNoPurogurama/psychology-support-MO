@@ -4,7 +4,9 @@ import { Footer } from '../../component/Footer';
 import { Student_Header } from "../../component/Student_Header";
 import { useState, useEffect } from 'react';
 import React from "react";
-import axios from "axios";  
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 
 export default function studentTest() {
@@ -13,7 +15,28 @@ export default function studentTest() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [options, setOptions] = useState<{ id: string, content: string }[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: string | null }>({});
+
+
+
+
+  useEffect(() => {
+
+    const fetchToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('authToken');
+        if (token) {
+          const decoded: any = jwtDecode(token);
+          console.log("User ID:", decoded.userId);
+        }
+      } catch (error) {
+        console.error("Error getting token:", error);
+      }
+    };
+
+    fetchToken();
+  }, []);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -21,14 +44,14 @@ export default function studentTest() {
         const response = await axios.get(
           "https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/test-questions/8fc88dbb-daee-4b17-9eca-de6cfe886097",
           {
-            params: { PageIndex: 0, PageSize: 21 }, 
-            headers:{
-              'Content-Type':'application/json'
+            params: { PageIndex: 0, PageSize: 21 },
+            headers: {
+              'Content-Type': 'application/json'
             }
           }
         );
 
-        console.log("Fetched data:", response.data);  
+        console.log("Fetched data:", response.data);
         const testData = response.data?.testQuestions?.data;
         if (!testData || testData.length === 0) {
           throw new Error("No questions found");
@@ -48,7 +71,120 @@ export default function studentTest() {
     };
 
     fetchQuestions();
+
   }, []);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        if (!questions[currentIndex]?.id) return;
+        const questionId = questions[currentIndex].id;
+
+        const response = await axios.get(
+          `https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/question-options/${questionId}`,
+          {
+            params: { PageIndex: 0, PageSize: 10 },
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+
+        console.log("Fetched options:", response.data);
+        const optionData = response.data?.questionOptions?.data || [];
+
+        if (!Array.isArray(optionData) || optionData.length === 0) {
+          throw new Error("No options found");
+        }
+
+        // Đảm bảo options có đúng kiểu { id, content }
+        const formattedOptions = optionData.map(opt => ({
+          id: opt.id,
+          content: opt.content,
+        }));
+
+        setOptions(formattedOptions);
+      } catch (err) {
+        console.error("Error fetching options:", err);
+      }
+    };
+
+    if (questions.length > 0) {
+      fetchOptions();
+    }
+  }, [questions, currentIndex]);
+
+  const handleSelectOption = (index: number, optionId: string) => {
+    setSelectedOptions((prev) => ({
+      ...prev,
+      [index]: optionId, // Lưu id của option thay vì index
+    }));
+  };
+
+  // const submitTestResults = async () => {
+  //   try {
+  //     const token = await AsyncStorage.getItem('authToken');
+  //     if (!token) throw new Error("User not authenticated");
+
+  //     const decoded: any = jwtDecode(token);
+  //     const patientId = decoded.userId; 
+
+  //     const testId = "8fc88dbb-daee-4b17-9eca-de6cfe886097"; 
+  //     const selectedOptionIds = questions
+  //       .map((q, index) =>
+  //         selectedOption !== null ? q.options[selectedOption]?.id : null 
+  //       )
+  //       .filter(Boolean); 
+
+  //     const response = await axios.post(
+  //       "https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/test-results",
+  //       { patientId, testId, selectedOptionIds },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': `Bearer ${token}`
+  //         }
+  //       }
+  //     );
+
+  //     console.log("Test results submitted:", response.data);
+  //     // router.push("/user/testResult"); 
+  //   } catch (error) {
+  //     console.error("Error submitting test results:", error);
+  //   }
+  // };
+  const submitTestResults = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) throw new Error("User not authenticated");
+
+      const decoded: any = jwtDecode(token);
+      const patientId = decoded.userId;
+
+      const testId = "8fc88dbb-daee-4b17-9eca-de6cfe886097";
+      const selectedOptionIds = questions.map((q, index) => selectedOptions[index]).filter(Boolean);
+
+      console.log(typeof selectedOptionIds[0]);
+      console.log("TestId:", testId);
+      console.log("user IDs:", patientId);
+      console.log("Selected Option IDs:", selectedOptionIds);
+
+      const response = await axios.post(
+        "https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/test-results",
+        { patientId, testId, selectedOptionIds },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      console.log("Test results submitted:", response.data);
+    } catch (error) {
+      console.error("Error submitting test results:", error);
+    }
+  };
+
+
 
   if (loading) {
     return <ActivityIndicator size="large" color="#6B21A8" style={{ marginTop: 50 }} />;
@@ -70,35 +206,39 @@ export default function studentTest() {
         <View className='justify-center items-center mt-7'>
           <Text style={styles.title}>MENTAL HEALTH TEST</Text>
           <Text className="mt-2 text-gray-500">Question {currentIndex + 1} of {questions?.length}</Text>
-          
+
           <View style={styles.questionBox}>
             <Text style={styles.questionText}>{currentQuestion?.content || "No content available"}</Text>
           </View>
-          
+
           <View style={styles.optionsContainer}>
-            {['Did not apply to me at all', 'Applied to me to some degree, or some of the time', 'Applied to me to a considerable degree or a good part of time', 'Applied to me very much or most of the time'].map((option, index) => (
+            {options.map((option) => (
               <TouchableOpacity
-                key={index}
-                style={[styles.optionButton, selectedOption === index && styles.selectedOption]}
-                onPress={() => setSelectedOption(index)}
+                key={option.id}
+                style={[
+                  styles.optionButton,
+                  selectedOptions[currentIndex] === option.id && styles.selectedOption
+                ]}
+                onPress={() => handleSelectOption(currentIndex, option.id)}
               >
-                <Text style={styles.optionText}>{option}</Text>
+                <Text style={styles.optionText}>{option.content}</Text>
               </TouchableOpacity>
             ))}
           </View>
+
         </View>
 
         <View style={styles.navigationContainer}>
-          <TouchableOpacity style={styles.startOverButton} 
+          <TouchableOpacity style={styles.startOverButton}
             onPress={() => {
-              setCurrentIndex(0); 
-              setSelectedOption(null); 
+              setCurrentIndex(0);
+              setSelectedOption(null);
             }}>
             <Text style={styles.buttonText}>Start Over</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.beforeButton, currentIndex === 0 && styles.disabledButton]} 
+          <TouchableOpacity
+            style={[styles.beforeButton, currentIndex === 0 && styles.disabledButton]}
             onPress={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
             disabled={currentIndex === 0}
           >
@@ -106,21 +246,22 @@ export default function studentTest() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.nextButton, selectedOption === null && styles.disabledButton]}
+            style={[styles.nextButton, !selectedOptions[currentIndex] && styles.disabledButton]}
             onPress={() => {
-              if (selectedOption !== null) {
+              if (selectedOptions[currentIndex]) { // Kiểm tra đã chọn option chưa
                 if (currentIndex < questions.length - 1) {
                   setCurrentIndex(prev => prev + 1);
-                  setSelectedOption(null);
                 } else {
+                  // submitTestResults();
                   router.push("/user/testResult");
                 }
               }
             }}
-            disabled={selectedOption === null}
+            disabled={!selectedOptions[currentIndex]} // Vô hiệu hóa khi chưa chọn option
           >
             <Text style={styles.buttonText}>{currentIndex < questions.length - 1 ? "Next" : "Finish"}</Text>
           </TouchableOpacity>
+
         </View>
       </ScrollView>
 
