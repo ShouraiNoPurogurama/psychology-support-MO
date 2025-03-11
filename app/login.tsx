@@ -7,6 +7,7 @@ import * as WebBrowser from 'expo-web-browser';
 import '../assets/Google.jpg';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
 import {jwtDecode} from "jwt-decode";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const GoogleLogo = require('../assets/Google.jpg');
@@ -65,7 +66,8 @@ export default function Login(): React.JSX.Element {
       console.log('API Response:', data);
 
       if (response.ok) {
-        const token = data.token;  // Lấy token từ API response
+        const token = data.token;  
+        await AsyncStorage.setItem('authToken',token)
   
         if (!token) {
           Alert.alert("Error", "No token received");
