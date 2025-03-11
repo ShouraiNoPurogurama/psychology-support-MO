@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useRootNavigationState } from "expo-router";
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import "../global.css";
 import { StatusBar } from "expo-status-bar";
@@ -10,7 +10,20 @@ import React, {useEffect} from "react";
 
 
 export default function App() {
-  
+  const navigationState = useRootNavigationState(); 
+
+  useEffect(() => {
+    if (!navigationState?.ready) return; 
+
+    router.replace("/login");
+  }, [navigationState?.ready]);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      router.replace("/login");
+    }, ); 
+
+    return () => clearTimeout(timeout); // Xóa timeout khi unmount
+  }, []);
 //   useEffect(() => {
 //     const fetchFCMToken = async () => {
 //       try {
@@ -58,7 +71,7 @@ export default function App() {
 //     .then(async (remoteMessage) =>{
 //       if(remoteMessage) {
 //         console.log(
-//           "Notification caused app to open from quit state asdasdwassdawwad",
+//           "Notification caused app to open from quit state ",
 //           remoteMessage.notification
 //         );
 //       }
@@ -87,12 +100,12 @@ export default function App() {
 
 
 
-    // return (
-    //   <View style={styles.container}>
-    //       <Text> FCM Tutorial </Text>
-    //       <StatusBar style="auto"/>
-    //   </View>
-    // );
+//     // return (
+//     //   <View style={styles.container}>
+//     //       <Text> FCM Tutorial </Text>
+//     //       <StatusBar style="auto"/>
+//     //   </View>
+//     // );
 
 
 
