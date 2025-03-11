@@ -12,7 +12,7 @@ const products = [
     description: "Giúp thư giãn, giảm căng thẳng và cải thiện giấc ngủ.",
     rating: 4.8,
     purchases: 320,
-    image: "https://source.unsplash.com/300x200/?lavender,oil",
+    image: "https://fujispacenter.vn/wp-content/uploads/2024/07/thumb-14.jpg",
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const products = [
     description: "Mang đến hương thơm dịu nhẹ, tạo không gian ấm áp.",
     rating: 4.7,
     purchases: 210,
-    image: "https://source.unsplash.com/300x200/?vanilla,candle",
+    image: "https://product.hstatic.net/200000485529/product/nen-thom-vanilla_44441940e88b45e7b8a67afe1fc636df_master.jpg",
   },
   {
     id: 3,
@@ -30,7 +30,7 @@ const products = [
     description: "Giúp thông mũi, giảm đau đầu và tăng sự tỉnh táo.",
     rating: 4.6,
     purchases: 150,
-    image: "https://source.unsplash.com/300x200/?mint,oil",
+    image: "https://cdn.nhathuoclongchau.com.vn/unsafe/800x0/https://cms-prod.s3-sgn09.fptcloud.com/giai_dap_tinh_dau_bac_ha_co_nhung_cong_dung_gi_1_acb07379cc.jpg",
   },
   {
     id: 4,
@@ -39,7 +39,7 @@ const products = [
     description: "Tạo cảm giác dễ chịu, giảm căng thẳng và lo âu.",
     rating: 4.9,
     purchases: 180,
-    image: "https://source.unsplash.com/300x200/?jasmine,candle",
+    image: "https://thegioihoahong.com/wp-content/uploads/2022/06/nen-thom-hoa-nhai-2.jpg",
   },
   {
     id: 5,
@@ -48,7 +48,7 @@ const products = [
     description: "Mùi hương tươi mát, giúp cải thiện tâm trạng.",
     rating: 4.8,
     purchases: 260,
-    image: "https://source.unsplash.com/300x200/?orange,oil",
+    image: "https://file.hstatic.net/200000055530/file/tinh-dau-cam-ngot_1_276a4363028b41c2a542cb8eb1dec1bc_grande.png",
   },
 ];
 
