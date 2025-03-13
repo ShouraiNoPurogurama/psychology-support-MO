@@ -1,13 +1,28 @@
 import { router, useLocalSearchParams } from "expo-router";
 
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { Student_Header } from "../../../component/Student_Header";
 import { Footer } from "../../../component/Footer";
 import { FontAwesome } from '@expo/vector-icons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BookingModal from "../../../component/BookingModal";
 import { blue } from "react-native-reanimated/lib/typescript/Colors";
 import React from "react";
+
+type Doctor = {
+    id: string;
+    name: string;
+    specialty: string;
+    address: string;
+    phoneNumber: string;
+    email: string;
+    gender: string;
+    rating: number;
+    image: string;
+    bio: string;
+    yearsOfExperience: number;
+    qualifications: string;
+};
 
 
 const doctors = [
@@ -157,67 +172,128 @@ const doctors = [
 ];
 
 export default function doctorDetail() {
+    // const doctor = doctors.find(doc => doc.id === Number(id));
     const { id } = useLocalSearchParams();
-    const doctor = doctors.find(doc => doc.id === Number(id));
+    const [doctor, setDoctor] = useState<Doctor | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showMore, setShowMore] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
 
 
-    if (!doctor) {
+    useEffect(() => {
+        const fetchDoctorDetail = async () => {
+            try {
+                const response = await fetch(`https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/doctors/${id}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch doctor details");
+                }
+                const data = await response.json();
+                const doctorData = data.doctorProfileDto;
+
+                // Map dữ liệu từ API vào đúng format của Doctor type
+                const formattedDoctor: Doctor = {
+                    id: doctorData.id,
+                    name: doctorData.fullName,
+                    specialty: (doctorData.specialties as { name: string }[]).map(s => s.name).join(", "),
+                    address: doctorData.contactInfo.address,
+                    phoneNumber: doctorData.contactInfo.phoneNumber,
+                    email: doctorData.contactInfo.email,
+                    gender: doctorData.gender,
+                    rating: doctorData.rating,
+                    image: "", // API không có hình ảnh, có thể cập nhật sau
+                    bio: doctorData.bio,
+                    yearsOfExperience: doctorData.yearsOfExperience,
+                    qualifications: doctorData.qualifications
+                };
+
+                setDoctor(formattedDoctor);
+            } catch (err) {
+                console.error("Error fetching doctors:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDoctorDetail();
+    }, [id]);
+
+
+    if (loading) {
         return (
-            <View style={styles.container}>
-                <Text>Doctor not found</Text>
+            <View style={styles.centered}>
+                <ActivityIndicator size="large" color="#007BFF" />
             </View>
         );
     }
 
+    if (error || !doctor) {
+        return (
+            <View style={styles.centered}>
+                <Text style={styles.errorText}>{error || "Doctor not found"}</Text>
+            </View>
+        );
+    }
     return (
         <>
             <Student_Header />
-            <View style={styles.fixedImageContainer}>
+            {/* <View style={styles.image}>
                 <Image source={{ uri: doctor.image }} style={styles.image} resizeMode="stretch" />
-            </View>
+            </View> */}
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.container}>
+                    <Image source={{ uri: doctor.image || "https://taimuihongsg.com/wp-content/uploads/2018/05/Kim-Bun-ThuongE_taimuihongsg.jpg" }} style={styles.image} resizeMode="cover" />
                     <Text style={styles.name}>{doctor.name}</Text>
                     <Text style={styles.specialty}>{doctor.specialty}</Text>
                     <Text style={styles.address}>{doctor.address}</Text>
-                    <Text style={styles.fee}>Consultation Fee: {doctor.fee.toLocaleString()} VND</Text>
+                    <Text style={styles.textLeft}>Gender: {doctor.gender}</Text>
+                    <Text style={styles.textLeft}>Phone: {doctor.phoneNumber}</Text>
+                    <Text style={styles.textLeft}>Email: {doctor.email}</Text>
+
                     <View style={styles.ratingContainer}>
                         <FontAwesome name="star" size={18} color="gold" />
                         <Text style={styles.rating}>{doctor.rating} / 5</Text>
                     </View>
-                    <Text style={styles.sectionTitle}>Doctor's Information</Text>
-                    <Text style={styles.bio} numberOfLines={showMore ? undefined : 3}>{doctor.bio}</Text>
-                    <TouchableOpacity onPress={() => setShowMore(!showMore)}>
-                        <Text style={styles.showMore}>{showMore ? "Show Less" : "Show More"}</Text>
-                    </TouchableOpacity>
 
-                    <Text style={styles.sectionTitle}>Experience</Text>
-                    <Text style={styles.textLeft}>Years of Experience: {doctor.yearsOfExperience}</Text>
+                    {doctor.bio && (
+                        <>
+                            <Text style={styles.sectionTitle}>About</Text>
+                            <Text style={styles.bio} numberOfLines={showMore ? undefined : 3}>{doctor.bio}</Text>
+                            <TouchableOpacity onPress={() => setShowMore(!showMore)}>
+                                <Text style={styles.showMore}>{showMore ? "Show Less" : "Show More"}</Text>
+                            </TouchableOpacity>
+                        </>
+                    )}
 
-                    <Text style={styles.sectionTitle}>Education</Text>
-                    <Text style={styles.textLeft}>{doctor.qualifications}</Text>
+                    {doctor.yearsOfExperience > 0 && (
+                        <>
+                            <Text style={styles.sectionTitle}>Experience</Text>
+                            <Text style={styles.text}>{doctor.yearsOfExperience} years</Text>
+                        </>
+                    )}
 
-                    <Text style={styles.sectionTitle}>Certificates</Text>
-                    {doctor.certificates.map((cert, index) => (
-                        <Text key={index} style={styles.textLeft}>- {cert}</Text>
-                    ))}
+                    {doctor.qualifications && (
+                        <>
+                            <Text style={styles.sectionTitle}>Education</Text>
+                            <Text style={styles.text}>{doctor.qualifications}</Text>
+                        </>
+                    )}
+
                     <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
                         <Text style={styles.buttonText}>Book Appointment</Text>
                     </TouchableOpacity>
-                    <BookingModal
-                        visible={modalVisible}
-                        onClose={() => setModalVisible(false)}
-                        doctorId={doctor.id}
-                        onConfirm={(selectedTime) => {
-                            console.log(`Confirmed appointment at ${selectedTime} with doctor ${doctor.id}`);
-                            setModalVisible(false);
-                        }}
-                    />
                 </View>
             </ScrollView>
             <Footer />
+            <BookingModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                doctorId={doctor.id}
+                onConfirm={(selectedTime) => {
+                    console.log(`Confirmed appointment at ${selectedTime} with doctor ${doctor.id}`);
+                    setModalVisible(false);
+                }}
+            />
 
 
         </>
@@ -228,100 +304,31 @@ export default function doctorDetail() {
 
 const styles = StyleSheet.create({
     scrollContainer: {
+        paddingTop:80,
         paddingBottom: 80,
-        flexGrow: 1
     },
     container: {
-        flex: 1,
         alignItems: 'center',
         padding: 20,
-        marginTop: 370,
-        borderRadius: 40
-    },
-    fixedImageContainer: {
-        position: 'absolute',
-        top: 65,
-        left: 0,
-        right: 0,
-        alignItems: 'center',
-        zIndex: 10,
-        backgroundColor: 'white',
-        paddingVertical: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 5,
     },
     image: {
-        width: '70%',
-        height: 300,
-        borderRadius: 600,
-        borderWidth: 2,
-        borderColor: '#ddd',
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        marginBottom: 15,
     },
     name: {
         fontSize: 22,
         fontWeight: 'bold',
-       
     },
     specialty: {
         fontSize: 16,
-        color: 'gray'
+        color: 'gray',
     },
     address: {
         fontSize: 14,
         color: 'gray',
-        marginBottom: 10
-    },
-    ratingContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginVertical: 5
-    },
-    rating: {
-        fontSize: 16,
-        marginLeft: 5
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginTop: 20,
-        alignSelf: 'flex-start',
-         color: "blue"
-        
-    },
-    bio: {
-        fontSize: 14,
-        color: 'gray',
-        marginVertical: 5,
-        textAlign: 'justify'
-    },
-    showMore: {
-        fontSize: 14,
-        color: '#007BFF',
-        fontWeight: 'bold',
-        marginTop: 5
-    },
-    experience: {
-        fontSize: 16,
-        marginVertical: 5
-    },
-    qualifications: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginTop: 10,
-    },
-    certificateItem: {
-        fontSize: 14,
-        color: 'gray'
-    },
-    button: {
-        marginTop: 20,
-        backgroundColor: '#007BFF',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5
+        marginBottom: 10,
     },
     textLeft: {
         fontSize: 16,
@@ -329,13 +336,55 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         alignSelf: 'flex-start'
     },
+    ratingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 5,
+    },
+    rating: {
+        fontSize: 16,
+        marginLeft: 5,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginTop: 20,
+    },
+    bio: {
+        fontSize: 14,
+        color: 'gray',
+        textAlign: 'justify',
+    },
+    showMore: {
+        fontSize: 14,
+        color: '#007BFF',
+        fontWeight: 'bold',
+        marginTop: 5,
+    },
+    text: {
+        fontSize: 16,
+        textAlign: 'left',
+        alignSelf: 'flex-start',
+    },
+    button: {
+        marginTop: 40,
+        backgroundColor: '#007BFF',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+    },
     buttonText: {
         color: '#fff',
         fontSize: 16,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
-    fee: {
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
         fontSize: 16,
-        fontWeight: 'bold'
+        color: 'red',
     },
 });

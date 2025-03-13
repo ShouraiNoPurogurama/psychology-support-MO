@@ -13,7 +13,7 @@ interface BookingModalProps {
     visible: boolean;
     onClose: () => void;
     onConfirm: (date: string, time: string) => void;
-    doctorId: number;
+    doctorId: string;
 }
 
 const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalProps) => {
