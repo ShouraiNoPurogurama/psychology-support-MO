@@ -20,7 +20,7 @@ export default function MedicalRecordDetails() {
 
   useEffect(() => {
     if (!id) return;
-    
+
     const fetchMedicalRecord = async () => {
       try {
         const response = await fetch(
@@ -62,9 +62,11 @@ export default function MedicalRecordDetails() {
 
   return (
     <>
-      <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <View style={styles.backButtonContent}>
             <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
           </View>
@@ -73,15 +75,28 @@ export default function MedicalRecordDetails() {
       </View>
 
       <View style={styles.wrapper}>
-        <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
           {/* Thông tin chính */}
           <View style={styles.card}>
             <Text style={styles.title}>Medical Record</Text>
-            <Text style={styles.date}>{new Date(record.createdAt).toLocaleDateString()}</Text>
+            <Text style={styles.date}>
+              {new Date(record.createdAt).toLocaleDateString()}
+            </Text>
 
             {[
-              { icon: "user-md", label: "Doctor", value: record.doctorProfileId },
-              { icon: "clipboard-list", label: "Notes", value: record.notes || "No notes" },
+              {
+                icon: "user-md",
+                label: "Doctor",
+                value: record.doctorProfileId,
+              },
+              {
+                icon: "clipboard-list",
+                label: "Notes",
+                value: record.notes || "No notes",
+              },
               { icon: "clock", label: "Status", value: record.status },
             ].map((item, index) => (
               <View style={styles.section} key={index}>
@@ -93,20 +108,25 @@ export default function MedicalRecordDetails() {
           </View>
 
           {/* Rối loạn tâm thần */}
-          {record.specificMentalDisorders && record.specificMentalDisorders.length > 0 && (
-            <View style={styles.borderBox}>
-              <View style={styles.sectionHeader}>
-                <FontAwesome5 name="brain" size={18} color="#6C63FF" />
-                <Text style={styles.sectionTitle}>Mental Disorders</Text>
-              </View>
-              {record.specificMentalDisorders.map((disorder: any, index: number) => (
-                <View key={index} style={styles.innerSection}>
-                  <Text style={styles.innerTitle}>{disorder.mentalDisorderName}</Text>
-                  <Text style={styles.info}>{disorder.description}</Text>
+          {record.specificMentalDisorders &&
+            record.specificMentalDisorders.length > 0 && (
+              <View style={styles.borderBox}>
+                <View style={styles.sectionHeader}>
+                  <FontAwesome5 name="brain" size={18} color="#6C63FF" />
+                  <Text style={styles.sectionTitle}>Mental Disorders</Text>
                 </View>
-              ))}
-            </View>
-          )}
+                {record.specificMentalDisorders.map(
+                  (disorder: any, index: number) => (
+                    <View key={index} style={styles.innerSection}>
+                      <Text style={styles.innerTitle}>
+                        {disorder.mentalDisorderName}
+                      </Text>
+                      <Text style={styles.info}>{disorder.description}</Text>
+                    </View>
+                  )
+                )}
+              </View>
+            )}
         </ScrollView>
       </View>
       <Footer />

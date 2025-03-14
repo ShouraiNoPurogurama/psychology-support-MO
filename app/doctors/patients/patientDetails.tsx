@@ -11,7 +11,6 @@ import { Footer } from "../../../component/doctorFooter";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
-
 export default function PatientProfile() {
   const { id } = useLocalSearchParams();
 
@@ -75,7 +74,7 @@ export default function PatientProfile() {
           `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/${id}/medical-records?PageIndex=1&PageSize=10&SortBy=CreateAt&SortOrder=asc&Status=Processing`
         );
         if (!response.ok) throw new Error("Failed to fetch medical records");
-  
+
         const data = await response.json();
         setMedicalRecords(data.medicalRecords?.data || []);
       } catch (error) {
@@ -87,7 +86,6 @@ export default function PatientProfile() {
     }
     fetchMedicalRecords();
   }, [id]);
-
 
   if (loading) {
     return (
@@ -108,7 +106,10 @@ export default function PatientProfile() {
   return (
     <View style={styles.wrapper}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
         </TouchableOpacity>
         <Text style={styles.header}>Patient Profile</Text>
@@ -119,73 +120,121 @@ export default function PatientProfile() {
       >
         <View style={styles.sectionContainer}>
           <View style={styles.nameRow}>
-            <FontAwesome5 name="user" size={20} color="#6C63FF" style={styles.iconSpacing} />
+            <FontAwesome5
+              name="user"
+              size={20}
+              color="#6C63FF"
+              style={styles.iconSpacing}
+            />
             <Text style={styles.name}>{patientData.fullName}</Text>
           </View>
-          <Text style={styles.info}>Allergies: {patientData.allergies || "N/A"}</Text>
-          <Text style={styles.info}>Personality: {patientData.personalityTraits || "N/A"}</Text>
+          <Text style={styles.info}>
+            Allergies: {patientData.allergies || "N/A"}
+          </Text>
+          <Text style={styles.info}>
+            Personality: {patientData.personalityTraits || "N/A"}
+          </Text>
         </View>
 
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>
-            <FontAwesome5 name="address-book" size={20} color="#6C63FF" /> Contact Information
+            <FontAwesome5 name="address-book" size={20} color="#6C63FF" />{" "}
+            Contact Information
           </Text>
           <View style={styles.iconRow}>
-            <FontAwesome5 name="envelope" size={16} color="#6C63FF" style={styles.iconSpacing} />
+            <FontAwesome5
+              name="envelope"
+              size={16}
+              color="#6C63FF"
+              style={styles.iconSpacing}
+            />
             <Text style={styles.info}>{patientData.contactInfo.email}</Text>
           </View>
           <View style={styles.iconRow}>
-            <FontAwesome5 name="phone" size={16} color="#6C63FF" style={styles.iconSpacing} />
-            <Text style={styles.info}>{patientData.contactInfo.phoneNumber}</Text>
+            <FontAwesome5
+              name="phone"
+              size={16}
+              color="#6C63FF"
+              style={styles.iconSpacing}
+            />
+            <Text style={styles.info}>
+              {patientData.contactInfo.phoneNumber}
+            </Text>
           </View>
           <View style={styles.iconRow}>
-            <FontAwesome5 name="map-marker-alt" size={16} color="#6C63FF" style={styles.iconSpacing} />
+            <FontAwesome5
+              name="map-marker-alt"
+              size={16}
+              color="#6C63FF"
+              style={styles.iconSpacing}
+            />
             <Text style={styles.info}>{patientData.contactInfo.address}</Text>
           </View>
         </View>
 
         <View style={styles.sectionContainer}>
           <Text style={styles.headerSection}>
-            <FontAwesome5 name="heartbeat" size={20} color="#6C63FF" /> Health Condition
+            <FontAwesome5 name="heartbeat" size={20} color="#6C63FF" /> Health
+            Condition
           </Text>
           <Text style={styles.subHeader}>Mental Disorders</Text>
-          {patientData.medicalHistory?.specificMentalDisorders?.map((disorder, index) => (
-            <Text key={index} style={styles.bulletPoint}>• {disorder.name} - {disorder.description}</Text>
-          )) || <Text style={styles.info}>No mental disorder history available</Text>}
+          {patientData.medicalHistory?.specificMentalDisorders?.map(
+            (disorder, index) => (
+              <Text key={index} style={styles.bulletPoint}>
+                • {disorder.name} - {disorder.description}
+              </Text>
+            )
+          ) || (
+            <Text style={styles.info}>
+              No mental disorder history available
+            </Text>
+          )}
 
           <Text style={styles.subHeader}>Physical Symptoms</Text>
-          {patientData.medicalHistory?.physicalSymptoms?.map((symptom, index) => (
-            <Text key={index} style={styles.bulletPoint}>• {symptom.name} ({symptom.description})</Text>
-          )) || <Text style={styles.info}>No physical symptoms reported</Text>}
+          {patientData.medicalHistory?.physicalSymptoms?.map(
+            (symptom, index) => (
+              <Text key={index} style={styles.bulletPoint}>
+                • {symptom.name} ({symptom.description})
+              </Text>
+            )
+          ) || <Text style={styles.info}>No physical symptoms reported</Text>}
         </View>
         <View style={styles.sectionContainer}>
-  <Text style={styles.headerSection}>
-    <FontAwesome5 name="file-medical" size={20} color="#6C63FF" style={styles.iconSpacing} /> Medical Records
-  </Text>
-  {loadingRecords ? (
-    <ActivityIndicator size="small" color="#6A8CAF" />
-  ) : medicalRecords.length > 0 ? (
-    medicalRecords.map((record) => (
-      <TouchableOpacity
-        key={record.id}
-        style={styles.recordItem}
-        onPress={() =>
-          router.push({
-            pathname: "/doctors/medicalRecords/medicalRecordDetails",
-            params: { id: record.id },
-          })
-        }
-      >
-        <Text style={styles.recordTitle}>{record.notes || "No Notes Available"}</Text>
-        <Text style={styles.recordDate}>
-          Created At: {new Date(record.createdAt).toLocaleDateString()}
-        </Text>
-      </TouchableOpacity>
-    ))
-  ) : (
-    <Text style={styles.info}>No medical records found.</Text>
-  )}
-</View>
+          <Text style={styles.headerSection}>
+            <FontAwesome5
+              name="file-medical"
+              size={20}
+              color="#6C63FF"
+              style={styles.iconSpacing}
+            />{" "}
+            Medical Records
+          </Text>
+          {loadingRecords ? (
+            <ActivityIndicator size="small" color="#6A8CAF" />
+          ) : medicalRecords.length > 0 ? (
+            medicalRecords.map((record) => (
+              <TouchableOpacity
+                key={record.id}
+                style={styles.recordItem}
+                onPress={() =>
+                  router.push({
+                    pathname: "/doctors/medicalRecords/medicalRecordDetails",
+                    params: { id: record.id },
+                  })
+                }
+              >
+                <Text style={styles.recordTitle}>
+                  {record.notes || "No Notes Available"}
+                </Text>
+                <Text style={styles.recordDate}>
+                  Created At: {new Date(record.createdAt).toLocaleDateString()}
+                </Text>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.info}>No medical records found.</Text>
+          )}
+        </View>
       </ScrollView>
       <Footer />
     </View>
@@ -200,10 +249,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#f5f5f5",
     elevation: 4,
   },
-  header: { fontSize: 24, fontWeight: "bold", color: "#4B3F72", marginLeft: 40 },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#4B3F72",
+    marginLeft: 5,
+    flex: 1,
+  },
   nameRow: { flexDirection: "row", alignItems: "center" },
   iconSpacing: { marginRight: 10 },
   iconRow: { flexDirection: "row", alignItems: "center", marginVertical: 5 },
@@ -226,8 +281,28 @@ const styles = StyleSheet.create({
   recordDate: { fontSize: 14, color: "gray" },
   info: { fontSize: 16, color: "#333", marginLeft: 10 },
   backButton: { marginRight: 15 },
-  headerSection: { fontSize: 20, fontWeight: "bold", color: "#4B3F72", marginBottom: 10 },
-  subHeader: { fontSize: 18, fontWeight: "bold", color: "#4B3F72", marginTop: 10 },
-  bulletPoint: { fontSize: 16, color: "#333", marginLeft: 10, marginVertical: 2 },
-  name: { fontSize: 22, fontWeight: "bold", color: "#4B3F72", marginBottom: 10 },
+  headerSection: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#4B3F72",
+    marginBottom: 10,
+  },
+  subHeader: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#4B3F72",
+    marginTop: 10,
+  },
+  bulletPoint: {
+    fontSize: 16,
+    color: "#333",
+    marginLeft: 10,
+    marginVertical: 2,
+  },
+  name: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#4B3F72",
+    marginBottom: 10,
+  },
 });

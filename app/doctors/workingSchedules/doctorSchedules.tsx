@@ -13,18 +13,12 @@ import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 
-type Appointment = {
-  id: number;
-  name: string;
-  time: string;
-  gender: string;
-  age: number;
-  phone: string;
-  email: string;
-};
-
-type Appointments = {
-  [date: string]: Appointment[];
+type TimeSlot = {
+  status: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  occupiedInfo: string;
 };
 
 type DayObject = {
@@ -35,49 +29,32 @@ type DayObject = {
   timestamp: number;
 };
 
-const appointments: Appointments = {
-  "2025-03-01": [
-    {
-      id: 1,
-      name: "Nguyen Van A",
-      time: "09:00 AM",
-      gender: "Male",
-      age: 30,
-      phone: "0123456789",
-      email: "nguyenvana@example.com",
-    },
-    {
-      id: 2,
-      name: "Tran Thi B",
-      time: "10:30 AM",
-      gender: "Female",
-      age: 25,
-      phone: "0987654321",
-      email: "tranthib@example.com",
-    },
-  ],
-  "2025-03-05": [
-    {
-      id: 3,
-      name: "Le Hoang C",
-      time: "02:00 PM",
-      gender: "Male",
-      age: 40,
-      phone: "0934567890",
-      email: "lehoangc@example.com",
-    },
-  ],
-};
-
 export default function DoctorSchedule() {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string>(today);
-  const [patients, setPatients] = useState<Appointment[]>(
-    appointments[today] || []
-  );
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
 
   useEffect(() => {
-    setPatients(appointments[selectedDate] || []);
+    const fetchTimeSlots = async () => {
+      try {
+        const doctorId = "6d95bbbf-32ba-44ff-82b3-a5deea337848";
+        const response = await fetch(
+          `https://psychologysupportscheduling-g0efgxc5bwhbhjgc.southeastasia-01.azurewebsites.net/doctor-schedule/${doctorId}/${selectedDate}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch time slots");
+        }
+
+        const data = await response.json();
+        setTimeSlots(data.timeSlots || []);
+      } catch (error) {
+        console.error("Error fetching time slots:", error);
+        setTimeSlots([]);
+      }
+    };
+
+    fetchTimeSlots();
   }, [selectedDate]);
 
   const formatDate = (dateString: string) => {
@@ -85,24 +62,15 @@ export default function DoctorSchedule() {
     return `${day}-${month}-${year}`;
   };
 
-  const markedDates = Object.keys(appointments).reduce((acc, date) => {
-    acc[date] = { marked: true, dotColor: "red", selectedColor: "red" };
-    return acc;
-  }, {} as { [key: string]: { marked: boolean; dotColor: string; selectedColor: string } });
+  const extractBookingCode = (occupiedInfo: string) => {
+    const match = occupiedInfo.match(/BookingCode:\s?(\S+)/i);
+    return match ? match[1] : null;
+  };
 
-  const handleAppointmentPress = (patient: Appointment) => {
-    router.push({
-      pathname: "/doctors/appointments/scheduleAppointmentDetails",
-      params: {
-        name: patient.name,
-        age: patient.age.toString(),
-        gender: patient.gender,
-        phone: patient.phone,
-        email: patient.email,
-        date: selectedDate,
-        time: patient.time,
-      },
-    });
+  const navigateToDetails = (bookingCode: string) => {
+    router.push(
+      `/doctors/appointments/scheduleAppointmentDetails?bookingCode=${bookingCode}`
+    );
   };
 
   return (
@@ -126,12 +94,9 @@ export default function DoctorSchedule() {
           <Calendar
             current={today}
             markedDates={{
-              ...markedDates,
               [selectedDate]: {
                 selected: true,
-                selectedColor: "#6A8CAF",
-                marked: !!appointments[selectedDate],
-                dotColor: "red",
+                selectedColor: "rgba(147, 112, 219, 0.5)",
               },
               [today]: {
                 selected: true,
@@ -142,7 +107,7 @@ export default function DoctorSchedule() {
             }}
             onDayPress={(day: DayObject) => setSelectedDate(day.dateString)}
             theme={{
-              selectedDayBackgroundColor: "#6A8CAF",
+              selectedDayBackgroundColor: "rgba(147, 112, 219, 0.5)",
               todayTextColor: "#D9534F",
               arrowColor: "#6A8CAF",
               textMonthFontSize: 20,
@@ -150,29 +115,47 @@ export default function DoctorSchedule() {
               textDayHeaderFontSize: 14,
               textDayHeaderFontWeight: "bold",
               textDayHeaderColor: "#000",
+              dayTextColor: "rgba(0,0,0,0.5)",
             }}
           />
         </View>
 
         <Text style={styles.title}>
-          {patients.length > 0
-            ? `Patients scheduled on ${formatDate(selectedDate)}`
-            : `No appointments on ${formatDate(selectedDate)}`}
+          {timeSlots.filter((slot) => slot.status === "Unavailable").length > 0
+            ? `Unavailable time slots on ${formatDate(selectedDate)}`
+            : `No unavailable time slots on ${formatDate(selectedDate)}`}
         </Text>
 
-        <FlatList
-          data={patients}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.patientItem}
-              onTouchStart={() => handleAppointmentPress(item)}
-            >
-              <Text style={styles.patientName}>{item.name}</Text>
-              <Text style={styles.patientTime}>{item.time}</Text>
-            </Pressable>
-          )}
-        />
+        <View style={styles.listContainer}>
+          <FlatList
+            data={timeSlots.filter((slot) => slot.status === "Unavailable")}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => {
+              const bookingCode = extractBookingCode(item.occupiedInfo);
+              return (
+                <Pressable
+                  style={[styles.timeSlotItem, { backgroundColor: "#9B59B6" }]}
+                  disabled={!bookingCode}
+                  onPress={() => bookingCode && navigateToDetails(bookingCode)}
+                >
+                  <Text
+                    style={styles.timeSlotText}
+                  >{`${item.startTime} - ${item.endTime}`}</Text>
+                  {bookingCode ? (
+                    <Text
+                      style={styles.occupiedInfo}
+                    >{`Booking Code: ${bookingCode}`}</Text>
+                  ) : item.occupiedInfo ? (
+                    <Text
+                      style={styles.occupiedInfo}
+                    >{`Patient: ${item.occupiedInfo}`}</Text>
+                  ) : null}
+                </Pressable>
+              );
+            }}
+            nestedScrollEnabled={true}
+          />
+        </View>
       </View>
       <Footer />
     </>
@@ -222,6 +205,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 20,
   },
+  listContainer: {
+    maxHeight: 300,
+  },
+  timeSlotItem: {
+    padding: 15,
+    marginVertical: 5,
+    borderRadius: 5,
+  },
   title: {
     fontSize: 18,
     fontWeight: "bold",
@@ -229,21 +220,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#6A8CAF",
   },
-  patientItem: {
-    backgroundColor: "#f9f9f9",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  patientName: {
+  timeSlotText: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
+    color: "#fff",
   },
-  patientTime: {
+  occupiedInfo: {
     fontSize: 14,
-    color: "#666",
+    color: "#fff",
+    marginTop: 5,
   },
 });

@@ -29,42 +29,41 @@ export default function SettingOptions() {
 
   return (
     <>
-    <DoctorHeader />
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <View style={styles.backButtonContent}>
-            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-          </View>
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Settings</Text>
-      </View>
-
-      <View style={styles.settingsList}>
-        {settings.map((item, index) => (
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
           <TouchableOpacity
-            key={index}
-            style={styles.settingItem}
-            onPress={() => router.push(item.route)}
+            onPress={() => router.back()}
+            style={styles.backButton}
           >
-            <View style={styles.iconTextContainer}>
-              <MaterialIcons
-                name={item.icon as any}
-                size={24}
-                color="#AF93D2"
-                style={styles.icon}
-              />
-              <Text style={styles.settingText}>{item.name}</Text>
+            <View style={styles.backButtonContent}>
+              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
             </View>
-            <MaterialIcons name="chevron-right" size={24} color="#666" />
           </TouchableOpacity>
-        ))}
+          <Text style={styles.headerText}>Settings</Text>
+        </View>
+
+        <View style={styles.settingsList}>
+          {settings.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.settingItem}
+              onPress={() => router.push(item.route)}
+            >
+              <View style={styles.iconTextContainer}>
+                <MaterialIcons
+                  name={item.icon as any}
+                  size={24}
+                  color="#AF93D2"
+                  style={styles.icon}
+                />
+                <Text style={styles.settingText}>{item.name}</Text>
+              </View>
+              <MaterialIcons name="chevron-right" size={24} color="#666" />
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
-    </View>
-    <Footer />
+      <Footer />
     </>
   );
 }
