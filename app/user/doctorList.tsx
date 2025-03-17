@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 15,
-    marginTop: 80,
+    marginTop: 110,
     marginHorizontal: 10
   },
   sortContainer: {

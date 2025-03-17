@@ -33,7 +33,7 @@ export default function ConfirmAppointment() {
                     id: doctorData.id,
                     name: doctorData.fullName,
                     specialty: (doctorData.specialties as { name: string }[]).map(s => s.name).join(", "),
-                    fee: 0, // API chưa có fee
+                    fee: 150.000, // API chưa có fee
                     image: "https://taimuihongsg.com/wp-content/uploads/2018/05/Kim-Bun-ThuongE_taimuihongsg.jpg", // API chưa có image
                 };
                 setDoctor(formattedDoctor);
