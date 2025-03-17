@@ -35,8 +35,6 @@ export default function AppointmentDetails() {
 
   return (
     <View style={styles.wrapper}>
-      <DoctorHeader />
-
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}

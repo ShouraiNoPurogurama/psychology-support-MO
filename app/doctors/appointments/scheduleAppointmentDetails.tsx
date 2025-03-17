@@ -1,53 +1,131 @@
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Linking,
+  ActivityIndicator,
 } from "react-native";
-
 import { router, useLocalSearchParams } from "expo-router";
-import { FontAwesome5 } from "@expo/vector-icons";
-import React from "react";
-import { DoctorHeader } from "../../../component/doctorHeader";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import { Footer } from "../../../component/doctorFooter";
 
 export default function AppointmentDetails() {
   const params = useLocalSearchParams();
 
-  const doctorMeetingUrl = "https://meet.google.com/doctor-meeting-link";
+  interface BookingDetails {
+    bookingCode: string;
+    doctorId: string;
+    patientId: string;
+    date: string;
+    startTime: string;
+    duration: number;
+    price: number;
+    promoCodeId?: string;
+    giftCodeId?: string;
+    status: string;
+  }
 
-  const patientData = {
-    name: params.name || "John Doe",
-    gender: params.gender || "Male",
-    age: params.age || 35,
-    avatar: Array.isArray(params.avatar)
-      ? params.avatar[0]
-      : params.avatar || "https://via.placeholder.com/100",
-    email: params.email || "johndoe@example.com",
-    phone: params.phone || "+123456789",
-    dob: params.dob || "15 March 1989",
-    testResult: params.testResult || "Normal",
-    date: params.date || "20 March 2024",
-    time: params.time || "10:30 AM",
+  interface PatientDetails {
+    id: string;
+    fullName: string;
+    gender: string;
+    contactInfo: {
+      address: string;
+      phoneNumber: string;
+      email: string;
+    };
+  }
+
+  const [bookingDetails, setBookingDetails] = useState<BookingDetails | null>(
+    null
+  );
+  const [patientDetails, setPatientDetails] = useState<PatientDetails | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        if (!params.bookingCode) return;
+
+        const bookingResponse = await fetch(
+          `https://psychologysupportscheduling-g0efgxc5bwhbhjgc.southeastasia-01.azurewebsites.net/bookings/${params.bookingCode}`
+        );
+
+        if (!bookingResponse.ok) {
+          throw new Error("Failed to fetch booking details");
+        }
+
+        const bookingData = await bookingResponse.json();
+        setBookingDetails(bookingData.booking);
+
+        const patientResponse = await fetch(
+          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/${bookingData.booking.patientId}`
+        );
+
+        if (!patientResponse.ok) {
+          throw new Error("Failed to fetch patient details");
+        }
+
+        const patientData = await patientResponse.json();
+        const patientProfile = patientData.patientProfileDto;
+
+        setPatientDetails({
+          id: patientProfile.id,
+          fullName: patientProfile.fullName,
+          gender: patientProfile.gender,
+          contactInfo: patientProfile.contactInfo,
+        });
+      } catch (error) {
+        console.error("Error fetching details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, [params.bookingCode]);
+
+  const getGenderIcon = (gender: string): MaterialIconName => {
+    switch (gender.toLowerCase()) {
+      case "male":
+        return "male";
+      case "female":
+        return "female";
+      default:
+        return "person-outline";
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4B3F72" />
+      </View>
+    );
+  }
+
+  if (!bookingDetails || !patientDetails) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Booking or Patient not found!</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.wrapper}>
-      <DoctorHeader />
-
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <View style={styles.backButtonContent}>
-            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-          </View>
+          <FontAwesome5 name="arrow-left" size={24} color="#4B3F72" />
         </TouchableOpacity>
-        <Text style={styles.header}>Appointment Details</Text>
+        <Text style={styles.header}>Schedule Information</Text>
       </View>
 
       <ScrollView
@@ -55,75 +133,84 @@ export default function AppointmentDetails() {
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         <View style={styles.sectionContainer}>
-          <View style={styles.detailsContainer}>
-            <Image source={{ uri: patientData.avatar }} style={styles.avatar} />
-            <Text style={styles.name}>{patientData.name}</Text>
-            <Text style={styles.age}>
-              {patientData.age} Years, {patientData.gender}
-            </Text>
-          </View>
+          <Text style={styles.header}>Patient Information</Text>
+          <InfoRow
+            icon="person-outline"
+            label="Name"
+            value={patientDetails.fullName}
+          />
+          <InfoRow
+            icon={getGenderIcon(patientDetails.gender)}
+            label="Gender"
+            value={patientDetails.gender}
+          />
+          <InfoRow
+            icon="phone"
+            label="Phone"
+            value={patientDetails.contactInfo.phoneNumber}
+          />
+          <InfoRow
+            icon="email"
+            label="Email"
+            value={patientDetails.contactInfo.email}
+          />
+          <InfoRow
+            icon="home"
+            label="Address"
+            value={patientDetails.contactInfo.address}
+          />
         </View>
 
         <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Contact Information</Text>
-          <View style={styles.row}>
-            <FontAwesome5
-              name="envelope"
-              size={18}
-              color="#4B3F72"
-              style={styles.icon}
-            />
-            <Text style={styles.info}>{patientData.email}</Text>
-          </View>
-          <View style={styles.row}>
-            <FontAwesome5
-              name="phone"
-              size={18}
-              color="#4B3F72"
-              style={styles.icon}
-            />
-            <Text style={styles.info}>{patientData.phone}</Text>
-          </View>
-        </View>
-
-        <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Medical Information</Text>
-          <Text style={styles.label}>Date of Birth</Text>
-          <Text style={styles.info}>{patientData.dob}</Text>
-          <Text style={styles.label}>Test Result</Text>
-          <Text style={styles.info}>{patientData.testResult}</Text>
-        </View>
-
-        <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Appointment Details</Text>
-          <Text style={styles.label}>Date & Time</Text>
-          <Text style={styles.info}>
-            {patientData.date} - {patientData.time}
-          </Text>
-          <Text style={styles.label}>Doctor's Google Meet Link</Text>
-          <TouchableOpacity onPress={() => Linking.openURL(doctorMeetingUrl)}>
-            <Text style={[styles.info, styles.link]}>{doctorMeetingUrl}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.declineButton} activeOpacity={0.8}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.confirmButton} activeOpacity={0.8}>
-            <Text style={styles.buttonText}>Complete</Text>
-          </TouchableOpacity>
+          <Text style={styles.header}>Booking Information</Text>
+          <InfoRow icon="date-range" label="Date" value={bookingDetails.date} />
+          <InfoRow
+            icon="access-time"
+            label="Start Time"
+            value={bookingDetails.startTime}
+          />
+          <InfoRow
+            icon="timer"
+            label="Duration"
+            value={`${bookingDetails.duration} minutes`}
+          />
+          <InfoRow
+            icon="check-circle"
+            label="Status"
+            value={bookingDetails.status}
+          />
         </View>
       </ScrollView>
+
       <Footer />
     </View>
   );
 }
 
+type MaterialIconName = React.ComponentProps<typeof MaterialIcons>["name"];
+
+const InfoRow = ({
+  icon,
+  label,
+  value,
+}: {
+  icon: MaterialIconName;
+  label: string;
+  value: string;
+}) => (
+  <View style={styles.infoRow}>
+    <MaterialIcons name={icon} size={24} color="#6A8CAF" />
+    <Text style={styles.info}>
+      <Text style={styles.infoLabel}>{label}: </Text>
+      {value}
+    </Text>
+  </View>
+);
+
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: "#F7F6FB",
+    backgroundColor: "#F9FAFB",
   },
   container: {
     flex: 1,
@@ -131,103 +218,68 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   sectionContainer: {
-    borderRadius: 12,
-    padding: 15,
+    borderRadius: 16,
+    padding: 5,
     marginBottom: 20,
     backgroundColor: "#ffffff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
   },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    justifyContent: "flex-start",
+    marginBottom: 5,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 6,
+  },
+  info: {
+    fontSize: 16,
+    color: "#374151",
+    marginLeft: 12,
+  },
+  infoLabel: {
+    fontWeight: "500",
+    color: "#4B3F72",
   },
   header: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "600",
     color: "#4B3F72",
-    marginLeft: 50,
   },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    top: "50%",
-    transform: [{ translateY: -22 }],
-    zIndex: 10,
-  },
+  //
   backButtonContent: {
     width: 44,
     height: 44,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 22,
+    backgroundColor: "#E8EAF6",
   },
-  detailsContainer: {
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
   },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: "#AF93D2",
-    marginBottom: 10,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  age: {
-    fontSize: 16,
-    color: "#555",
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#777",
-    marginTop: 10,
-  },
-  info: {
-    fontSize: 16,
-    color: "#333",
-  },
-  row: {
-    flexDirection: "row",
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    marginVertical: 5,
   },
-  icon: {
-    marginRight: 10,
-  },
-  link: {
-    color: "#1E90FF",
-    textDecorationLine: "underline",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 30,
-  },
-  confirmButton: {
-    backgroundColor: "#2ECC71",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-  },
-  declineButton: {
-    backgroundColor: "#E74C3C",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+  errorText: {
+    fontSize: 18,
+    color: "#E74C3C",
   },
 });

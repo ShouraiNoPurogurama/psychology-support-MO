@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
 import React from "react";
 import { DoctorHeader } from "../../component/doctorHeader";
 import { Footer } from "../../component/doctorFooter";
@@ -49,13 +56,19 @@ export default function Home() {
             <TouchableOpacity
               style={styles.card}
               activeOpacity={0.8}
-              onPress={() => router.push("/doctors/appointments/doctorAppointments")}
+              onPress={() =>
+                router.push("/doctors/appointments/doctorAppointments")
+              }
             >
               <MaterialIcons name="event" size={32} color="#AF93D2" />
               <Text style={styles.cardText}>Appointment Request</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.card} activeOpacity={0.8} onPress={handleMyPatientsPress}>
+            <TouchableOpacity
+              style={styles.card}
+              activeOpacity={0.8}
+              onPress={handleMyPatientsPress}
+            >
               <MaterialIcons name="group" size={32} color="#AF93D2" />
               <Text style={styles.cardText}>My Patients</Text>
             </TouchableOpacity>
@@ -63,7 +76,9 @@ export default function Home() {
             <TouchableOpacity
               style={styles.card}
               activeOpacity={0.8}
-              onPress={() => router.push("/doctors/workingSchedules/doctorSchedules")}
+              onPress={() =>
+                router.push("/doctors/workingSchedules/doctorSchedules")
+              }
             >
               <MaterialIcons name="schedule" size={32} color="#AF93D2" />
               <Text style={styles.cardText}>My Schedule</Text>
@@ -72,7 +87,9 @@ export default function Home() {
             <TouchableOpacity
               style={styles.card}
               activeOpacity={0.8}
-              onPress={() => router.push("/doctors/treatmentHistory/doctorTreatmentHistory")}
+              onPress={() =>
+                router.push("/doctors/treatmentHistory/doctorTreatmentHistory")
+              }
             >
               <MaterialIcons name="history" size={32} color="#AF93D2" />
               <Text style={styles.cardText}>Treatment History</Text>

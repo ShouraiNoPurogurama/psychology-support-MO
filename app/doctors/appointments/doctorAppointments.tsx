@@ -80,7 +80,6 @@ const appointments = [
 export default function DoctorAppointments() {
   return (
     <>
-      <DoctorHeader />
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}

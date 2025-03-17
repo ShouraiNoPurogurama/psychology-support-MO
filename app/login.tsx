@@ -1,18 +1,24 @@
 import { router } from "expo-router";
 import React from "react";
-import * as Google from 'expo-auth-session/providers/google';
-import { useEffect, useState } from 'react';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
-import '../assets/Google.jpg';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
+import * as Google from "expo-auth-session/providers/google";
+import { useEffect, useState } from "react";
+import * as AuthSession from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
+// import '../assets/Google.jpg';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import { jwtDecode } from "jwt-decode";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 
-
-
-const GoogleLogo = require('../assets/Google.jpg');
+// const GoogleLogo = require('../assets/Google.jpg');
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -36,12 +42,10 @@ export default function Login(): React.JSX.Element {
   //   }
   // }, [response]);
 
-
-
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const isValidEmail = (email: string) => {
@@ -52,11 +56,16 @@ export default function Login(): React.JSX.Element {
     return /^(0|\+84)[1-9][0-9]{8}$/.test(phone);
   };
 
-
   const handleLogin = async () => {
     if (!identifier || !password) {
-      Alert.alert('Error', 'Please enter your Email or Phone number and Password');
-      console.error('Error', 'Please enter your Email or Phone number and Password');
+      Alert.alert(
+        "Error",
+        "Please enter your Email or Phone number and Password"
+      );
+      console.error(
+        "Error",
+        "Please enter your Email or Phone number and Password"
+      );
 
       return;
     }
@@ -76,22 +85,21 @@ export default function Login(): React.JSX.Element {
 
     try {
       const response = await fetch(
-        'https://psychologysupportauth-gqdkbafkbpf5a4gf.eastasia-01.azurewebsites.net/Auth/login',
+        "https://psychologysupportauth-gqdkbafkbpf5a4gf.eastasia-01.azurewebsites.net/Auth/login",
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(loginData),
-
         }
       );
 
-      console.log(email, phoneNumber, password)
-      console.log('Response status:', response.status);
+      console.log(email, phoneNumber, password);
+      console.log("Response status:", response.status);
 
       const data = await response.json();
-      console.log('API Response:', data);
+      console.log("API Response:", data);
 
       if (response.ok) {
         const token = data.token;
@@ -108,7 +116,7 @@ export default function Login(): React.JSX.Element {
 
           const userRole = decoded.role; //chỗ này gọi role từ token đã giải mã
 
-          Alert.alert('Success', 'Login successful');
+          Alert.alert("Success", "Login successful");
 
           if (userRole === "User") {
             router.push("/user/home");
@@ -120,12 +128,12 @@ export default function Login(): React.JSX.Element {
           Alert.alert("Error", "Invalid token format");
         }
       } else {
-        Alert.alert('Error', data.message || 'Login failed');
-        console.error('Login failed:', data);
+        Alert.alert("Error", data.message || "Login failed");
+        console.error("Login failed:", data);
       }
     } catch (error) {
-      console.log('API Error:', error);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      console.log("API Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
 
@@ -170,12 +178,19 @@ export default function Login(): React.JSX.Element {
         </TouchableOpacity>
  
         {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
+
+        {/* <TouchableOpacity onPress={() => router.push("/doctors/doctorHome")} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity> */}
 
-
         <Text style={styles.footerText}>
-          Don't have an account? <Text style={styles.linkText} onPress={() => router.push("/register")}>Register</Text>
+          Don't have an account?{" "}
+          <Text
+            style={styles.linkText}
+            onPress={() => router.push("/register")}
+          >
+            Register
+          </Text>
         </Text>
 
         {/* <TouchableOpacity
@@ -195,26 +210,26 @@ export default function Login(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 48,
-    fontWeight: 'bold',
-    color: '#AF93D2',
+    fontWeight: "bold",
+    color: "#AF93D2",
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   headerText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     margin: 4,
   },
   form: {
-    width: '80%',
+    width: "80%",
     marginTop: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   input: {
     borderWidth: 2,
@@ -222,43 +237,50 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginTop: 12,
-    color: 'gray',
-    width: '100%',
+    color: "gray",
+    width: "100%",
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 2,
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 16,
     marginTop: 12,
-    width: '100%',
+    width: "100%",
   },
-passwordInput: {
-  flex: 1,
-  color: 'gray',
-},
-  button: { backgroundColor: '#AF93D2', paddingVertical: 15, width: '100%', borderRadius: 8, alignItems: 'center', marginTop: 20 },
-  buttonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+  passwordInput: {
+    flex: 1,
+    color: "gray",
+  },
+  button: {
+    backgroundColor: "#AF93D2",
+    paddingVertical: 15,
+    width: "100%",
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonText: { color: "white", fontSize: 16, fontWeight: "bold" },
 
   linkText: {
-    color: 'blue',
+    color: "blue",
     marginTop: 8,
   },
   loginButton: {
-    backgroundColor: '#AF93D2',
-    color: 'white',
+    backgroundColor: "#AF93D2",
+    color: "white",
     paddingVertical: 16,
     paddingHorizontal: 100,
-    textAlign: 'center',
+    textAlign: "center",
     borderRadius: 8,
     marginTop: 28,
   },
   googleButtonContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4285F4',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4285F4",
     borderRadius: 50,
     width: 50,
     height: 50,
@@ -269,11 +291,11 @@ passwordInput: {
     height: 50,
   },
   disabledButton: {
-    backgroundColor: '#A0A0A0',
+    backgroundColor: "#A0A0A0",
   },
   footerText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 16,
-    color: 'gray',
+    color: "gray",
   },
 });

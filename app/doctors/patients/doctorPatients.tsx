@@ -1,8 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Image, Animated, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Image,
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Card, Text, Button, ActivityIndicator } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { Footer } from "../../../component/doctorFooter";
 
 export default function DoctorPatients() {
   const router = useRouter();
@@ -66,49 +73,55 @@ export default function DoctorPatients() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header với nút quay lại */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-        </TouchableOpacity>
-        <Text style={styles.header}>Patients</Text>
-      </View>
+    <>
+      <View style={styles.container}>
+        {/* Header với nút quay lại */}
+        <View style={styles.headerContainer}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
+          </TouchableOpacity>
+          <Text style={styles.header}>Patients</Text>
+        </View>
 
-      {/* Danh sách bệnh nhân */}
-      {patientList.map((patient) => (
-        <Animated.View key={patient.id} style={{ opacity: fadeAnim }}>
-          <Card style={styles.card}>
-            <View style={styles.cardContent}>
-              <Image
-                source={{ uri: "https://placehold.co/60x60" }} // Không có avatar từ API
-                style={styles.avatar}
-              />
-              <View style={styles.info}>
-                <Text style={styles.name}>{patient.fullName}</Text>
-                <Text style={styles.details}>
-                  {patient.gender} | {patient.allergies || "No allergies"}
-                </Text>
+        {/* Danh sách bệnh nhân */}
+        {patientList.map((patient) => (
+          <Animated.View key={patient.id} style={{ opacity: fadeAnim }}>
+            <Card style={styles.card}>
+              <View style={styles.cardContent}>
+                <Image
+                  source={{ uri: "https://placehold.co/60x60" }} // Không có avatar từ API
+                  style={styles.avatar}
+                />
+                <View style={styles.info}>
+                  <Text style={styles.name}>{patient.fullName}</Text>
+                  <Text style={styles.details}>
+                    {patient.gender} | {patient.allergies || "No allergies"}
+                  </Text>
+                </View>
+                <Button
+                  mode="contained"
+                  buttonColor="#4CAF50"
+                  onPress={() =>
+                    router.push({
+                      pathname: "/doctors/patients/patientDetails",
+                      params: {
+                        id: patient.id,
+                      },
+                    })
+                  }
+                >
+                  Detail
+                </Button>
               </View>
-              <Button
-                mode="contained"
-                buttonColor="#4CAF50"
-                onPress={() =>
-                  router.push({
-                    pathname: "/doctors/patients/patientDetails",
-                    params: {
-                      id: patient.id,
-                    },
-                  })
-                }
-              >
-                Detail
-              </Button>
-            </View>
-          </Card>
-        </Animated.View>
-      ))}
-    </View>
+            </Card>
+          </Animated.View>
+        ))}
+      </View>
+      <Footer />
+    </>
   );
 }
 
@@ -172,4 +185,3 @@ const styles = StyleSheet.create({
     color: "#555",
   },
 });
-

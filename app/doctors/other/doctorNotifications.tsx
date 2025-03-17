@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { DoctorHeader } from "../../../component/doctorHeader";
 import { Footer } from "../../../component/doctorFooter";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -27,7 +33,11 @@ const notifications = [
 ];
 
 export default function DoctorNotification() {
-  const renderItem = ({ item }: { item: { id: string; title: string; message: string; time: string } }) => (
+  const renderItem = ({
+    item,
+  }: {
+    item: { id: string; title: string; message: string; time: string };
+  }) => (
     <View style={styles.notificationItem}>
       <Text style={styles.notificationTitle}>{item.title}</Text>
       <Text style={styles.notificationMessage}>{item.message}</Text>
@@ -37,10 +47,12 @@ export default function DoctorNotification() {
 
   return (
     <>
-      <DoctorHeader />
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
             <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Notifications</Text>

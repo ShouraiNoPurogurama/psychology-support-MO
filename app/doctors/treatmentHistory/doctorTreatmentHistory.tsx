@@ -47,8 +47,6 @@ const historyRecords: HistoryRecords = {
 export default function DoctorHistory() {
   return (
     <>
-      <DoctorHeader />
-
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -82,8 +80,12 @@ export default function DoctorHistory() {
                 </View>
                 <View style={styles.infoContainer}>
                   <Text style={styles.patientName}>{item.patientName}</Text>
-                  <Text style={styles.symptoms}>🩺 Symptoms: {item.symptoms}</Text>
-                  <Text style={styles.diagnosis}>📋 Diagnosis: {item.diagnosis}</Text>
+                  <Text style={styles.symptoms}>
+                    🩺 Symptoms: {item.symptoms}
+                  </Text>
+                  <Text style={styles.diagnosis}>
+                    📋 Diagnosis: {item.diagnosis}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center", 
+    justifyContent: "center",
     paddingHorizontal: 15,
     marginTop: 10,
   },
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   header: {
-    flex: 1, 
+    flex: 1,
     fontSize: 22,
     fontWeight: "bold",
     color: "#6C63FF",
@@ -183,4 +185,3 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
 });
-
