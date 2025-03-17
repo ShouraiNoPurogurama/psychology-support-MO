@@ -79,7 +79,7 @@ export default function Workshop() {
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 70,
+        paddingVertical: 110,
         paddingHorizontal: 15,
         backgroundColor: "#f9f9f9",
     },

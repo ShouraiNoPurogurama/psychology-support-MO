@@ -85,7 +85,7 @@ export default function Shop() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 80,
+    paddingVertical: 110,
     paddingHorizontal: 15,
     backgroundColor: "#f9f9f9",
   },

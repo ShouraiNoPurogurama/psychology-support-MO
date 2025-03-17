@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
 import { DatePickerModal } from 'react-native-paper-dates';
 
@@ -17,9 +17,58 @@ interface BookingModalProps {
 }
 
 const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalProps) => {
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [datePickerVisible, setDatePickerVisible] = useState(false);
+    const [availableTimes, setAvailableTimes] = useState<{ time: string, available: boolean }[]>([]);
+    const [loading, setLoading] = useState(false);
+
+
+    useEffect(() => {
+        if (selectedDate) {
+            fetchAvailableTimes(selectedDate);
+        }
+    }, [selectedDate]);
+
+    const fetchAvailableTimes = async (date: Date) => {
+        setLoading(true);
+        const dateToUse = selectedDate ?? new Date();
+
+        const formattedDate = dateToUse.getFullYear() + "-" +
+            String(dateToUse.getMonth() + 1).padStart(2, "0") + "-" +
+            String(dateToUse.getDate()).padStart(2, "0");
+
+        const url = `https://psychologysupportscheduling-g0efgxc5bwhbhjgc.southeastasia-01.azurewebsites.net/doctor-schedule/${doctorId}/${formattedDate}`;
+
+        console.log("Fetching API with:");
+        console.log("Doctor ID:", doctorId);
+        console.log("Selected Date:", formattedDate);
+        console.log("URL:", url);
+        try {
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data?.timeSlots) {
+                const times = data.timeSlots.map((slot: any) => ({
+                    time: `${slot.startTime.slice(0, 5)}-${slot.endTime.slice(0, 5)}`,
+                    available: slot.status === "Available" 
+                }));
+                setAvailableTimes(times);
+                
+
+                console.log("data", data);
+            } else {
+                setAvailableTimes([]);
+            }
+
+        } catch (error) {
+            console.error("Error fetching available times:", error);
+            setAvailableTimes([]);
+        }
+        setLoading(false);
+    };
+
 
     const handleConfirm = () => {
         if (selectedDate && selectedTime) {
@@ -31,7 +80,6 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
 
         }
     }
-
     return (
         <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
             <View style={styles.modalOverlay}>
@@ -62,15 +110,29 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
                     <FlatList
                         data={availableTimes}
                         numColumns={2}
-                        keyExtractor={(item) => item}
+                        keyExtractor={(item) => item.time}
                         renderItem={({ item }) => (
                             <TouchableOpacity
-                                style={[styles.timeSlot, selectedTime === item && styles.selectedTimeSlot]}
-                                onPress={() => setSelectedTime(item)}
+                                style={[
+                                    styles.timeSlot,
+                                    !item.available && styles.unavailableTimeSlot,
+                                    selectedTime === item.time && styles.selectedTimeSlot
+                                ]}
+                                onPress={() => item.available && setSelectedTime(item.time)}
+                                disabled={!item.available}
                             >
-                                <Text style={[styles.timeText, selectedTime === item && styles.selectedTimeText]}>{item}</Text>
+                                <Text style={[
+                                    styles.timeText,
+                                    !item.available && styles.unavailableTimeText,
+                                    selectedTime === item.time && styles.selectedTimeText
+                                ]}>
+                                    {item.time}
+                                </Text>
                             </TouchableOpacity>
+                            
                         )}
+                        contentContainerStyle={{ paddingBottom: 20 }}
+                        style={{ flexGrow: 0, width: '100%' }}
                     />
 
                     {/* Buttons */}
@@ -183,6 +245,13 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
+    unavailableTimeSlot: {
+        backgroundColor: '#FFCDD2', 
+    },
+    unavailableTimeText: {
+        color: '#D32F2F', 
+    }
+    
 });
 
 export default BookingModal;
