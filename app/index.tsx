@@ -24,6 +24,8 @@ export default function App() {
 
     return () => clearTimeout(timeout); // Xóa timeout khi unmount
   }, []);
+
+  
 //   useEffect(() => {
 //     const fetchFCMToken = async () => {
 //       try {
@@ -97,6 +99,18 @@ export default function App() {
 //   };
 //   checkPermissionAndToken();
 //   },[]);
+// const getToken = async () => {
+//   try {
+//       const token = await messaging().getToken();
+//       console.log("FCM Token:", token);
+//   } catch (error) {
+//       console.error("Error getting FCM token:", error);
+//   }
+// };
+
+// useEffect(() => {
+//   getToken();
+// }, []);
 
 
 

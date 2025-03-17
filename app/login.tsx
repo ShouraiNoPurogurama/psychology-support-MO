@@ -95,7 +95,7 @@ export default function Login(): React.JSX.Element {
 
       if (response.ok) {
         const token = data.token;
-        await AsyncStorage.setItem('authToken', token)
+        await AsyncStorage.setItem('authToken', token) //chỗ này lưu token vào storage
 
         if (!token) {
           Alert.alert("Error", "No token received");
@@ -103,10 +103,10 @@ export default function Login(): React.JSX.Element {
         }
 
         try {
-          const decoded: any = jwtDecode(token);
+          const decoded: any = jwtDecode(token); //chỗ này decode token
           console.log("Decoded Token:", decoded);
 
-          const userRole = decoded.role;
+          const userRole = decoded.role; //chỗ này gọi role từ token đã giải mã
 
           Alert.alert('Success', 'Login successful');
 
@@ -168,7 +168,7 @@ export default function Login(): React.JSX.Element {
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-
+ 
         {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity> */}
