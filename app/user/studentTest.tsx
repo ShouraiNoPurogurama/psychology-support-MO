@@ -42,7 +42,7 @@ export default function studentTest() {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          "https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/test-questions/8fc88dbb-daee-4b17-9eca-de6cfe886097",
+          "https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/test-questions/8fc88dbb-daee-4b17-9eca-de6cfe886097",
           {
             params: { PageIndex: 0, PageSize: 21 },
             headers: {
@@ -81,7 +81,7 @@ export default function studentTest() {
         const questionId = questions[currentIndex].id;
 
         const response = await axios.get(
-          `https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/question-options/${questionId}`,
+          `https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/question-options/${questionId}`,
           {
             params: { PageIndex: 0, PageSize: 10 },
             headers: { 'Content-Type': 'application/json' }
@@ -157,7 +157,7 @@ export default function studentTest() {
       if (!token) throw new Error("User not authenticated");
 
       const decoded: any = jwtDecode(token);
-      const patientId = decoded.userId;
+      const patientId = decoded.profileId;
 
       const testId = "8fc88dbb-daee-4b17-9eca-de6cfe886097";
       const selectedOptionIds = questions.map((q, index) => selectedOptions[index]).filter(Boolean);
@@ -168,7 +168,7 @@ export default function studentTest() {
       console.log("Selected Option IDs:", selectedOptionIds);
 
       const response = await axios.post(
-        "https://psychologysupporttest-cvexa2gae4a3a4gt.eastasia-01.azurewebsites.net/test-results",
+        "https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/test-results",
         { patientId, testId, selectedOptionIds },
         {
           headers: {
@@ -179,6 +179,10 @@ export default function studentTest() {
       );
 
       console.log("Test results submitted:", response.data);
+      const testResultId = response.data.testResultId;
+
+      router.push({ pathname: "/user/testResult", params: { testResultId } });
+
     } catch (error) {
       console.error("Error submitting test results:", error);
     }
@@ -252,8 +256,8 @@ export default function studentTest() {
                 if (currentIndex < questions.length - 1) {
                   setCurrentIndex(prev => prev + 1);
                 } else {
-                  // submitTestResults();
-                  router.push("/user/testResult");
+                  submitTestResults();
+                  // router.push("/user/testResult");
                 }
               }
             }}
@@ -273,7 +277,7 @@ export default function studentTest() {
 
 const styles = StyleSheet.create({
   title: {
-    marginTop: 80,
+    marginTop: 140,
     fontSize: 27,
     fontWeight: "800",
     color: "#AF93D2"

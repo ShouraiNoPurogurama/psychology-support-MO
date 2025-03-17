@@ -1,16 +1,57 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { Student_Header } from '../../component/Student_Header';
 import { Footer } from '../../component/Footer';
+import { router } from 'expo-router';
 
 interface ServicePackage {
-    id: number;
+    id: string;
     name: string;
     description: string;
     price: number;
+    durationDays: number;
     isActive: boolean;
-    features: string[];
+    features?: string[];
 }
+
+const packages = [
+    {
+        name: "Student Plan",
+        features: [
+            "Access to the DAS21 psychological test for evaluating anxiety, stress, and tension levels",
+            "Insights into mental well-being through blog articles",
+            "Shopping for mental health-related products",
+            "Viewing a list of trusted psychological consultants",
+            "Booking appointments with licensed therapists"
+        ]
+    },
+    {
+        name: "Basic Plan",
+        features: [
+            "Access to the DAS21 psychological test for evaluating anxiety, stress, and tension levels",
+            "Insights into mental well-being through blog articles",
+            "Viewing full detailed test results",
+            "Personalized 2-week mental health improvement plan based on preferences, food, and activities",
+            "Sharing personal stories on the blog",
+            "Access to information about upcoming mental health workshops",
+            "Shopping for mental health-related products",
+            "Viewing a list of trusted psychological consultants",
+            "Booking appointments with licensed therapists"
+        ]
+    },
+    {
+        name: "Premium Plan",
+        features: [
+            "Personalized 1-month mental health improvement plan based on preferences, food, and activities",
+            "Regular reminders to follow the personalized improvement plan",
+            "AI chatbox for daily emotional support and conversations",
+            "Discounts on therapist bookings",
+            "Unlimited access to the psychological test",
+            "Sharing personal stories on the blog"
+        ]
+    }
+]
+
 
 const ServicePackagesScreen = () => {
     const [servicePackages, setServicePackages] = useState<ServicePackage[]>([]);
@@ -20,7 +61,7 @@ const ServicePackagesScreen = () => {
         const fetchServicePackages = async () => {
             try {
                 const response = await fetch(
-                    'https://psychologysupportsubscription-gmgqg4hudadufya9.eastasia-01.azurewebsites.net/service-packages?PageIndex=1&PageSize=10'
+                    'https://psychologysupportsubscription-azb9d4hfameeengd.southeastasia-01.azurewebsites.net/service-packages?PageIndex=1&PageSize=10'
                 );
                 const result = await response.json();
 
@@ -30,20 +71,16 @@ const ServicePackagesScreen = () => {
                     throw new Error("API did not return an array in servicePackages.data");
                 }
 
-                const fakeFeatures = [
-                    "24/7 mental health support",
-                    "Exclusive therapy sessions",
-                    "Personalized progress tracking",
-                    "Access to mental wellness courses",
-                    "Community support & events"
-                ];
-
                 const activePackages = result.servicePackages.data
-                    .filter((pkg: { isActive: any; }) => pkg.isActive)
-                    .map((pkg: any) => ({
-                        ...pkg,
-                        features: fakeFeatures.slice(0, Math.floor(Math.random() * fakeFeatures.length) + 2) // Random features
-                    }));
+                    .filter((pkg: ServicePackage) => pkg.isActive)
+                    .map((pkg: any) => {
+                        const matchedPackage = packages.find(p => p.name === pkg.name);
+
+                        return {
+                            ...pkg,
+                            features: matchedPackage ? matchedPackage.features : []
+                        };
+                    });
 
                 setServicePackages(activePackages);
             } catch (error) {
@@ -58,30 +95,41 @@ const ServicePackagesScreen = () => {
     const renderItem = ({ item }: { item: ServicePackage }) => (
         <View style={styles.packageContainer}>
             <Text style={styles.packageName}>{item.name}</Text>
-            <Text style={styles.price}>${item.price.toFixed(2)} / month</Text>
+            <Text style={styles.price}>{item.price.toLocaleString()} VND / {item.durationDays} days</Text>
 
-            <Text style={styles.subtitle}>Everything on Basic plus:</Text>
-
-            {item.features.map((feature, index) => (
-                <Text key={index} style={styles.featureText}>✔ {feature}</Text>
-            ))}
+            {item.features && item.features.length > 0 && (
+                <>
+                    <Text style={styles.subtitle}>Includes:</Text>
+                    {item.features.map((feature, index) => (
+                        <Text key={index} style={styles.featureText}>✔ {feature}</Text>
+                    ))}
+                </>
+            )}
 
             <Text style={styles.description}>{item.description}</Text>
 
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                    // Alert.alert("Thông báo", "Thanh toán thành công");
+                    router.push('/user/userTask'); 
+                }}
+            >
                 <Text style={styles.buttonText}>Get now</Text>
+
             </TouchableOpacity>
         </View>
     );
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#570A57" />
-                <Text>Loading data...</Text>
-            </View>
-        );
-    }
+
+    // if (loading) {
+    //     return (
+    //         <View style={styles.loadingContainer}>
+    //             <ActivityIndicator size="large" color="#570A57" />
+    //             <Text>Loading data...</Text>
+    //         </View>
+    //     );
+    // }
 
     return (
         <>
@@ -89,27 +137,23 @@ const ServicePackagesScreen = () => {
             <ScrollView style={styles.container}>
                 <FlatList
                     data={servicePackages}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item.id}
                     renderItem={renderItem}
                     contentContainerStyle={styles.listContainer}
+                    scrollEnabled={false}
                 />
             </ScrollView>
-            <Footer/>   
+            <Footer />
         </>
-
-
     );
 };
 
 const styles = StyleSheet.create({
     listContainer: {
         padding: 16,
-        marginTop: 80,
+        marginTop: 90,
         marginBottom: 80
-
-
     },
-
     container: {
         flex: 1,
     },

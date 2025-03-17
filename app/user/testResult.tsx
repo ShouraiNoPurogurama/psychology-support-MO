@@ -1,20 +1,51 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { Footer } from '../../component/Footer';
 import { Student_Header } from "../../component/Student_Header";
 import { Ionicons } from '@expo/vector-icons';
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 
 type EvaluationType = 'stress' | 'anxiety' | 'depression';
 
 export default function testResult() {
-  const results = {
-    stress: 11,
-    anxiety: 15,
-    depression: 18,
-  };
+
+  const { testResultId } = useLocalSearchParams();
+  console.log("id:", testResultId);
+  const [loading, setLoading] = useState(true);
+  const [scores, setScores] = useState({
+    stress: 0,
+    anxiety: 0,
+    depression: 0,
+  });
+  useEffect(() => {
+    const fetchTestResult = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/test-result/${testResultId}`
+        );
+
+        const result = response.data.testResult;
+        setScores({
+          stress: result.stressScore.value,
+          anxiety: result.anxietyScore.value,
+          depression: result.depressionScore.value,
+        });
+      } catch (error) {
+        console.error("Error fetching test results:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (testResultId) {
+      fetchTestResult();
+    }
+  }, [testResultId]);
+
 
   const getEvaluation = (score: number, type: EvaluationType): string => {
     if (type === 'stress') {
@@ -49,18 +80,18 @@ export default function testResult() {
           <Text style={styles.title}>MENTAL HEALTH TEST RESULT</Text>
           <View style={styles.resultBox}>
             <Text style={styles.sectionTitle}>Stress Score:</Text>
-            <Text style={styles.score}>{results.stress}</Text>
-            <Text style={styles.description}>{getEvaluation(results.stress, 'stress')}</Text>
+            <Text style={styles.score}>{scores.stress}</Text>
+            <Text style={styles.description}>{getEvaluation(scores.stress, 'stress')}</Text>
           </View>
           <View style={styles.resultBox}>
             <Text style={styles.sectionTitle}>Anxiety Score:</Text>
-            <Text style={styles.score}>{results.anxiety}</Text>
-            <Text style={styles.description}>{getEvaluation(results.anxiety, 'anxiety')}</Text>
+            <Text style={styles.score}>{scores.anxiety}</Text>
+            <Text style={styles.description}>{getEvaluation(scores.anxiety, 'anxiety')}</Text>
           </View>
           <View style={styles.resultBox}>
             <Text style={styles.sectionTitle}>Depression Score:</Text>
-            <Text style={styles.score}>{results.depression}</Text>
-            <Text style={styles.description}>{getEvaluation(results.depression, 'depression')}</Text>
+            <Text style={styles.score}>{scores.depression}</Text>
+            <Text style={styles.description}>{getEvaluation(scores.depression, 'depression')}</Text>
           </View>
           <TouchableOpacity style={styles.unlockButton} onPress={() => router.push("/user/Services")}>
           <Ionicons name="lock-open" size={24} color="white" />
@@ -83,7 +114,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     alignItems: 'center',
-    marginTop: 70,
+    marginTop: 90,
     marginBottom: 50,
     gap: 20
   },

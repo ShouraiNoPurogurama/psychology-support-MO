@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, FlatList, StyleSheet, ScrollView } from 'react-native';
 import { Student_Header } from '../../component/Student_Header';
 import { Footer } from '../../component/Footer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
+
 
 interface ActivityItem {
     name: string;
-    frequency?: string;  
-    severity?: string;   
-    isDisease?: boolean; 
+    frequency?: string;
+    severity?: string;
+    isDisease?: boolean;
 }
 
 const activities: { title: string; icon: string; data: ActivityItem[] }[] = [
@@ -58,11 +63,11 @@ const activities: { title: string; icon: string; data: ActivityItem[] }[] = [
 const getFrequencyColor = (frequency: string) => {
     switch (frequency) {
         case "Daily":
-            return "#B065F6"; 
+            return "#B065F6";
         case "Weekly":
-            return "#00C5B8"; 
+            return "#00C5B8";
         case "Monthly":
-            return "#F5B700"; 
+            return "#F5B700";
         default:
             return "#ccc";
     }
@@ -70,11 +75,11 @@ const getFrequencyColor = (frequency: string) => {
 const getSeverityColor = (severity: string) => {
     switch (severity) {
         case "Mild":
-            return "#B065F6"; 
+            return "#B065F6";
         case "Moderate":
-            return "#00C5B8"; 
+            return "#00C5B8";
         case "Severe":
-            return "#F5B700"; 
+            return "#F5B700";
         default:
             return "#ccc";
     }
@@ -91,8 +96,19 @@ const UserProfile = () => {
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
     const [contactNumber, setContactNumber] = useState('');
-    const [gender, setGender] = useState('');
     const [password, setPassword] = useState('');
+    const [allergies, setAllergies] = useState('');
+    const [genderOpen, setGenderOpen] = useState(false);
+    const [gender, setGender] = useState(null);
+
+    const [traitsOpen, setTraitsOpen] = useState(false);
+    const [personalityTraits, setPersonalityTraits] = useState(null);
+
+
+
+    const [loading, setLoading] = useState(true);
+
+
 
     const selectActivity = (activity: { name: string; isDisease?: boolean }) => {
         setSelectedActivity(activity);
@@ -117,6 +133,52 @@ const UserProfile = () => {
         setModalVisible(false);
     };
 
+    // const token = await AsyncStorage.getItem('authToken');
+    // if (!token) throw new Error("User not authenticated");
+
+    // const decoded: any = jwtDecode(token);
+
+    // const patientId = decoded.ProfileId;
+    // const API_BASE_URL = "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/";
+
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = await AsyncStorage.getItem('authToken');
+                if (!token) throw new Error("User not authenticated");
+
+                const decoded: any = jwtDecode(token);
+                const patientId = decoded.profileId;
+                const API_BASE_URL = "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/";
+
+                const response = await fetch(`${API_BASE_URL}${patientId}`);
+                const data = await response.json();
+
+                console.log("User Data:", data);
+
+                setFullName(data.patientProfileDto.fullName || '');
+                setEmail(data.patientProfileDto.contactInfo.email || '');
+                setAddress(data.patientProfileDto.contactInfo.address || '');
+                setContactNumber(data.patientProfileDto.contactInfo.phoneNumber || '');
+                setGender(data.patientProfileDto.gender || 'Female');
+                setPersonalityTraits(data.patientProfileDto.personalityTraits || 'Extroversion');
+                setAllergies(data.patientProfileDto.allergies || '');
+
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    if (loading) {
+        return <Text style={styles.loadingText}>Loading...</Text>;
+    }
+
 
     const handleSave = () => {
         console.log("Profile updated:", { fullName, email, address, contactNumber, gender, password });
@@ -131,28 +193,57 @@ const UserProfile = () => {
     return (
         <>
             <Student_Header />
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true} 
+            >
                 <Text style={styles.pageName} > Your Profile </Text>
                 <View style={styles.formContainer}>
                     <Text style={styles.label}>Full Name</Text>
-                    <TextInput style={styles.input} value={fullName} onChangeText={setFullName} placeholder="Nguyen Minh Trung" />
+                    <TextInput style={styles.input} value={fullName} onChangeText={setFullName} />
 
                     <Text style={styles.label}>Email</Text>
-                    <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="trungdepzai@gmail.com" keyboardType="email-address" />
+                    <TextInput style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" />
 
                     <Text style={styles.label}>Address</Text>
-                    <TextInput style={styles.input} value={address} onChangeText={setAddress} placeholder="Ba Ria Vung Tau" />
+                    <TextInput style={styles.input} value={address} onChangeText={setAddress} />
 
                     <Text style={styles.label}>Contact Number</Text>
-                    <TextInput style={styles.input} value={contactNumber} onChangeText={setContactNumber} placeholder="+84 876696969" keyboardType="phone-pad" />
+                    <TextInput style={styles.input} value={contactNumber} onChangeText={setContactNumber} keyboardType="phone-pad" />
 
-                    <Text style={styles.label}>Gender</Text>
-                    <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder="Male" />
+                    {/* <Text style={styles.label}>Gender</Text>
+                    <View style={{ zIndex: 2000 }}>
+                        <DropDownPicker
+                            open={genderOpen}
+                            value={gender}
+                            items={[
+                                { label: 'Male', value: 'Male' },
+                                { label: 'Female', value: 'Female' }
+                            ]}
+                            setOpen={setGenderOpen}
+                            setValue={setGender}
+                            placeholder="Select gender"
+                            style={styles.dropdown}
+                            dropDownContainerStyle={styles.dropDownContainer}
+                        />
+                    </View>
+                    <Text style={styles.label}>Personality Traits</Text>
+                    <View>
+                    <DropDownPicker
+                        open={traitsOpen}
+                        value={personalityTraits}
+                        items={[
+                            { label: 'Extroversion', value: 'Extroversion' },
+                            { label: 'Introversion', value: 'Introversion' }
+                        ]}
+                        setOpen={setTraitsOpen}
+                        setValue={setPersonalityTraits}
+                        placeholder="Select Personality Trait"
+                        style={styles.dropdown}
+                        dropDownContainerStyle={styles.dropDownContainer}
+                    />
+                </View> */}
 
-                    {/* <Text style={styles.label}>Password</Text>
-                <TextInput style={styles.input} value={password} onChangeText={setPassword} placeholder="Enter password" secureTextEntry /> */}
-
-
+                    <Text style={styles.label}>Allergies</Text>
+                    <TextInput style={styles.input} value={allergies} onChangeText={setAllergies} />
                 </View>
 
                 {activities.map((category, index) => (
@@ -167,6 +258,7 @@ const UserProfile = () => {
                                 data={category.data}
                                 keyExtractor={(item) => item.name}
                                 numColumns={3}
+                                scrollEnabled={false}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity
                                         style={[
@@ -224,7 +316,7 @@ const UserProfile = () => {
                     </View>
                 </Modal>
                 <View style={styles.buttonRow}>
-                    <TouchableOpacity style={styles.cancelButton}><Text>Cancel</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.saveButton}><Text>Cancel</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                         <Text style={styles.saveText}>Save</Text>
                     </TouchableOpacity>
@@ -238,12 +330,12 @@ const UserProfile = () => {
 };
 
 const styles = StyleSheet.create({
-    pageName: {justifyContent:"center", alignItems:"center", marginLeft:90, fontSize:30,marginBottom:10},
-    container: { flexGrow: 1, padding: 20, marginBottom:60,marginTop:70 },
+    pageName: { justifyContent: "center", alignItems: "center", marginLeft: 90, fontSize: 30, marginBottom: 20 },
+    container: { flexGrow: 1, padding: 20, marginBottom: 90, marginTop: 95, minHeight: 'auto' },
     formContainer: { marginBottom: 30 },
     label: { fontWeight: "bold", marginBottom: 5, fontSize: 18 },
     input: { borderWidth: 1, padding: 10, borderRadius: 5, marginBottom: 10 },
-    buttonRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
+    buttonRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 10, marginBottom: 60 },
     cancelButton: { padding: 10, borderWidth: 1, borderRadius: 5, paddingHorizontal: 80, marginTop: 6 },
     saveButton: { backgroundColor: "#D4B5FF", padding: 10, borderRadius: 5, paddingHorizontal: 50 },
     saveText: { color: "white", fontWeight: "bold" },
@@ -255,6 +347,15 @@ const styles = StyleSheet.create({
         minWidth: 90,
         alignItems: "center",
     },
+    dropdown: { borderColor: 'gray', borderWidth: 1 },
+    dropDownContainer: {
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        zIndex: 1000, // Giúp dropdown không bị che khuất
+        elevation: 5,
+    },
+
     activityText: { color: "white", fontWeight: "bold" },
     frequencyText: { color: "white" },
     modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
@@ -278,6 +379,8 @@ const styles = StyleSheet.create({
     arrow: {
         fontSize: 18,
     },
+    loadingText: { textAlign: 'center', fontSize: 18, marginTop: 50 },
+
 
 });
 
