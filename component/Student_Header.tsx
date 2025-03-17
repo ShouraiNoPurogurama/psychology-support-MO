@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, StyleSheet, Text, Modal, TouchableWithoutFeedback, Image } from "react-native";
+import { TouchableOpacity, View, StyleSheet, Text, Modal, TouchableWithoutFeedback, Image, Platform, StatusBar } from "react-native";
 import React, { useState } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
@@ -42,7 +42,7 @@ export const Student_Header: React.FC = () => {
                                 <TouchableOpacity
                                     style={styles.drawerItem}
                                     onPress={() => {
-                                        router.push("/user/userProfile");
+                                        router.push("/user/showUserProfile");
                                         setIsDrawerOpen(false)
                                     }
                                     }
@@ -134,6 +134,7 @@ export const Student_Header: React.FC = () => {
 
 const styles = StyleSheet.create({
     HeaderContainer: {
+        paddingTop: Platform.OS === 'ios' ? 44 : StatusBar.currentHeight,  // chỉ dùng khi test expo go
         position: "absolute",
         top: 0,
         width: "100%",
@@ -146,7 +147,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         justifyContent: "space-between",
         zIndex: 1000,
-
     },
     button: {
         paddingVertical: 8,
@@ -168,7 +168,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#AF93D2",
         paddingVertical: 40,
         paddingHorizontal: 20,
-        borderRadius: 20,
+        borderBottomRightRadius:20,
+        borderTopRightRadius:20,
         height:"100%",
         gap:10
     },
