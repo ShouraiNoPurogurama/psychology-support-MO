@@ -4,8 +4,8 @@ import { Student_Header } from '../../component/Student_Header';
 import { Footer } from '../../component/Footer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
-import { Picker } from '@react-native-picker/picker';
-import DropDownPicker from 'react-native-dropdown-picker';
+import { RadioButton } from "react-native-paper";
+
 
 
 interface ActivityItem {
@@ -99,10 +99,15 @@ const UserProfile = () => {
     const [password, setPassword] = useState('');
     const [allergies, setAllergies] = useState('');
     const [genderOpen, setGenderOpen] = useState(false);
-    const [gender, setGender] = useState(null);
+    const [gender, setGender] = useState<string|null>(null);
+    const [showDropDown, setShowDropDown] = useState(false);
+    const genderList = [
+        { label: 'Male', value: 'Male' },
+        { label: 'Female', value: 'Female' }
+    ];
 
     const [traitsOpen, setTraitsOpen] = useState(false);
-    const [personalityTraits, setPersonalityTraits] = useState(null);
+    const [personalityTraits, setPersonalityTraits] = useState<string | null>(null);
 
 
 
@@ -180,8 +185,52 @@ const UserProfile = () => {
     }
 
 
-    const handleSave = () => {
-        console.log("Profile updated:", { fullName, email, address, contactNumber, gender, password });
+    const handleSave = async () => {
+        try {
+            const token = await AsyncStorage.getItem('authToken');
+            if (!token) throw new Error("User not authenticated");
+    
+            const decoded: any = jwtDecode(token);
+            const patientId = decoded.profileId;
+            const API_BASE_URL = "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/";
+    
+            const updatedProfile = {
+                patientProfileUpdate: {
+                    fullName,
+                    gender,
+                    allergies,
+                    personalityTraits,
+                    contactInfo: {
+                        address,
+                        phoneNumber: contactNumber,
+                        email
+
+                    }
+                }
+            };
+            
+            console.log("update data", updatedProfile)
+            const response = await fetch(`${API_BASE_URL}${patientId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(updatedProfile)
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to update profile");
+            }
+    
+            const data = await response.json();
+            console.log("Profile updated successfully:", data);
+    
+            alert("Profile updated successfully!");
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert("Failed to update profile.");
+        }
     };
     const toggleCategory = (title: string) => {
         setExpandedCategories((prev) => ({
@@ -193,7 +242,7 @@ const UserProfile = () => {
     return (
         <>
             <Student_Header />
-            <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true} 
+            <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true}
             >
                 <Text style={styles.pageName} > Your Profile </Text>
                 <View style={styles.formContainer}>
@@ -209,38 +258,39 @@ const UserProfile = () => {
                     <Text style={styles.label}>Contact Number</Text>
                     <TextInput style={styles.input} value={contactNumber} onChangeText={setContactNumber} keyboardType="phone-pad" />
 
-                    {/* <Text style={styles.label}>Gender</Text>
-                    <View style={{ zIndex: 2000 }}>
-                        <DropDownPicker
-                            open={genderOpen}
-                            value={gender}
-                            items={[
-                                { label: 'Male', value: 'Male' },
-                                { label: 'Female', value: 'Female' }
-                            ]}
-                            setOpen={setGenderOpen}
-                            setValue={setGender}
-                            placeholder="Select gender"
-                            style={styles.dropdown}
-                            dropDownContainerStyle={styles.dropDownContainer}
-                        />
-                    </View>
-                    <Text style={styles.label}>Personality Traits</Text>
-                    <View>
-                    <DropDownPicker
-                        open={traitsOpen}
-                        value={personalityTraits}
-                        items={[
-                            { label: 'Extroversion', value: 'Extroversion' },
-                            { label: 'Introversion', value: 'Introversion' }
-                        ]}
-                        setOpen={setTraitsOpen}
-                        setValue={setPersonalityTraits}
-                        placeholder="Select Personality Trait"
-                        style={styles.dropdown}
-                        dropDownContainerStyle={styles.dropDownContainer}
-                    />
-                </View> */}
+            {/* Gender */}
+            <Text style={styles.label}>Gender</Text>
+            <View style={styles.radioGroup}>
+                <RadioButton.Item 
+                    label="Male" 
+                    value="Male" 
+                    status={gender === "Male" ? "checked" : "unchecked"} 
+                    onPress={() => setGender("Male")} 
+                />
+                <RadioButton.Item 
+                    label="Female" 
+                    value="Female" 
+                    status={gender === "Female" ? "checked" : "unchecked"} 
+                    onPress={() => setGender("Female")} 
+                />
+            </View>
+
+            {/* Personality Traits */}
+            <Text style={styles.label}>Personality Traits</Text>
+            <View style={styles.radioGroup}>
+                <RadioButton.Item 
+                    label="Extroversion" 
+                    value="Extroversion" 
+                    status={personalityTraits === "Extroversion" ? "checked" : "unchecked"} 
+                    onPress={() => setPersonalityTraits("Extroversion")} 
+                />
+                <RadioButton.Item 
+                    label="Introversion" 
+                    value="Introversion" 
+                    status={personalityTraits === "Introversion" ? "checked" : "unchecked"} 
+                    onPress={() => setPersonalityTraits("Introversion")} 
+                />
+            </View>
 
                     <Text style={styles.label}>Allergies</Text>
                     <TextInput style={styles.input} value={allergies} onChangeText={setAllergies} />
@@ -340,6 +390,8 @@ const styles = StyleSheet.create({
     saveButton: { backgroundColor: "#D4B5FF", padding: 10, borderRadius: 5, paddingHorizontal: 50 },
     saveText: { color: "white", fontWeight: "bold" },
     categoryTitle: { fontWeight: "bold", fontSize: 18, marginBottom: 10 },
+    radioGroup: { marginBottom: 15 },
+
     activityItem: {
         padding: 10,
         borderRadius: 15,
