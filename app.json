@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "psychology-support-MO",
+    "owner": "soltech_emoease",
     "slug": "psychology-support-MO",
     "version": "1.0.0",
     "orientation": "portrait",
