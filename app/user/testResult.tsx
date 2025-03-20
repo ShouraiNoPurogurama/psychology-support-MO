@@ -25,7 +25,7 @@ export default function testResult() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/test-result/${testResultId}`
+          `https://psychologysupport-test.azurewebsites.net/test-result/${testResultId}`
         );
 
         const result = response.data.testResult;

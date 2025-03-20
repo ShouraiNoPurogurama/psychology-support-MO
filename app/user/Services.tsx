@@ -61,7 +61,7 @@ const ServicePackagesScreen = () => {
         const fetchServicePackages = async () => {
             try {
                 const response = await fetch(
-                    'https://psychologysupportsubscription-azb9d4hfameeengd.southeastasia-01.azurewebsites.net/service-packages?PageIndex=1&PageSize=10'
+                    'https://psychologysupport-subscription.azurewebsites.net/service-packages?PageIndex=1&PageSize=10'
                 );
                 const result = await response.json();
 

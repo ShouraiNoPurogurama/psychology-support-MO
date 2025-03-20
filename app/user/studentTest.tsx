@@ -42,7 +42,7 @@ export default function studentTest() {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(
-          "https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/test-questions/8fc88dbb-daee-4b17-9eca-de6cfe886097",
+          "https://psychologysupport-test.azurewebsites.net/test-questions/8fc88dbb-daee-4b17-9eca-de6cfe886097",
           {
             params: { PageIndex: 0, PageSize: 21 },
             headers: {
@@ -81,7 +81,7 @@ export default function studentTest() {
         const questionId = questions[currentIndex].id;
 
         const response = await axios.get(
-          `https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/question-options/${questionId}`,
+          `https://psychologysupport-test.azurewebsites.net/question-options/${questionId}`,
           {
             params: { PageIndex: 0, PageSize: 10 },
             headers: { 'Content-Type': 'application/json' }
@@ -95,7 +95,6 @@ export default function studentTest() {
           throw new Error("No options found");
         }
 
-        // Đảm bảo options có đúng kiểu { id, content }
         const formattedOptions = optionData.map(opt => ({
           id: opt.id,
           content: opt.content,
@@ -115,8 +114,16 @@ export default function studentTest() {
   const handleSelectOption = (index: number, optionId: string) => {
     setSelectedOptions((prev) => ({
       ...prev,
-      [index]: optionId, // Lưu id của option thay vì index
+      [index]: optionId,
     }));
+    // Tự động chuyển sang câu tiếp theo hoặc submit nếu là câu cuối
+    setTimeout(() => {
+      if (index < questions.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+      } else {
+        submitTestResults();
+      }
+    }, 300);
   };
 
   // const submitTestResults = async () => {
@@ -168,7 +175,7 @@ export default function studentTest() {
       console.log("Selected Option IDs:", selectedOptionIds);
 
       const response = await axios.post(
-        "https://psychologysupporttest-cmekh5gahsd2c9h7.eastasia-01.azurewebsites.net/test-results",
+        "https://psychologysupport-test.azurewebsites.net/test-results",
         { patientId, testId, selectedOptionIds },
         {
           headers: {
@@ -206,72 +213,54 @@ export default function studentTest() {
 
   return (
     <>
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
-        <View className='justify-center items-center mt-7'>
-          <Text style={styles.title}>MENTAL HEALTH TEST</Text>
-          <Text className="mt-2 text-gray-500">Question {currentIndex + 1} of {questions?.length}</Text>
+    <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+      <View className='justify-center items-center mt-7'>
+        <Text style={styles.title}>MENTAL HEALTH TEST</Text>
+        <Text className="mt-2 text-gray-500">Question {currentIndex + 1} of {questions?.length}</Text>
 
-          <View style={styles.questionBox}>
-            <Text style={styles.questionText}>{currentQuestion?.content || "No content available"}</Text>
-          </View>
-
-          <View style={styles.optionsContainer}>
-            {options.map((option) => (
-              <TouchableOpacity
-                key={option.id}
-                style={[
-                  styles.optionButton,
-                  selectedOptions[currentIndex] === option.id && styles.selectedOption
-                ]}
-                onPress={() => handleSelectOption(currentIndex, option.id)}
-              >
-                <Text style={styles.optionText}>{option.content}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
+        <View style={styles.questionBox}>
+          <Text style={styles.questionText}>{currentQuestion?.content || "No content available"}</Text>
         </View>
 
-        <View style={styles.navigationContainer}>
-          <TouchableOpacity style={styles.startOverButton}
-            onPress={() => {
-              setCurrentIndex(0);
-              setSelectedOption(null);
-            }}>
-            <Text style={styles.buttonText}>Start Over</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.beforeButton, currentIndex === 0 && styles.disabledButton]}
-            onPress={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
-            disabled={currentIndex === 0}
-          >
-            <Text style={styles.buttonText}>Before</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.nextButton, !selectedOptions[currentIndex] && styles.disabledButton]}
-            onPress={() => {
-              if (selectedOptions[currentIndex]) { // Kiểm tra đã chọn option chưa
-                if (currentIndex < questions.length - 1) {
-                  setCurrentIndex(prev => prev + 1);
-                } else {
-                  submitTestResults();
-                  // router.push("/user/testResult");
-                }
-              }
-            }}
-            disabled={!selectedOptions[currentIndex]} // Vô hiệu hóa khi chưa chọn option
-          >
-            <Text style={styles.buttonText}>{currentIndex < questions.length - 1 ? "Next" : "Finish"}</Text>
-          </TouchableOpacity>
-
+        <View style={styles.optionsContainer}>
+          {options.map((option) => (
+            <TouchableOpacity
+              key={option.id}
+              style={[
+                styles.optionButton,
+                selectedOptions[currentIndex] === option.id && styles.selectedOption
+              ]}
+              onPress={() => handleSelectOption(currentIndex, option.id)}
+            >
+              <Text style={styles.optionText}>{option.content}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      </ScrollView>
 
-      <Student_Header />
-      <Footer />
-    </>
+      </View>
+
+      <View style={styles.navigationContainer}>
+        <TouchableOpacity style={styles.startOverButton}
+          onPress={() => {
+            setCurrentIndex(0);
+            setSelectedOption(null);
+          }}>
+          <Text style={styles.buttonText}>Start Over</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.beforeButton, currentIndex === 0 && styles.disabledButton]}
+          onPress={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+          disabled={currentIndex === 0}
+        >
+          <Text style={styles.buttonText}>Before</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+
+    <Student_Header />
+    <Footer />
+  </>
   );
 }
 
@@ -295,6 +284,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#6B21A8',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   optionsContainer: {
     marginTop: 20,

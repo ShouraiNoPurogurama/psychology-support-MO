@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions } from 'react-native';
 import { DatePickerModal } from 'react-native-paper-dates';
 
 const availableTimes = [
@@ -15,6 +15,7 @@ interface BookingModalProps {
     onConfirm: (date: string, time: string) => void;
     doctorId: string;
 }
+const { width } = Dimensions.get('window');
 
 const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalProps) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
@@ -38,7 +39,7 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
             String(dateToUse.getMonth() + 1).padStart(2, "0") + "-" +
             String(dateToUse.getDate()).padStart(2, "0");
 
-        const url = `https://psychologysupportscheduling-g0efgxc5bwhbhjgc.southeastasia-01.azurewebsites.net/doctor-schedule/${doctorId}/${formattedDate}`;
+        const url = `https://psychologysupport-scheduling.azurewebsites.net/doctor-schedule/${doctorId}/${formattedDate}`;
 
         console.log("Fetching API with:");
         console.log("Doctor ID:", doctorId);
@@ -195,18 +196,18 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     timeSlot: {
+        // Tính toán chiều rộng động: chiều rộng modal (90% màn hình) trừ padding, chia cho 2 cột
         flex: 1,
         backgroundColor: '#f0f0f0',
         paddingVertical: 15,
-        paddingHorizontal: 20,
-        minWidth: 170,
+        paddingHorizontal: 10, // Giảm padding ngang để tránh tràn
+        minWidth: (width * 0.9 - 60) / 2, // 60 là tổng padding ngang của modalContainer (20 * 2) + margin giữa các slot
         margin: 5,
         borderRadius: 8,
         alignItems: 'center',
     },
     selectedTimeSlot: {
         backgroundColor: '#007bff',
-
     },
     timeText: {
         fontSize: 16,
@@ -246,12 +247,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     unavailableTimeSlot: {
-        backgroundColor: '#FFCDD2', 
+        backgroundColor: '#FFCDD2',
     },
     unavailableTimeText: {
-        color: '#D32F2F', 
-    }
-    
+        color: '#D32F2F',
+    },
 });
 
 export default BookingModal;

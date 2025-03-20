@@ -1,189 +1,392 @@
-import React, { useEffect, useState, useRef  } from "react";
-import { View, Text, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Animated,
+} from "react-native";
 import { Student_Header } from "../../component/Student_Header";
 import { Footer } from "../../component/Footer";
+import Icon from "react-native-vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
+// Define data type
 type Task = {
   id: string;
   text: string;
   time: string;
   completed: boolean;
   date: string;
+  description?: string;
+  benefits?: string[];
+  duration?: string;
+  icon?: string;
+  originalTime?: Date; // Added temporarily for sorting (optional)
 };
 
-interface ScheduleItem {
-  sessions: { id: string; purpose: string; startDate: string }[];
-}
-const activitiesByDay: Record<string, { id: number; text: string; time: string }[]> = {
-  "2025-03-14": [
-    { id: 1, text: "Thiền 10 phút", time: "08:00 AM" },
-    { id: 2, text: "Đi bộ nhẹ nhàng 15 phút", time: "09:00 AM" },
-    { id: 3, text: "Ghi lại 3 điều biết ơn trong ngày", time: "07:00 PM" },
-    { id: 4, text: "Nghe nhạc thư giãn 20 phút", time: "08:00 PM" },
-    { id: 5, text: "Đọc sách phát triển bản thân 30 phút", time: "09:00 PM" },
-    { id: 6, text: "Thực hành 5 phút hít thở sâu", time: "10:00 PM" },
-    { id: 7, text: "Trò chuyện với một người bạn", time: "10:30 PM" }
-  ],
-  "2025-03-15": [
-    { id: 8, text: "Thiền 15 phút", time: "08:00 AM" },
-    { id: 9, text: "Vận động nhẹ nhàng 20 phút", time: "09:00 AM" },
-    { id: 10, text: "Ghi lại cảm xúc trong ngày", time: "07:00 PM" },
-    { id: 11, text: "Nghe podcast về tâm lý tích cực", time: "08:00 PM" },
-    { id: 12, text: "Tìm hiểu một chủ đề mới 15 phút", time: "09:00 PM" },
-    { id: 13, text: "Thực hành 5 phút hít thở sâu", time: "10:00 PM" },
-    { id: 14, text: "Gọi điện cho người thân", time: "10:30 PM" }
-  ],
-  "2025-03-16": [
-    { id: 15, text: "Thiền 10 phút", time: "08:00 AM" },
-    { id: 16, text: "Đi bộ ngoài trời 20 phút", time: "09:00 AM" },
-    { id: 17, text: "Ghi lại một điều tích cực trong ngày", time: "07:00 PM" },
-    { id: 18, text: "Nghe một bài hát yêu thích", time: "08:00 PM" },
-    { id: 19, text: "Thử vẽ hoặc tô màu thư giãn", time: "09:00 PM" },
-    { id: 20, text: "Tập yoga hoặc giãn cơ 15 phút", time: "10:00 PM" },
-    { id: 21, text: "Dành thời gian với gia đình", time: "10:30 PM" }
-  ],
-  "2025-03-17": [
-    { id: 22, text: "Thiền buổi sáng 10 phút", time: "08:00 AM" },
-    { id: 23, text: "Đi bộ 15 phút ngoài trời", time: "09:00 AM" },
-    { id: 24, text: "Viết ra mục tiêu ngày mai", time: "07:00 PM" },
-    { id: 25, text: "Podcast truyền cảm hứng 20 phút", time: "08:00 PM" },
-    { id: 26, text: "Chơi hoặc nghe nhạc yêu thích", time: "09:00 PM" },
-    { id: 27, text: "Thực hành 5 phút hít thở sâu", time: "10:00 PM" },
-    { id: 28, text: "Tắm nước ấm hoặc xông hơi", time: "10:30 PM" }
-  ],
-  "2025-03-18": [
-    { id: 29, text: "Thiền buổi tối 15 phút", time: "08:00 AM" },
-    { id: 30, text: "Tập thể dục nhẹ 20 phút", time: "09:00 AM" },
-    { id: 31, text: "Ghi lại khoảnh khắc đáng nhớ", time: "07:00 PM" },
-    { id: 32, text: "Nghe nhạc không lời 30 phút", time: "08:00 PM" },
-    { id: 33, text: "Vẽ hoặc sáng tạo nghệ thuật", time: "09:00 PM" },
-    { id: 34, text: "Thực hành hít thở thư giãn", time: "10:00 PM" },
-    { id: 35, text: "Trò chuyện với bạn bè", time: "10:30 PM" }
-  ],
-  "2025-03-19": [
-    { id: 36, text: "Thiền 10 phút", time: "08:00 AM" },
-    { id: 37, text: "Đi bộ ngoài trời 20 phút", time: "09:00 AM" },
-    { id: 38, text: "Viết về cảm xúc hiện tại", time: "07:00 PM" },
-    { id: 39, text: "Nghe podcast nâng cao tư duy", time: "08:00 PM" },
-    { id: 40, text: "Yoga hoặc giãn cơ 15 phút", time: "09:00 PM" },
-    { id: 41, text: "Thực hành 5 phút hít thở sâu", time: "10:00 PM" },
-    { id: 42, text: "Tắm nước ấm hoặc đọc sách", time: "10:30 PM" }
-  ],
-  "2025-03-20": [
-    { id: 43, text: "Thiền thư giãn 15 phút", time: "08:00 AM" },
-    { id: 44, text: "Tập yoga 20 phút", time: "09:00 AM" },
-    { id: 45, text: "Ghi lại 3 điều tích cực trong tuần", time: "07:00 PM" },
-    { id: 46, text: "Nghe nhạc giúp thư giãn", time: "08:00 PM" },
-    { id: 47, text: "Thử vẽ một điều vui vẻ", time: "09:00 PM" },
-    { id: 48, text: "Thực hành hít thở sâu", time: "10:00 PM" },
-    { id: 49, text: "Dành thời gian làm điều mình thích", time: "10:30 PM" }
-  ]
+// API Config
+const BASE_URL = "https://psychologysupport-scheduling.azurewebsites.net";
+const SCHEDULES_ENDPOINT = `${BASE_URL}/schedules`;
+const ACTIVITIES_ENDPOINT = `${BASE_URL}/schedule-activities`;
+
+
+
+
+// Format date to YYYY-MM-DD
+const formatDateKey = (date: Date | string) => {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${(d.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
 };
 
-const data = Object.keys(activitiesByDay).map((date) => ({
-  date,
-  activities: activitiesByDay[date]
-}));
-//fix cung
-
-
-const API_URL =
-  "https://psychologysupportscheduling-g0efgxc5bwhbhjgc.southeastasia-01.azurewebsites.net/schedules?PageIndex=1&PageSize=10&SortBy=startDate&SortOrder=asc&PatientId=8b483db4-46be-448f-bd63-3f41aaac6e6a";
-
-// Hàm lấy thứ trong tuần từ ngày (yyyy-mm-dd)
+// Get day of the week
 const getWeekday = (dateStr: string) => {
-  const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
   const date = new Date(dateStr);
   return days[date.getDay()];
 };
 
+const createTaskObject = (activity: any) => {
+  const time = new Date(activity.timeRange);
+
+  const timeString = time.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+  });
+
+  const endTime = new Date(time);
+  const durationMinutes = parseInt(activity.duration?.split(" ")[0] || "30");
+  endTime.setMinutes(endTime.getMinutes() + durationMinutes);
+
+  const endTimeString = endTime.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+  });
+
+  let text = "Activity";
+  let description = "No description available";
+  let benefits: string[] = [];
+  let icon = "help-circle-outline";
+
+  if (activity.foodActivity) {
+    text = `Meal: ${activity.foodActivity.name}`;
+    description = activity.foodActivity.description;
+    benefits = [
+      `Time: ${activity.foodActivity.mealTime}`,
+      `Nutrients: ${activity.foodActivity.foodNutrients.join(", ")}`,
+      `Intensity: ${activity.foodActivity.intensityLevel}`,
+    ];
+    icon = "restaurant-outline";
+  } else if (activity.physicalActivity) {
+    text = `Physical Activity: ${activity.physicalActivity.name}`;
+    description = activity.physicalActivity.description;
+    benefits = [
+      `Intensity: ${activity.physicalActivity.intensityLevel}`,
+      `Impact Level: ${activity.physicalActivity.impactLevel}`,
+    ];
+    icon = "walk-outline";
+  } else if (activity.entertainmentActivity) {
+    text = `Entertainment: ${activity.entertainmentActivity.name}`;
+    description = activity.entertainmentActivity.description;
+    benefits = [
+      `Intensity: ${activity.entertainmentActivity.intensityLevel}`,
+      `Impact Level: ${activity.entertainmentActivity.impactLevel}`,
+    ];
+    icon = "musical-notes-outline";
+  } else if (activity.therapeuticActivity) {
+    text = `Therapy: ${activity.therapeuticActivity.name}`;
+    description = activity.therapeuticActivity.description;
+    benefits = [
+      `Intensity: ${activity.therapeuticActivity.intensityLevel}`,
+      `Impact Level: ${activity.therapeuticActivity.impactLevel}`,
+      `Instructions: ${activity.therapeuticActivity.instructions}`,
+    ];
+    icon = "flower-outline";
+  }
+
+  return {
+    id: activity.id,
+    text,
+    time: timeString,
+    completed: activity.status === "Completed",
+    date: formatDateKey(time),
+    description,
+    benefits,
+    duration: `${timeString} - ${endTimeString}`,
+    icon,
+    originalTime: time, // Added for sorting
+  };
+};
 
 export default function UserTask() {
   const scrollViewRef = useRef<ScrollView | null>(null);
-  const itemRefs = useRef<{ [key: string]: React.RefObject<typeof TouchableOpacity> }>({});
+  const itemRefs = useRef<{ [key: string]: any }>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [dayNow, setDayNow] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showTaskDetail, setShowTaskDetail] = useState(false);
+  const [taskLoading, setTaskLoading] = useState<{ [key: string]: boolean }>({});
+  const [sessionForDate, setSessionForDate] = useState<string | null>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const fetchTasks = async () => {
+  // Fetch sessions list
+  const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_URL);
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        console.error("No token found.");
+        return;
+      }
+  
+      // Decode token để lấy profileId
+      const decoded: any = jwtDecode(token);
+      const profileId = decoded.profileId; // Đảm bảo key này đúng với token của bạn
+  
+      if (!profileId) {
+        console.error("No profile ID found in token.");
+        return;
+      }
+      const response = await fetch(
+        `${SCHEDULES_ENDPOINT}?PageIndex=1&PageSize=10&SortBy=startDate&SortOrder=asc&PatientId=${profileId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       const data = await response.json();
 
-      if (!data || !data.schedules || !Array.isArray(data.schedules.data)) {
-        console.error("Dữ liệu không hợp lệ:", data);
-        setTasks([]);
-        setAvailableDates([]);
+      if (!data?.schedules?.data) {
+        console.error("Invalid data:", data);
         return;
       }
 
-      const schedule: ScheduleItem[] = data.schedules.data;
+      const sessionsData = data.schedules.data[0]?.sessions || [];
+      setSessions(sessionsData);
 
-      // Lọc danh sách ngày duy nhất
-      const uniqueDates: string[] = [
-        ...new Set(
-          schedule
-            .flatMap((s) => s.sessions.map((session) => session.startDate.split("T")[0]))
-            .filter(Boolean)
-        ),
+      const uniqueDates = [
+        ...new Set(sessionsData.map((s: any) => formatDateKey(s.startDate))),
       ];
-
-      // Lấy tất cả các nhiệm vụ từ các session
-      const allTasks: Task[] = schedule.flatMap((s) =>
-        s.sessions.map((session) => ({
-          id: session.id,
-          text: session.purpose,
-          time: new Date(session.startDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          completed: false,
-          date: session.startDate.split("T")[0],
-        }))
-      );
-
       setAvailableDates(uniqueDates);
 
-      // Chọn ngày mặc định là hôm nay (nếu có trong danh sách)
-      const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD theo múi giờ địa phương
+      const today = formatDateKey(new Date());
       setSelectedDate(uniqueDates.includes(today) ? today : uniqueDates[0] || null);
       setDayNow(uniqueDates.includes(today) ? today : uniqueDates[0] || null);
-
-      setTasks(allTasks);
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu:", error);
+      console.error("Error fetching sessions:", error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch activities for the selected date
+  const fetchActivitiesForDate = async () => {
+    if (!selectedDate || sessions.length === 0) return;
+
+    try {
+      setLoading(true);
+      const session = sessions.find(
+        (s) => formatDateKey(s.startDate) === selectedDate
+      );
+
+      if (session) {
+        setSessionForDate(session.id);
+        const response = await fetch(`${ACTIVITIES_ENDPOINT}/${session.id}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Create tasks list from activities
+        const activities = data.scheduleActivities.map((activity: any) =>
+          createTaskObject(activity)
+        );
+
+        // Sort by start time (originalTime)
+        const sortedActivities = activities.sort(
+          (a: Task & { originalTime: Date }, b: Task & { originalTime: Date }) =>
+            a.originalTime - b.originalTime
+        );
+
+        // Remove originalTime if not needed in UI
+        const finalTasks = sortedActivities.map(
+          ({ originalTime, ...rest }) => rest
+        );
+
+        setTasks(finalTasks);
+      } else {
+        setTasks([]);
+        setSessionForDate(null);
+      }
+    } catch (error) {
+      console.error("Error fetching activities:", error.message);
+      setTasks([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleTaskStatus = async (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task || !sessionForDate) {
+      console.warn("Task or sessionForDate not found:", { taskId, sessionForDate });
+      return;
+    }
+  
+    const newStatus = !task.completed;
+    const apiStatus = newStatus ? "Completed" : "Pending";
+  
+    // Update UI first (optimistic update) and show loading
+    setTaskLoading((prev) => ({ ...prev, [taskId]: true }));
+    setTasks((prevTasks) =>
+      prevTasks.map((t) =>
+        t.id === taskId ? { ...t, completed: newStatus } : t
+      )
+    );
+  
+    // Update selectedTask optimistically to reflect the change in the modal
+    setSelectedTask((prev) =>
+      prev && prev.id === taskId ? { ...prev, completed: newStatus } : prev
+    );
+  
+    try {
+      const url = `${BASE_URL}/schedule-activities/${taskId}/${sessionForDate}/status`;
+      console.log("Sending request to:", url, "with payload:", { status: apiStatus });
+  
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: apiStatus }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+      }
+  
+      const result = await response.json(); // Read response data from API
+      console.log("API response:", result);
+  
+      // Since API doesn't return the updated status, we assume success if response.ok is true
+      // The optimistic update to selectedTask and tasks will remain
+  
+    } catch (error) {
+      console.error("Error updating status:", error.message);
+  
+      // Rollback UI status if API fails
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t.id === taskId ? { ...t, completed: !newStatus } : t
+        )
+      );
+  
+      // Rollback selectedTask as well
+      setSelectedTask((prev) =>
+        prev && prev.id === taskId ? { ...prev, completed: !newStatus } : prev
+      );
+    } finally {
+      setTaskLoading((prev) => ({ ...prev, [taskId]: false }));
+    }
+  };
+
+  // Animation for modal
+  const openModal = () => {
+    setShowTaskDetail(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeModal = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => setShowTaskDetail(false));
+  };
+
   useEffect(() => {
-    fetchTasks();
+    fetchSessions();
   }, []);
+
+  useEffect(() => {
+    fetchActivitiesForDate();
+  }, [selectedDate, sessions]);
+
   useEffect(() => {
     if (dayNow && itemRefs.current[dayNow]?.current && scrollViewRef.current) {
       itemRefs.current[dayNow]?.current?.measureLayout(
-        scrollViewRef.current,
-        (x) => {
+        scrollViewRef.current.getNativeScrollRef(),
+        (x: number) => {
           scrollViewRef.current?.scrollTo({ x: x - 125, animated: true });
         },
-        () => console.log("Không thể đo layout của phần tử")
+        () => console.log("Unable to measure layout of element")
       );
     }
   }, [dayNow, availableDates]);
+
   return (
     <>
       <Student_Header />
-      <ScrollView style={{ flex: 1, backgroundColor: "white", padding: 20, marginTop: 70, marginBottom: 50 }}>
-        <Text style={{ fontSize: 22, fontWeight: "bold", textAlign: "center", marginTop:20 }}>Lịch hoạt động</Text>
-
-        {/* Hiển thị danh sách ngày từ API */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: "row", marginVertical: 10 }} ref={scrollViewRef}
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: "#F5F6FA",
+          padding: 20,
+          marginTop: 70,
+          marginBottom: 50,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "bold",
+            textAlign: "center",
+            marginTop: 20,
+            color: "#4A4A4A",
+            fontFamily: "Nunito-Bold",
+          }}
         >
-           {availableDates.map((date) => {
-            // Tạo ref cho mỗi TouchableOpacity
+          Your Activity Schedule 🌟
+        </Text>
+
+        {/* Display list of dates */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flexDirection: "row", marginVertical: 15 }}
+          ref={scrollViewRef}
+        >
+          {availableDates.map((date) => {
             if (!itemRefs.current[date]) {
-              itemRefs.current[date] = React.createRef<TouchableOpacity>();
+              itemRefs.current[date] = React.createRef();
             }
 
             return (
@@ -194,90 +397,320 @@ export default function UserTask() {
                 style={{
                   padding: 15,
                   marginRight: 10,
-                  backgroundColor: selectedDate === date ? "#6a5acd" : "#f0f0f0",
-                  borderRadius: 10,
-                  borderColor: dayNow === date ? "#6a5acd" : "#f0f0f0",
+                  backgroundColor: selectedDate === date ? "#AF93D2" : "#FFFFFF", // Change to purple
+                  borderRadius: 15,
+                  borderColor: dayNow === date ? "#AF93D2" : "#E0E0E0", // Change to purple
                   borderWidth: 2,
                   alignItems: "center",
                   minWidth: 100,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
                 }}
               >
-                <Text style={{ fontSize: 18, fontWeight: "bold", color: selectedDate === date ? "white" : "black" }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    color: selectedDate === date ? "#FFFFFF" : "#4A4A4A",
+                    fontFamily: "Nunito-Bold",
+                  }}
+                >
                   {getWeekday(date)}
                 </Text>
-                <Text style={{ fontSize: 16, color: selectedDate === date ? "white" : "black" }}>{date}</Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: selectedDate === date ? "#FFFFFF" : "#4A4A4A",
+                    fontFamily: "Nunito-Regular",
+                  }}
+                >
+                  {date}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
 
-        {/* Danh sách nhiệm vụ của ngày đã chọn */}
+        {/* Task list */}
         {loading ? (
-          <ActivityIndicator size="large" color="#6a5acd" style={{ marginTop: 20 }} />
+          <ActivityIndicator
+            size="large"
+            color="#A8D5BA"
+            style={{ marginTop: 20 }}
+          />
+        ) : tasks.length === 0 ? (
+          <Text
+            style={{
+              textAlign: "center",
+              color: "#4A4A4A",
+              marginTop: 20,
+              fontSize: 16,
+              fontFamily: "Nunito-Regular",
+            }}
+          >
+            No activities today, take a rest! 🌸
+          </Text>
         ) : (
-          // <FlatList
-          //   data={tasks.filter((task) => task.date === selectedDate)}
-          //   keyExtractor={(item) => item.id}
-          //   scrollEnabled={false}
-          //   renderItem={({ item }) => (
-          //     <View
-          //       style={{
-          //         padding: 15,
-          //         marginBottom: 10,
-          //         backgroundColor: "white",
-          //         borderRadius: 10,
-          //         shadowColor: "#000",
-          //         shadowOffset: { width: 0, height: 2 },
-          //         shadowOpacity: 0.1,
-          //         shadowRadius: 4,
-          //         elevation: 3,
-          //       }}
-          //     >
-          //       {/* <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.text}</Text>
-          //       <Text style={{ fontSize: 14, color: "gray" }}>{item.time}</Text> */}
-          //       <Text style={{ fontSize: 16, fontWeight: "bold" }}>{item.text}</Text>
-          //       <Text style={{ fontSize: 14, color: "gray" }}>{item.time}</Text>
-          //     </View>
-          //   )}
-          // /> 
           <FlatList
-            data={data.filter((item) => item.date === selectedDate)} // Chỉ lấy ngày đã chọn
-            keyExtractor={(item) => item.date}
+            data={tasks}
+            keyExtractor={(item) => item.id}
             scrollEnabled={false}
-            
             renderItem={({ item }) => (
-              <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}>
-                  {item.date} {/* Hiển thị ngày */}
-                </Text>
-                {item.activities.map((activity) => (
-                  <View
-                    key={activity.id}
+              <TouchableOpacity
+                onPress={() => {
+                  setSelectedTask(item);
+                  openModal();
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 15,
+                  marginBottom: 10,
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: 15,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
+                }}
+              >
+                <Icon
+                  name={item.icon || "help-circle-outline"}
+                  size={24}
+                  color={item.completed ? "#F4A7B9" : "#A8D5BA"}
+                  style={{ marginRight: 10 }}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text
                     style={{
-                      padding: 15,
-                      marginBottom: 10,
-                      backgroundColor: "white",
-                      borderRadius: 10,
-                      shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.1,
-                      shadowRadius: 4,
-                      elevation: 3,
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#4A4A4A",
+                      fontFamily: "Nunito-Bold",
                     }}
                   >
-                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                      {activity.text}
-                    </Text>
-                    <Text style={{ fontSize: 14, color: "gray" }}>{activity.time}</Text>
-                  </View>
-                ))}
-              </View>
+                    {item.text}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: "#4A4A4A",
+                      fontFamily: "Nunito-Regular",
+                    }}
+                  >
+                    {item.time}
+                  </Text>
+                </View>
+                <Icon name="chevron-forward" size={20} color="#A8D5BA" />
+              </TouchableOpacity>
             )}
           />
-
         )}
       </ScrollView>
+
+      {/* Modal to display task details */}
+      <Modal
+        visible={showTaskDetail}
+        transparent={true}
+        animationType="none"
+        onRequestClose={closeModal}
+      >
+        <Animated.View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+            opacity: fadeAnim,
+          }}
+        >
+          <View style={styles.modalContainer}>
+            {/* Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {selectedTask?.text || "Activity Details"} 🌼
+              </Text>
+              <Pressable onPress={closeModal} style={styles.closeButton}>
+                <Icon name="close-circle-outline" size={28} color="#F4A7B9" />
+              </Pressable>
+            </View>
+
+            {/* Body */}
+            <ScrollView style={styles.modalBody}>
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Time ⏰</Text>
+                <Text style={styles.sectionContent}>
+                  {selectedTask?.duration || "No information"}
+                </Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Description 📝</Text>
+                <Text style={styles.sectionContent}>
+                  {selectedTask?.description || "No description"}
+                </Text>
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Benefits 🌟</Text>
+                {selectedTask?.benefits && selectedTask.benefits.length > 0 ? (
+                  selectedTask.benefits.map((benefit, index) => (
+                    <Text key={index} style={styles.benefitItem}>
+                      • {benefit}
+                    </Text>
+                  ))
+                ) : (
+                  <Text style={styles.sectionContent}>No benefits</Text>
+                )}
+              </View>
+
+              <View style={styles.detailSection}>
+                <Text style={styles.sectionTitle}>Status ✅</Text>
+                <View style={styles.statusContainer}>
+                  <Pressable
+                    onPress={() => selectedTask && toggleTaskStatus(selectedTask.id)}
+                    disabled={taskLoading[selectedTask?.id || ""]}
+                    style={styles.checkboxContainer}
+                  >
+                    <Icon
+                      name={selectedTask?.completed ? "checkbox-outline" : "square-outline"}
+                      size={24}
+                      color={selectedTask?.completed ? "#F4A7B9" : "#A8D5BA"}
+                      style={{ marginRight: 10 }}
+                    />
+                    <Text
+                      style={[
+                        styles.checkboxLabel,
+                        { color: selectedTask?.completed ? "#F4A7B9" : "#A8D5BA" },
+                      ]}
+                    >
+                      {selectedTask?.completed ? "Completed" : "Mark as Completed"}
+                    </Text>
+                  </Pressable>
+                  {taskLoading[selectedTask?.id || ""] && (
+                    <ActivityIndicator size="small" color="#A8D5BA" style={{ marginLeft: 10 }} />
+                  )}
+                </View>
+              </View>
+            </ScrollView>
+
+            {/* Footer */}
+            <View style={styles.modalFooter}>
+              <Pressable onPress={closeModal} style={styles.closeModalButton}>
+                <Text style={styles.closeModalButtonText}>Close 💖</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Animated.View>
+      </Modal>
+
       <Footer />
     </>
   );
 }
+
+// Styles for the UI
+const styles = StyleSheet.create({
+  modalContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    width: "90%",
+    maxHeight: "80%",
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+    backgroundColor: "#F9FAFC",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#4A4A4A",
+    fontFamily: "Nunito-Bold",
+    flex: 1, // Allow title to take remaining space
+    marginRight: 10, // Ensure spacing with close button
+    numberOfLines: 1, // Limit to 1 line
+    ellipsizeMode: "tail", // Truncate with "..." if too long
+  },
+  closeButton: {
+    padding: 5,
+  },
+  modalBody: {
+    padding: 15,
+  },
+  detailSection: {
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#A8D5BA",
+    textTransform: "uppercase",
+    marginBottom: 5,
+    fontFamily: "Nunito-Bold",
+  },
+  sectionContent: {
+    fontSize: 16,
+    color: "#4A4A4A",
+    fontFamily: "Nunito-Regular",
+  },
+  benefitItem: {
+    fontSize: 16,
+    color: "#4A4A4A",
+    marginLeft: 10,
+    fontFamily: "Nunito-Regular",
+  },
+  statusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#F9FAFC", // Light background to stand out
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    color: "#4A4A4A",
+    fontFamily: "Nunito-Regular",
+    marginLeft: 5,
+  },
+  modalFooter: {
+    padding: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+    alignItems: "center",
+  },
+  closeModalButton: {
+    backgroundColor: "#F4A7B9",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+  },
+  closeModalButtonText: {
+    fontSize: 16,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontFamily: "Nunito-Bold",
+  },
+});
