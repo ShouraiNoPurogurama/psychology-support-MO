@@ -85,7 +85,7 @@ export default function Login(): React.JSX.Element {
 
     try {
       const response = await fetch(
-        "https://psychologysupportauth-gqdkbafkbpf5a4gf.eastasia-01.azurewebsites.net/Auth/login",
+        "https://psychologysupport-auth.azurewebsites.net/Auth/Login",
         {
           method: "POST",
           headers: {

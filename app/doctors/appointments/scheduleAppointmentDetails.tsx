@@ -52,7 +52,7 @@ export default function AppointmentDetails() {
         if (!params.bookingCode) return;
 
         const bookingResponse = await fetch(
-          `https://psychologysupportscheduling-g0efgxc5bwhbhjgc.southeastasia-01.azurewebsites.net/bookings/${params.bookingCode}`
+          `https://psychologysupport-scheduling.azurewebsites.net/bookings/${params.bookingCode}`
         );
 
         if (!bookingResponse.ok) {
@@ -63,7 +63,7 @@ export default function AppointmentDetails() {
         setBookingDetails(bookingData.booking);
 
         const patientResponse = await fetch(
-          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/${bookingData.booking.patientId}`
+          `https://psychologysupport-profile.azurewebsites.net/patients/${bookingData.booking.patientId}`
         );
 
         if (!patientResponse.ok) {

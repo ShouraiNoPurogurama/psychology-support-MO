@@ -26,7 +26,7 @@ export default function Home() {
   const handleMyPatientsPress = async () => {
     try {
       const response = await fetch(
-        "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients?PageIndex=1&PageSize=10"
+        "https://psychologysupport-profile.azurewebsites.net/patients?PageIndex=1&PageSize=10"
       );
       const data = await response.json();
       router.push({

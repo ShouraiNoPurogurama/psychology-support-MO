@@ -12,6 +12,8 @@ import { DoctorHeader } from "../../../component/doctorHeader";
 import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {jwtDecode} from "jwt-decode";
 
 type TimeSlot = {
   status: string;
@@ -37,9 +39,14 @@ export default function DoctorSchedule() {
   useEffect(() => {
     const fetchTimeSlots = async () => {
       try {
-        const doctorId = "6d95bbbf-32ba-44ff-82b3-a5deea337848";
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) throw new Error("No token found");
+
+        const decoded: any = jwtDecode(token);
+        const doctorId = decoded.profileId;
+
         const response = await fetch(
-          `https://psychologysupportscheduling-g0efgxc5bwhbhjgc.southeastasia-01.azurewebsites.net/doctor-schedule/${doctorId}/${selectedDate}`
+          `https://psychologysupport-scheduling.azurewebsites.net/doctor-schedule/${doctorId}/${selectedDate}`
         );
 
         if (!response.ok) {
@@ -161,6 +168,7 @@ export default function DoctorSchedule() {
     </>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
