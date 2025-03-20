@@ -44,7 +44,7 @@ export default function Home() {
 const styles = StyleSheet.create({
     scrollContainer: {
         paddingBottom: 100,
-        paddingTop:100
+        paddingTop:120
     },
     section: {
         position: "relative",
