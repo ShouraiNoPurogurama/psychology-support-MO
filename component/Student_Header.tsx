@@ -1,15 +1,56 @@
 import { TouchableOpacity, View, StyleSheet, Text, Modal, TouchableWithoutFeedback, Image, Platform, StatusBar } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import { router, usePathname } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
-
+type User = {
+    fullName: string;
+    phoneNumber: string;
+};
 
 export const Student_Header: React.FC = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
     const pathname = usePathname();
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Lấy patientId từ token
+                const token = await AsyncStorage.getItem("authToken");
+                if (!token) {
+                    throw new Error("No authentication token found");
+                }
+                const decoded: any = jwtDecode(token);
+                const patientId = decoded.profileId;
+
+                // Fetch thông tin user từ API
+                const response = await fetch(`https://psychologysupport-profile.azurewebsites.net/patients/${patientId}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch user details");
+                }
+                const data = await response.json();
+                const patientProfile = data.patientProfileDto;
+
+                const userData: User = {
+                    fullName: patientProfile.fullName,
+                    phoneNumber: patientProfile.contactInfo.phoneNumber,
+                };
+                setUser(userData);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     return (
         <>
@@ -34,10 +75,21 @@ export const Student_Header: React.FC = () => {
                     <View style={styles.overlay}>
                         <TouchableWithoutFeedback>
                             <View style={styles.drawer}>
-                                <View style={styles.userInfo}>
-                                    <Image source={{ uri: 'https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg' }} style={styles.avatar} />
-                                    <Text style={styles.userName}>Minh Trung</Text>
-                                    <Text style={styles.userPhone}>+84 785901245</Text>
+                            <View style={styles.userInfo}>
+                                    <Image 
+                                        source={{ uri: 'https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg' }} 
+                                        style={styles.avatar} 
+                                    />
+                                    {loading ? (
+                                        <Text style={styles.userName}>Loading...</Text>
+                                    ) : user ? (
+                                        <>
+                                            <Text style={styles.userName}>{user.fullName}</Text>
+                                            <Text style={styles.userPhone}>{user.phoneNumber}</Text>
+                                        </>
+                                    ) : (
+                                        <Text style={styles.userName}>User not found</Text>
+                                    )}
                                 </View>
                                 <TouchableOpacity
                                     style={styles.drawerItem}
@@ -51,9 +103,16 @@ export const Student_Header: React.FC = () => {
                                     <Text style={styles.drawerText}>My Profile</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.drawerItem}>
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/userHistory");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
                                     <Ionicons name="time" size={24} color="white" />
-                                    <Text style={styles.drawerText}>Booking History</Text>
+                                    <Text style={styles.drawerText}>History</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.drawerItem}

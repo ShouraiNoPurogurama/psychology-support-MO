@@ -9,7 +9,6 @@ import {
   Image,
 } from "react-native";
 import { useRouter } from "expo-router";
-import Animated, { FadeIn, BounceIn } from "react-native-reanimated";
 import { Student_Header } from "../../component/Student_Header";
 import { Footer } from "../../component/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -40,7 +39,7 @@ const ShowUserProfile = () => {
         const decoded: any = jwtDecode(token);
         const patientId = decoded.profileId;
         const response = await fetch(
-          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/${patientId}`
+          `https://psychologysupport-profile.azurewebsites.net/patients/${patientId}`
         );
         const data = await response.json();
         setUser(data.patientProfileDto);
@@ -74,20 +73,20 @@ const ShowUserProfile = () => {
     <>
       <Student_Header />
       <ScrollView contentContainerStyle={styles.container}>
-        <Animated.View entering={FadeIn.duration(700)}>
+        <View>
           <Text style={styles.title}>Thông Tin Người Dùng</Text>
-        </Animated.View>
+        </View>
 
         {/* Avatar người dùng */}
-        <Animated.View style={styles.avatarContainer} entering={BounceIn}>
+        <View style={styles.avatarContainer}>
           <Image
             source={{ uri: user.avatarUrl || "https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg" }}
             style={styles.avatar}
           />
-        </Animated.View>
+        </View>
 
         {/* Thông tin người dùng */}
-        <Animated.View style={styles.infoContainer} entering={FadeIn.duration(500)}>
+        <View style={styles.infoContainer}>
           <Text style={styles.label}>Họ và Tên:</Text>
           <Text style={styles.value}>{user.fullName}</Text>
 
@@ -108,7 +107,7 @@ const ShowUserProfile = () => {
 
           <Text style={styles.label}>Tính cách:</Text>
           <Text style={styles.value}>{user.personalityTraits}</Text>
-        </Animated.View>
+        </View>
 
         {/* Nút Edit Profile */}
         <TouchableOpacity
@@ -131,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
     padding: 20,
     alignItems: "center",
-    marginTop:40
+    marginTop: 40,
   },
   title: {
     fontSize: 28,

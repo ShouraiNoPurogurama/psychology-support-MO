@@ -5,6 +5,7 @@ import { Footer } from '../../component/Footer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { RadioButton } from "react-native-paper";
+import { router } from 'expo-router';
 
 
 
@@ -91,7 +92,16 @@ const UserProfile = () => {
     const [selectedActivity, setSelectedActivity] = useState<ActivityItem | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [activityFrequencies, setActivityFrequencies] = useState<Record<string, string>>({});
-
+    const [initialData, setInitialData] = useState({
+        fullName: '',
+        email: '',
+        address: '',
+        contactNumber: '',
+        allergies: '',
+        gender: null,
+        personalityTraits: null,
+    });
+    const [isDataChanged, setIsDataChanged] = useState(false);
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
@@ -99,7 +109,7 @@ const UserProfile = () => {
     const [password, setPassword] = useState('');
     const [allergies, setAllergies] = useState('');
     const [genderOpen, setGenderOpen] = useState(false);
-    const [gender, setGender] = useState<string|null>(null);
+    const [gender, setGender] = useState<string | null>(null);
     const [showDropDown, setShowDropDown] = useState(false);
     const genderList = [
         { label: 'Male', value: 'Male' },
@@ -155,20 +165,32 @@ const UserProfile = () => {
 
                 const decoded: any = jwtDecode(token);
                 const patientId = decoded.profileId;
-                const API_BASE_URL = "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/";
+                const API_BASE_URL = "https://psychologysupport-profile.azurewebsites.net/patients/";
 
                 const response = await fetch(`${API_BASE_URL}${patientId}`);
                 const data = await response.json();
 
                 console.log("User Data:", data);
 
-                setFullName(data.patientProfileDto.fullName || '');
-                setEmail(data.patientProfileDto.contactInfo.email || '');
-                setAddress(data.patientProfileDto.contactInfo.address || '');
-                setContactNumber(data.patientProfileDto.contactInfo.phoneNumber || '');
-                setGender(data.patientProfileDto.gender || 'Female');
-                setPersonalityTraits(data.patientProfileDto.personalityTraits || 'Extroversion');
-                setAllergies(data.patientProfileDto.allergies || '');
+                const userData = {
+                    fullName: data.patientProfileDto.fullName || '',
+                    email: data.patientProfileDto.contactInfo.email || '',
+                    address: data.patientProfileDto.contactInfo.address || '',
+                    contactNumber: data.patientProfileDto.contactInfo.phoneNumber || '',
+                    gender: data.patientProfileDto.gender || 'Female',
+                    personalityTraits: data.patientProfileDto.personalityTraits || 'Extroversion',
+                    allergies: data.patientProfileDto.allergies || '',
+                };
+
+                setFullName(userData.fullName);
+                setEmail(userData.email);
+                setAddress(userData.address);
+                setContactNumber(userData.contactNumber);
+                setGender(userData.gender);
+                setPersonalityTraits(userData.personalityTraits);
+                setAllergies(userData.allergies);
+
+                setInitialData(userData); // Lưu dữ liệu ban đầu
 
                 setLoading(false);
             } catch (error) {
@@ -180,20 +202,34 @@ const UserProfile = () => {
         fetchUserData();
     }, []);
 
+    useEffect(() => {
+        const hasChanged =
+            fullName !== initialData.fullName ||
+            email !== initialData.email ||
+            address !== initialData.address ||
+            contactNumber !== initialData.contactNumber ||
+            allergies !== initialData.allergies ||
+            gender !== initialData.gender ||
+            personalityTraits !== initialData.personalityTraits;
+
+        setIsDataChanged(hasChanged);
+    }, [fullName, email, address, contactNumber, allergies, gender, personalityTraits, initialData]);
     if (loading) {
         return <Text style={styles.loadingText}>Loading...</Text>;
     }
 
 
     const handleSave = async () => {
+        if (!isDataChanged) return;
+
         try {
             const token = await AsyncStorage.getItem('authToken');
             if (!token) throw new Error("User not authenticated");
-    
+
             const decoded: any = jwtDecode(token);
             const patientId = decoded.profileId;
-            const API_BASE_URL = "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/";
-    
+            const API_BASE_URL = "https://psychologysupport-profile.azurewebsites.net/patients/";
+
             const updatedProfile = {
                 patientProfileUpdate: {
                     fullName,
@@ -208,7 +244,7 @@ const UserProfile = () => {
                     }
                 }
             };
-            
+
             console.log("update data", updatedProfile)
             const response = await fetch(`${API_BASE_URL}${patientId}`, {
                 method: "PUT",
@@ -218,15 +254,17 @@ const UserProfile = () => {
                 },
                 body: JSON.stringify(updatedProfile)
             });
-    
+
             if (!response.ok) {
                 throw new Error("Failed to update profile");
             }
-    
+
             const data = await response.json();
             console.log("Profile updated successfully:", data);
-    
+
             alert("Profile updated successfully!");
+            setInitialData({ fullName, email, address, contactNumber, allergies, gender, personalityTraits }); // Cập nhật dữ liệu ban đầu sau khi lưu
+            setIsDataChanged(false); // Reset trạng thái thay đổi
         } catch (error) {
             console.error("Error updating profile:", error);
             alert("Failed to update profile.");
@@ -258,45 +296,45 @@ const UserProfile = () => {
                     <Text style={styles.label}>Contact Number</Text>
                     <TextInput style={styles.input} value={contactNumber} onChangeText={setContactNumber} keyboardType="phone-pad" />
 
-            {/* Gender */}
-            <Text style={styles.label}>Gender</Text>
-            <View style={styles.radioGroup}>
-                <RadioButton.Item 
-                    label="Male" 
-                    value="Male" 
-                    status={gender === "Male" ? "checked" : "unchecked"} 
-                    onPress={() => setGender("Male")} 
-                />
-                <RadioButton.Item 
-                    label="Female" 
-                    value="Female" 
-                    status={gender === "Female" ? "checked" : "unchecked"} 
-                    onPress={() => setGender("Female")} 
-                />
-            </View>
+                    {/* Gender */}
+                    <Text style={styles.label}>Gender</Text>
+                    <View style={styles.radioGroup}>
+                        <RadioButton.Item
+                            label="Male"
+                            value="Male"
+                            status={gender === "Male" ? "checked" : "unchecked"}
+                            onPress={() => setGender("Male")}
+                        />
+                        <RadioButton.Item
+                            label="Female"
+                            value="Female"
+                            status={gender === "Female" ? "checked" : "unchecked"}
+                            onPress={() => setGender("Female")}
+                        />
+                    </View>
 
-            {/* Personality Traits */}
-            <Text style={styles.label}>Personality Traits</Text>
-            <View style={styles.radioGroup}>
-                <RadioButton.Item 
-                    label="Extroversion" 
-                    value="Extroversion" 
-                    status={personalityTraits === "Extroversion" ? "checked" : "unchecked"} 
-                    onPress={() => setPersonalityTraits("Extroversion")} 
-                />
-                <RadioButton.Item 
-                    label="Introversion" 
-                    value="Introversion" 
-                    status={personalityTraits === "Introversion" ? "checked" : "unchecked"} 
-                    onPress={() => setPersonalityTraits("Introversion")} 
-                />
-            </View>
+                    {/* Personality Traits */}
+                    <Text style={styles.label}>Personality Traits</Text>
+                    <View style={styles.radioGroup}>
+                        <RadioButton.Item
+                            label="Extroversion"
+                            value="Extroversion"
+                            status={personalityTraits === "Extroversion" ? "checked" : "unchecked"}
+                            onPress={() => setPersonalityTraits("Extroversion")}
+                        />
+                        <RadioButton.Item
+                            label="Introversion"
+                            value="Introversion"
+                            status={personalityTraits === "Introversion" ? "checked" : "unchecked"}
+                            onPress={() => setPersonalityTraits("Introversion")}
+                        />
+                    </View>
 
                     <Text style={styles.label}>Allergies</Text>
                     <TextInput style={styles.input} value={allergies} onChangeText={setAllergies} />
                 </View>
 
-                {activities.map((category, index) => (
+                {/* {activities.map((category, index) => (
                     <View key={index} style={styles.categoryContainer}>
                         <TouchableOpacity style={styles.categoryHeader} onPress={() => toggleCategory(category.title)}>
                             <Text style={styles.categoryTitle}>{category.icon} {category.title}</Text>
@@ -364,10 +402,20 @@ const UserProfile = () => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </Modal>
+                </Modal> */}
                 <View style={styles.buttonRow}>
-                    <TouchableOpacity style={styles.saveButton}><Text>Cancel</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <TouchableOpacity
+                     style={styles.saveButton}
+                     onPress={() => router.push("/user/showUserProfile")}
+                     
+                     >
+                        <Text>Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.saveButton, !isDataChanged && styles.disabledButton]}
+                        onPress={handleSave}
+                        disabled={!isDataChanged} // Disable nút khi không có thay đổi
+                    >
                         <Text style={styles.saveText}>Save</Text>
                     </TouchableOpacity>
                 </View>
@@ -390,6 +438,7 @@ const styles = StyleSheet.create({
     saveButton: { backgroundColor: "#D4B5FF", padding: 10, borderRadius: 5, paddingHorizontal: 50 },
     saveText: { color: "white", fontWeight: "bold" },
     categoryTitle: { fontWeight: "bold", fontSize: 18, marginBottom: 10 },
+    disabledButton: { backgroundColor: "#ccc" }, // Style cho nút bị disable
     radioGroup: { marginBottom: 15 },
 
     activityItem: {
