@@ -1,25 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const doctorInfo = {
-  id: "1",
-  name: "Dr. Nguyen Van Minh",
-  specialty: "Clinical Psychology",
-  experience: 10,
-  rating: 4.8,
-  totalReviews: 120,
-  patientsTreated: 350,
-  phone: "0987654321",
-  email: "minh.nguyen@hospital.com",
-  address: "123 ABC Street, District 1, Ho Chi Minh City",
-  certificates: "Psychology Certification - University of Medicine and Pharmacy",
-  workplace: "Central Mental Health Hospital",
-  avatar: "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577",
-};
-
 export const DoctorHeader: React.FC<{ avatarUrl?: string }> = ({ avatarUrl }) => {
+  const [profileId, setProfileId] = useState<string>("");
+
+
   return (
     <View style={styles.headerContainer}>
       {/* Góc trái: Thông báo & Tên ứng dụng */}
@@ -30,12 +17,13 @@ export const DoctorHeader: React.FC<{ avatarUrl?: string }> = ({ avatarUrl }) =>
 
       {/* Góc phải: Avatar bác sĩ */}
       <TouchableOpacity
-        onPress={() => router.push({ pathname: "/doctors/profiles/doctorProfile", params: doctorInfo })}
+        onPress={() =>
+          router.push({
+            pathname: "/doctors/profiles/doctorProfile",
+          })
+        }
       >
-        <Image
-          source={{ uri: avatarUrl || doctorInfo.avatar }}
-          style={styles.avatar}
-        />
+        <MaterialIcons name="person" size={40} color="white" style={styles.avatar} />
       </TouchableOpacity>
     </View>
   );
