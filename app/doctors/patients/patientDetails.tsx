@@ -49,7 +49,7 @@ export default function PatientProfile() {
 
       try {
         const response = await fetch(
-          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/${id}`
+          `https://psychologysupport-profile.azurewebsites.net/patients/${id}`
         );
         if (!response.ok) throw new Error("Failed to fetch patient details");
 
@@ -71,7 +71,7 @@ export default function PatientProfile() {
       if (!id) return;
       try {
         const response = await fetch(
-          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients/${id}/medical-records?PageIndex=1&PageSize=10&SortBy=CreateAt&SortOrder=asc&Status=Processing`
+          `https://psychologysupport-profile.azurewebsites.net/patients/${id}/medical-records?PageIndex=1&PageSize=10&SortBy=CreateAt&SortOrder=asc&Status=Processing`
         );
         if (!response.ok) throw new Error("Failed to fetch medical records");
 

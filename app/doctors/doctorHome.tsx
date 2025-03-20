@@ -6,27 +6,49 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DoctorHeader } from "../../component/doctorHeader";
 import { Footer } from "../../component/doctorFooter";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
-const avatarUrl =
-  "https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {jwtDecode} from "jwt-decode";
 
 const topBannerImage =
   "https://file.hstatic.net/200000256325/article/auc1576544994_a7cc6e2aaa604d3c86351b929f853a9e.jpg";
 
-const doctorName = "Dr. Nguyen Van Minh";
-
 export default function Home() {
   const router = useRouter();
+  const [doctorName, setDoctorName] = useState("Loading...");
+
+  useEffect(() => {
+    const fetchDoctorData = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) throw new Error("Token not found");
+
+       const decoded: any = jwtDecode(token);
+               const profileId = decoded?.profileId;
+               if (!profileId) throw new Error("Profile ID not found in token");
+
+        const response = await fetch(
+          `https://psychologysupport-profile.azurewebsites.net/doctors/${profileId}`
+        );
+        const data = await response.json();
+
+        setDoctorName(data?.doctorProfileDto?.fullName || "Doctor not found");
+      } catch (error) {
+        console.error("Error fetching doctor data:", error);
+      }
+    };
+
+    fetchDoctorData();
+  }, []);
 
   const handleMyPatientsPress = async () => {
     try {
       const response = await fetch(
-        "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients?PageIndex=1&PageSize=10"
+        "https://psychologysupport-profile.azurewebsites.net/patients?PageIndex=1&PageSize=10"
       );
       const data = await response.json();
       router.push({
@@ -40,11 +62,11 @@ export default function Home() {
 
   return (
     <>
-      <DoctorHeader avatarUrl={avatarUrl} />
+      <DoctorHeader/>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.profileSection}>
-            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+            <FontAwesome5 name="user-md" size={90} color="#AF93D2" />
             <Text style={styles.title}>Welcome, {doctorName}</Text>
           </View>
 
@@ -88,7 +110,9 @@ export default function Home() {
               style={styles.card}
               activeOpacity={0.8}
               onPress={() =>
-                router.push("/doctors/treatmentHistory/doctorTreatmentHistory")
+                router.push(
+                  "/doctors/treatmentHistory/doctorTreatmentHistory"
+                )
               }
             >
               <MaterialIcons name="history" size={32} color="#AF93D2" />
@@ -118,14 +142,6 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: "center",
     marginBottom: 20,
-  },
-  avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    borderWidth: 2,
-    borderColor: "#AF93D2",
-    marginBottom: 10,
   },
   title: {
     fontSize: 24,
@@ -169,40 +185,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     color: "#4B3F72",
-  },
-  bottomBannerContainer: {
-    flexDirection: "row",
-    width: "90%",
-    backgroundColor: "#AF93D2",
-    borderRadius: 10,
-    overflow: "hidden",
-    marginTop: 20,
-  },
-  imageWrapper: {
-    flex: 1,
-    position: "relative",
-  },
-  bottomBannerImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  bottomBannerTextContainer: {
-    flex: 1,
-    padding: 15,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bannerTitle: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  bannerSubtitle: {
-    color: "white",
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 5,
   },
 });

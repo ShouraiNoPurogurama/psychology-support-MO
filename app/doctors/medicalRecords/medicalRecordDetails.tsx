@@ -24,7 +24,7 @@ export default function MedicalRecordDetails() {
     const fetchMedicalRecord = async () => {
       try {
         const response = await fetch(
-          `https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/medical-records/${id}`
+          `https://psychologysupport-profile.azurewebsites.net/medical-records/${id}`
         );
         const data = await response.json();
 

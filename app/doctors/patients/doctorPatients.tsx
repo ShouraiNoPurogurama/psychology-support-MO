@@ -39,7 +39,7 @@ export default function DoctorPatients() {
     async function fetchPatients() {
       try {
         const response = await fetch(
-          "https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/patients?PageIndex=1&PageSize=10&SortBy=fullname&SortOrder=asc&MediccalRecordStatusStatus=Processing"
+          "https://psychologysupport-profile.azurewebsites.net/patients?PageIndex=1&PageSize=10&SortBy=fullname&SortOrder=asc&MediccalRecordStatusStatus=Processing"
         );
         if (!response.ok) throw new Error("API Error");
 
