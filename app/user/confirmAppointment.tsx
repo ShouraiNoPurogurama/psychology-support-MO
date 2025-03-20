@@ -4,6 +4,8 @@ import { Footer } from "../../component/Footer";
 import { Student_Header } from "../../component/Student_Header";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 type Doctor = {
     id: string;
@@ -13,39 +15,71 @@ type Doctor = {
     image: string;
 };
 
+type Patient = {
+    id: string;
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+};
+
 export default function ConfirmAppointment() {
-    const { date, time, doctorId } = useLocalSearchParams();
+    const { date, time, doctorId, patientId } = useLocalSearchParams(); // Thêm patientId
     const [doctor, setDoctor] = useState<Doctor | null>(null);
+    const [patient, setPatient] = useState<Patient | null>(null); // Thêm state cho patient
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-  
+
     useEffect(() => {
-        const fetchDoctorDetail = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch(`https://psychologysupportprofile-fddah4eef4a7apac.eastasia-01.azurewebsites.net/doctors/${doctorId}`);
-                if (!response.ok) {
+                const token = await AsyncStorage.getItem("authToken");
+                if (!token) {
+                    throw new Error("No authentication token found");
+                }
+                const decoded: any = jwtDecode(token);
+                const patientId = decoded.profileId;
+                // Fetch doctor details
+                const doctorResponse = await fetch(`https://psychologysupport-profile.azurewebsites.net/doctors/${doctorId}`);
+                if (!doctorResponse.ok) {
                     throw new Error("Failed to fetch doctor details");
                 }
-                const data = await response.json();
-                const doctorData = data.doctorProfileDto;
+                const doctorData = await doctorResponse.json();
+                const doctorProfile = doctorData.doctorProfileDto;
 
                 const formattedDoctor: Doctor = {
-                    id: doctorData.id,
-                    name: doctorData.fullName,
-                    specialty: (doctorData.specialties as { name: string }[]).map(s => s.name).join(", "),
-                    fee: 150.000, // API chưa có fee
-                    image: "https://taimuihongsg.com/wp-content/uploads/2018/05/Kim-Bun-ThuongE_taimuihongsg.jpg", // API chưa có image
+                    id: doctorProfile.id,
+                    name: doctorProfile.fullName,
+                    specialty: (doctorProfile.specialties as { name: string }[]).map(s => s.name).join(", "),
+                    fee: 170000,
+                    image: "https://kenh14cdn.com/203336854389633024/2022/5/6/f04d70b1f6e140338a7d2f27ebe67685-1651808959048730170550.png",
                 };
                 setDoctor(formattedDoctor);
+
+                // Fetch patient details
+                const patientResponse = await fetch(`https://psychologysupport-profile.azurewebsites.net/patients/${patientId}`);
+                if (!patientResponse.ok) {
+                    throw new Error("Failed to fetch patient details");
+                }
+                const patientData = await patientResponse.json();
+                const patientProfile = patientData.patientProfileDto; // Điều chỉnh theo cấu trúc response thực tế của API
+
+                const formattedPatient: Patient = {
+                    id: patientProfile.id,
+                    fullName: patientProfile.fullName,
+                    email: patientProfile.contactInfo.email,
+                    phoneNumber: patientProfile.contactInfo.phoneNumber,
+                };
+                setPatient(formattedPatient);
+
             } catch (err) {
-                setError("Doctor not found");
+                // setError(err.message || "Something went wrong");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchDoctorDetail();
-    }, [doctorId]);
+        fetchData();
+    }, [doctorId, patientId]); // Thêm patientId vào dependency array
 
     if (loading) {
         return (
@@ -55,13 +89,14 @@ export default function ConfirmAppointment() {
         );
     }
 
-    if (error || !doctor) {
+    if (error || !doctor || !patient) { // Kiểm tra cả patient
         return (
             <View style={styles.centered}>
-                <Text style={styles.errorText}>{error}</Text>
+                <Text style={styles.errorText}>{error || "Data not found"}</Text>
             </View>
         );
     }
+
     return (
         <>
             <Student_Header />
@@ -73,9 +108,9 @@ export default function ConfirmAppointment() {
                     <View style={styles.infoRow}>
                         <Ionicons name="person-circle-outline" size={40} color="#2A86FF" />
                         <View>
-                            <Text style={styles.textBold}>Minh Trung</Text>
-                            <Text style={styles.text}>nguyenminhtrung18072004@gmail.com</Text>
-                            <Text style={styles.text}>+84 784927089</Text>
+                            <Text style={styles.textBold}>{patient.fullName}</Text>
+                            <Text style={styles.text}>{patient.email}</Text>
+                            <Text style={styles.text}>{patient.phoneNumber}</Text>
                         </View>
                     </View>
                 </View>
@@ -133,7 +168,7 @@ const styles = StyleSheet.create({
     container: {
         paddingBottom: 80,
         paddingHorizontal: 20,
-        paddingTop: 80,
+        paddingTop: 100,
         gap: 20
 
     },
