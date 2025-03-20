@@ -10,7 +10,7 @@ import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 export default function DoctorAppointments() {
@@ -22,24 +22,24 @@ export default function DoctorAppointments() {
         const token = await AsyncStorage.getItem("authToken");
         if (!token) throw new Error("Token not found");
 
-       const decoded: any = jwtDecode(token);
-               const doctorId = decoded?.profileId;
-               if (!doctorId) throw new Error("Profile ID not found in token");
+        const decoded: any = jwtDecode(token);
+        const doctorId = decoded?.profileId;
+        if (!doctorId) throw new Error("Profile ID not found in token");
 
-               const response = await fetch(
-                    `https://psychologysupport-scheduling.azurewebsites.net/bookings?PageIndex=1&SortBy=time&PageSize=10&SortOrder=desc&DoctorId=${doctorId}&Status=Pending`,
-                    {
-                      headers: { Authorization: `Bearer ${token}` },
-                    }
-                  );
-          
-                  if (!response.ok) throw new Error("Failed to fetch appointments");
-          
-                  const data = await response.json();
-                  setAppointments(data.bookings.data || []);
-                } catch (error) {
-                  console.error("Error fetching appointments:", error);
-                }
+        const response = await fetch(
+          `https://psychologysupport-scheduling.azurewebsites.net/bookings?PageIndex=1&SortBy=time&PageSize=10&SortOrder=desc&DoctorId=${doctorId}&Status=Pending`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch appointments");
+
+        const data = await response.json();
+        setAppointments(data.bookings.data || []);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
     };
 
     fetchAppointments();
@@ -99,7 +99,7 @@ const AppointmentCard = ({ item }: { item: { bookingCode: string; date: string; 
         onPress={() =>
           router.push({
             pathname: "/doctors/appointments/appointmentDetails",
-            params: item,
+            params: { bookingCode: item.bookingCode },
           })
         }
       >
