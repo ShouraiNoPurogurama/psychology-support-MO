@@ -85,7 +85,7 @@ export default function Login(): React.JSX.Element {
 
     try {
       const response = await fetch(
-        "https://psychologysupportauth-gqdkbafkbpf5a4gf.eastasia-01.azurewebsites.net/Auth/login",
+        "https://psychologysupport-auth.azurewebsites.net/Auth/Login",
         {
           method: "POST",
           headers: {
@@ -175,13 +175,13 @@ export default function Login(): React.JSX.Element {
 
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> 
  
-        {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
-
-        {/* <TouchableOpacity onPress={() => router.push("/doctors/doctorHome")} style={styles.button}>
+       {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}> */}
+         {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity> */}
+         </TouchableOpacity> 
+ */}
 
         <Text style={styles.footerText}>
           Don't have an account?{" "}

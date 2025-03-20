@@ -28,7 +28,7 @@ export default function Register() {
 
     try {
       const response = await fetch(
-        'https://psychologysupportauth-gqdkbafkbpf5a4gf.eastasia-01.azurewebsites.net/Auth/register',
+        'https://psychologysupport-auth.azurewebsites.net/Auth/register',
         {
           method: 'POST',
           headers: {
