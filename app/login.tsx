@@ -86,11 +86,17 @@ export default function Login(): React.JSX.Element {
         "Error",
         "Please enter your Email or Phone number and Password"
       );
-
       return;
     }
 
-    let loginData: any = { password };
+    // Lấy FCM token từ state
+    const deviceToken = fcmToken;
+    
+    let loginData: any = { 
+      password,
+      deviceToken: deviceToken || "", 
+      deviceType: "Android" 
+    };
 
     if (isValidEmail(identifier)) {
       loginData.email = identifier;
@@ -99,7 +105,6 @@ export default function Login(): React.JSX.Element {
     } else {
       Alert.alert("Error", "Please enter a valid Email or Phone number");
       console.error("Error", "Please enter a valid Email or Phone number");
-
       return;
     }
 
@@ -115,7 +120,7 @@ export default function Login(): React.JSX.Element {
         }
       );
 
-      console.log(email, phoneNumber, password);
+      console.log("Login data sent:", loginData);
       console.log("Response status:", response.status);
 
       const data = await response.json();
@@ -123,7 +128,7 @@ export default function Login(): React.JSX.Element {
 
       if (response.ok) {
         const token = data.token;
-        await AsyncStorage.setItem('authToken', token) //chỗ này lưu token vào storage
+        await AsyncStorage.setItem('authToken', token);
 
         if (!token) {
           Alert.alert("Error", "No token received");
@@ -131,16 +136,16 @@ export default function Login(): React.JSX.Element {
         }
 
         try {
-          const decoded: any = jwtDecode(token); //chỗ này decode token
+          const decoded: any = jwtDecode(token);
           console.log("Decoded Token:", decoded);
 
-          const userRole = decoded.role; //chỗ này gọi role từ token đã giải mã
+          const userRole = decoded.role;
 
           Alert.alert("Success", "Login successful");
 
           if (userRole === "User") {
             router.push("/user/home");
-          } else if (userRole == "Doctor") {
+          } else if (userRole === "Doctor") {
             router.push("/doctors/doctorHome");
           }
         } catch (decodeError) {
