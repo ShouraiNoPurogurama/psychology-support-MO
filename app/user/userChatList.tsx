@@ -29,7 +29,7 @@ export default function userChatList() {
   return (
     <>
       <Student_Header />
-      <View style={{ flex: 1, backgroundColor: 'white', padding: 15, marginTop:40 }}>
+      <View style={{ flex: 1, backgroundColor: 'white', padding: 15, marginTop:70 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15, borderWidth: 1, borderColor: '#ddd', borderRadius: 20, paddingHorizontal: 10 }}>
           <FontAwesome name="search" size={18} color="#aaa" style={{ marginRight: 5 }} />
           <TextInput

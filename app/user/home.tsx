@@ -2,13 +2,36 @@ import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Dimensions
 import { router } from 'expo-router';
 import { Footer } from '../../component/Footer';
 import { Student_Header } from '../../component/Student_Header';
-import React from 'react';
+import React, { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 
 const { width: screenWidth } = Dimensions.get('window');
 const HomeScreenImage = require("../../assets/images/HomeScreen.png");
 const DoctorImage = require("../../assets/images/Doctor.jpg");
 
 export default function Home() {
+    useEffect(() => {
+        const getTokenAndDecode = async () => {
+            try {
+                // Lấy token từ AsyncStorage
+                const token = await AsyncStorage.getItem('authToken');
+                
+                if (token) {
+                    // Giải mã token
+                    const decode:any = jwtDecode(token);
+                    // In profileId ra console
+                    console.log("decode.profileId:", decode.profileId);
+                } else {
+                    console.log("No token found");
+                }
+            } catch (error) {
+                console.error("Error decoding token:", error);
+            }
+        };
+
+        getTokenAndDecode();
+    }, []); 
     return (
         <>
             <ScrollView contentContainerStyle={styles.scrollContainer}>

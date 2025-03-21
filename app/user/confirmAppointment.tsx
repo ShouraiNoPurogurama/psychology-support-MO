@@ -142,10 +142,14 @@ export default function ConfirmAppointment() {
                     <Text style={styles.feeAmount}>{doctor.fee.toLocaleString()} đ</Text>
                 </View>
 
-                <TouchableOpacity style={styles.confirmButton} onPress={() => console.log("Confirmed!")}>
+                <TouchableOpacity
+                onPress={() => router.push(`/user/PaymentSuccessScreen`)}
+                style={styles.confirmButton} >
                     <Text style={styles.confirmText}>Confirm Appointment</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.cancelButton} onPress={() => console.log("Canceled!")}>
+                <TouchableOpacity style={styles.cancelButton}
+                onPress={() => router.push(`/user/PaymentFailedScreen`)}
+                >
                     <Text style={styles.confirmText}>Cancel Appointment</Text>
                 </TouchableOpacity>
             </ScrollView>
@@ -243,10 +247,11 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     cancelButton: {
-        backgroundColor: 'red',
+        backgroundColor: "red",
         paddingVertical: 15,
         borderRadius: 10,
         alignItems: "center",
+        marginBottom:40
     },
     confirmText: {
         color: "#FFF",

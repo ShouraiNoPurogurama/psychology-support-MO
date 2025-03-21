@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 12, // Bo góc mềm mại hơn
     padding: 12,
     marginBottom: 20,
-    marginTop: 60, // Đẩy xuống để tránh header
+    marginTop: 90, // Đẩy xuống để tránh header
     marginHorizontal: 10,
     backgroundColor: '#fff',
     fontSize: 16,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 15,
-    marginBottom: 15,
+    marginBottom: 20,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },

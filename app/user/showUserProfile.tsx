@@ -64,7 +64,7 @@ const ShowUserProfile = () => {
   if (!user) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Không thể tải thông tin người dùng.</Text>
+        <Text style={styles.errorText}>Unable to load user information.</Text>
       </View>
     );
   }
@@ -74,10 +74,10 @@ const ShowUserProfile = () => {
       <Student_Header />
       <ScrollView contentContainerStyle={styles.container}>
         <View>
-          <Text style={styles.title}>Thông Tin Người Dùng</Text>
+          <Text style={styles.title}>User Information</Text>
         </View>
 
-        {/* Avatar người dùng */}
+        {/* User Avatar */}
         <View style={styles.avatarContainer}>
           <Image
             source={{ uri: user.avatarUrl || "https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg" }}
@@ -85,36 +85,36 @@ const ShowUserProfile = () => {
           />
         </View>
 
-        {/* Thông tin người dùng */}
+        {/* User Information */}
         <View style={styles.infoContainer}>
-          <Text style={styles.label}>Họ và Tên:</Text>
+          <Text style={styles.label}>Full Name:</Text>
           <Text style={styles.value}>{user.fullName}</Text>
 
           <Text style={styles.label}>Email:</Text>
           <Text style={styles.value}>{user.contactInfo.email}</Text>
 
-          <Text style={styles.label}>Địa chỉ:</Text>
+          <Text style={styles.label}>Address:</Text>
           <Text style={styles.value}>{user.contactInfo.address}</Text>
 
-          <Text style={styles.label}>Số điện thoại:</Text>
+          <Text style={styles.label}>Phone Number:</Text>
           <Text style={styles.value}>{user.contactInfo.phoneNumber}</Text>
 
-          <Text style={styles.label}>Giới tính:</Text>
+          <Text style={styles.label}>Gender:</Text>
           <Text style={styles.value}>{user.gender}</Text>
 
-          <Text style={styles.label}>Dị ứng:</Text>
+          <Text style={styles.label}>Allergies:</Text>
           <Text style={styles.value}>{user.allergies}</Text>
 
-          <Text style={styles.label}>Tính cách:</Text>
+          <Text style={styles.label}>Personality Traits:</Text>
           <Text style={styles.value}>{user.personalityTraits}</Text>
         </View>
 
-        {/* Nút Edit Profile */}
+        {/* Edit Profile Button */}
         <TouchableOpacity
           style={styles.editButton}
           onPress={() => router.push("/user/userProfile")}
         >
-          <Text style={styles.buttonText}>Chỉnh sửa hồ sơ</Text>
+          <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
       </ScrollView>
       <Footer />
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
     padding: 20,
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 70,
   },
   title: {
     fontSize: 28,
@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 8,
     elevation: 3,
+    marginBottom: 60,
   },
   buttonText: {
     color: "#fff",
