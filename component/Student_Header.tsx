@@ -171,7 +171,9 @@ export const Student_Header: React.FC = () => {
 
                                 <TouchableOpacity
                                     style={styles.drawerItem}
+
                                     onPress={() => {
+                                        AsyncStorage.removeItem("authToken");
                                         router.push("/login");
                                         setIsDrawerOpen(false)
                                     }

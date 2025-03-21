@@ -127,6 +127,15 @@ export default function DoctorProfile() {
           >
             <Text style={styles.buttonText}>✏️ Edit Profile</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={() => {
+              AsyncStorage.removeItem("authToken");
+              router.push("/login");     
+            }
+          }>
+            <Text style={styles.buttonText}>🔓 Logout</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -159,6 +168,7 @@ const styles = StyleSheet.create({
   iconRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   info: { fontSize: 16, marginLeft: 10, color: "#333" },
   editButton: { backgroundColor: "#6A8CAF", padding: 12, borderRadius: 8, alignItems: "center" },
+  logoutButton: { backgroundColor: "#6A8CAF", padding: 12, borderRadius: 8, alignItems: "center" },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   statText: { fontSize: 16, color: "#555" },
 });
