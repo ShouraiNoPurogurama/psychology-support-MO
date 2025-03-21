@@ -361,7 +361,7 @@ export default function UserTask() {
           backgroundColor: "#F5F6FA",
           padding: 20,
           marginTop: 70,
-          marginBottom: 50,
+          marginBottom: 80,
         }}
       >
         <Text
@@ -627,6 +627,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
+    marginBottom:0
   },
   modalHeader: {
     flexDirection: "row",
