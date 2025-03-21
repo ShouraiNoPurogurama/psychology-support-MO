@@ -4,13 +4,29 @@ import "../global.css";
 import { StatusBar } from "expo-status-bar";
 import  messaging, { registerDeviceForRemoteMessages }  from "@react-native-firebase/messaging";
 import React, {useEffect} from "react"; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
 
 
 export default function App() {
+
   const navigationState = useRootNavigationState(); 
+  const storeToken = async (token: string): Promise<boolean> => {
+    try {
+      if (!token || typeof token !== 'string') {
+        console.error('Invalid token provided');
+        return false;
+      }
+      await AsyncStorage.setItem('fcmToken', token);
+      console.log('Token saved successfully:', token);
+      return true;
+    } catch (error) {
+      console.error('Error saving token:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     if (!navigationState?.ready) return; 
@@ -26,79 +42,85 @@ export default function App() {
   }, []);
 
   
-//   useEffect(() => {
-//     const fetchFCMToken = async () => {
-//       try {
-//         await messaging().registerDeviceForRemoteMessages();
-//         const token = await messaging().getToken();
-//         console.log("FCM Token:", token);
-//       } catch (error) {
-//         console.error("Error fetching FCM Token:", error);
-//       }
-//     };
+  useEffect(() => {
+    const fetchFCMToken = async () => {
+      try {
+        await messaging().registerDeviceForRemoteMessages();
+        const token = await messaging().getToken();
+        console.log("FCM Token:", token);
+        const success = await storeToken(token); // Lưu token
+        if (!success) {
+          console.log("Failed to save token");
+        }
+      } catch (error) {
+        console.error("Error fetching FCM Token:", error);
+      }
+    };
   
-//     fetchFCMToken(); 
-//   }, []);
+    fetchFCMToken();
+  }, []);
   
   
-//   const requestUserPermission = async () => {
-//     const authStatus = await messaging().requestPermission();
-//     const enabled =
-//       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-//       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  const requestUserPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-//     if (enabled) {
-//       console.log("Authorization status:", authStatus);
-//     }
-//     return authStatus;
-// };
+    if (enabled) {
+      console.log("Authorization status:", authStatus);
+    }
+    return authStatus;
+};
 
-// useEffect(() => {
-//   const checkPermissionAndToken = async () => {
-//     const authStatus = await requestUserPermission(); 
-//     if (authStatus) {
-//       messaging()
-//         .getToken()
-//         .then((token) => {
-//           console.log("FCM Token:", token);
-//         });
-//     } else {
-//       console.log("Permission is not granted", authStatus);
-//     }
+useEffect(() => {
+  const checkPermissionAndToken = async () => {
+    const authStatus = await requestUserPermission(); 
+    if (authStatus) {
+      messaging()
+        .getToken()
+        .then((token) => {
+          console.log("FCM Token:", token);
+        });
+    } else {
+      console.log("Permission is not granted", authStatus);
+    }
 
 
-//   //check wheter an initial notification is avaiable
-//   messaging()
-//     .getInitialNotification()
-//     .then(async (remoteMessage) =>{
-//       if(remoteMessage) {
-//         console.log(
-//           "Notification caused app to open from quit state ",
-//           remoteMessage.notification
-//         );
-//       }
-//     });
-//     // Assume a message-notification contains a "types " property in the data payload of the screen to open
-//     messaging().onNotificationOpenedApp((remoteMessage) => {
-//       console.log(
-//         "Notification caused app to open from background state",
-//         remoteMessage.notification
-//       );
-//     }); 
+  //check wheter an initial notification is avaiable
+  messaging()
+    .getInitialNotification()
+    .then(async (remoteMessage) =>{
+      if(remoteMessage) {
+        console.log(
+          "Notification caused app to open from quit state ",
+          remoteMessage.notification
+        );
+      }
+    });
+    // Assume a message-notification contains a "types " property in the data payload of the screen to open
+    messaging().onNotificationOpenedApp((remoteMessage) => {
+      console.log(
+        "Notification caused app to open from background state",
+        remoteMessage.notification
+      );
+    }); 
 
-//     // Register background handler
-//     messaging().setBackgroundMessageHandler(async (remoteMessage) =>{
-//       console.log("Message handled in the background", remoteMessage);
-//     });
+    // Register background handler
+    messaging().setBackgroundMessageHandler(async (remoteMessage) =>{
+      console.log("Message handled in the background", remoteMessage);
+    });
 
-//     const unsubscribe = messaging().onMessage(async(remoteMessage) =>{
-//       Alert.alert("A new FCM message arrived", JSON.stringify(remoteMessage));
-//     });
+    const unsubscribe = messaging().onMessage(async(remoteMessage) =>{
+      Alert.alert("A new FCM message arrived", JSON.stringify(remoteMessage));
+    });
 
-//     return unsubscribe;
-//   };
-//   checkPermissionAndToken();
-//   },[]);
+    return unsubscribe;
+  };
+  checkPermissionAndToken();
+  },[]);
+
+
 // const getToken = async () => {
 //   try {
 //       const token = await messaging().getToken();

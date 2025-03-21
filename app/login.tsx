@@ -23,6 +23,8 @@ import { Ionicons } from "@expo/vector-icons";
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Login(): React.JSX.Element {
+
+
   // const [request, response, promptAsync] = Google.useAuthRequest({
   //   androidClientId: '398851471046-27k27bpi63vn7roon2g1phl00d6a2jn6.apps.googleusercontent.com',
   //   webClientId: '398851471046-f7p7vh7ncamknt4shpolr7kqrevfmeue.apps.googleusercontent.com',
@@ -47,6 +49,24 @@ export default function Login(): React.JSX.Element {
   const [password, setPassword] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [fcmToken, setFcmToken] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchFcmToken = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem("fcmToken");
+        if (storedToken) {
+          setFcmToken(storedToken);
+          console.log("Retrieved FCM Token:", storedToken);
+        }else {
+          console.log("no fcm token")
+        }
+      } catch (error) {
+        console.error("Error retrieving/generating FCM Token:", error);
+      }
+    };
+
+    fetchFcmToken();
+  }, []);
 
   const isValidEmail = (email: string) => {
     return /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
@@ -138,6 +158,7 @@ export default function Login(): React.JSX.Element {
   };
 
   return (
+
     <View style={styles.container}>
       <Text style={styles.title}>EmoEase</Text>
       <View style={styles.header}>
@@ -175,10 +196,10 @@ export default function Login(): React.JSX.Element {
 
         <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity> 
- 
-       {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}> */}
-         {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
+        </TouchableOpacity>
+
+        {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}> */}
+        {/* <TouchableOpacity onPress={() => router.push("/user/home")} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
          </TouchableOpacity> 
  */}
@@ -299,3 +320,7 @@ const styles = StyleSheet.create({
     color: "gray",
   },
 });
+function messaging() {
+  throw new Error("Function not implemented.");
+}
+
