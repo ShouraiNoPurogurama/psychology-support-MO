@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   FlatList,
   StyleSheet,
@@ -9,139 +8,88 @@ import {
 } from "react-native";
 import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
-import React, { useRef } from "react";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { DoctorHeader } from "../../../component/doctorHeader";
-import { FontAwesome5 } from "@expo/vector-icons";
-
-const appointments = [
-  {
-    id: "1",
-    name: "Jack Trinh",
-    gender: "Male",
-    age: 28,
-    date: "2025-02-27",
-    time: "7:00-7:30",
-    avatar:
-      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
-  },
-  {
-    id: "2",
-    name: "Jack Tran",
-    gender: "Female",
-    age: 23,
-    date: "2025-02-27",
-    time: "8:00-8:30",
-    avatar:
-      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
-  },
-  {
-    id: "3",
-    name: "Jack Phuong",
-    gender: "Male",
-    age: 27,
-    date: "2025-02-27",
-    time: "9:00-9:30",
-    avatar:
-      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
-  },
-  {
-    id: "4",
-    name: "Jack Tuan",
-    gender: "Male",
-    age: 28,
-    date: "2025-02-27",
-    time: "10:00-10:30",
-    avatar:
-      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
-  },
-  {
-    id: "5",
-    name: "Jack BoCon",
-    gender: "Female",
-    age: 42,
-    date: "2025-02-27",
-    time: "11:00-11:30",
-    avatar:
-      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
-  },
-  {
-    id: "6",
-    name: "Jack BoVo",
-    gender: "Male",
-    age: 35,
-    date: "2025-02-27",
-    time: "12:00-12:30",
-    avatar:
-      "https://png.pngtree.com/png-clipart/20201223/ourlarge/pngtree-person-taking-picture-photographer-hand-drawn-character-occupation-png-image_2604825.jpg",
-  },
-];
+import React, { useRef, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 export default function DoctorAppointments() {
+  const [appointments, setAppointments] = useState<{ bookingCode: string; date: string; startTime: string; duration: number; price: number; status: string }[]>([]);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) throw new Error("Token not found");
+
+        const decoded: any = jwtDecode(token);
+        const doctorId = decoded?.profileId;
+        if (!doctorId) throw new Error("Profile ID not found in token");
+
+        const response = await fetch(
+          `https://psychologysupport-scheduling.azurewebsites.net/bookings?PageIndex=1&SortBy=time&PageSize=10&SortOrder=desc&DoctorId=${doctorId}&Status=Pending`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch appointments");
+
+        const data = await response.json();
+        setAppointments(data.bookings.data || []);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
   return (
     <>
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <View style={styles.backButtonContent}>
             <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
           </View>
         </TouchableOpacity>
         <Text style={styles.header}>Appointment Requests</Text>
       </View>
+
       <View style={styles.container}>
         <FlatList
           data={appointments}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.bookingCode}
           renderItem={({ item }) => <AppointmentCard item={item} />}
         />
       </View>
+
       <Footer />
     </>
   );
 }
 
-interface Appointment {
-  id: string;
-  name: string;
-  gender: string;
-  age: number;
-  date: string;
-  time: string;
-  avatar: string;
-}
-
-const AppointmentCard = ({ item }: { item: Appointment }) => {
+const AppointmentCard = ({ item }: { item: { bookingCode: string; date: string; startTime: string; duration: number; price: number; status: string } }) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
-    Animated.spring(scaleValue, {
-      toValue: 0.97,
-      useNativeDriver: true,
-    }).start();
+    Animated.spring(scaleValue, { toValue: 0.97, useNativeDriver: true }).start();
   };
 
   const handlePressOut = () => {
-    Animated.spring(scaleValue, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
+    Animated.spring(scaleValue, { toValue: 1, useNativeDriver: true }).start();
   };
 
   return (
-    <Animated.View
-      style={[styles.item, { transform: [{ scale: scaleValue }] }]}
-    >
-      <Image source={{ uri: item.avatar }} style={styles.avatar} />
+    <Animated.View style={[styles.item, { transform: [{ scale: scaleValue }] }]}>
+      <MaterialIcons name="event" size={40} color="#6D5BA5" style={styles.icon} />
       <View style={styles.info}>
-        <Text style={styles.name}>
-          {item.name} ({item.gender}, {item.age})
-        </Text>
+        <Text style={styles.name}>Booking Code: {item.bookingCode}</Text>
         <Text style={styles.time}>
-          {item.date} | {item.time}
+          {item.date} | {item.startTime} | {item.duration} mins
         </Text>
+        <Text style={styles.price}>Price: {item.price} VND</Text>
+        <Text style={styles.status}>Status: {item.status}</Text>
       </View>
       <TouchableOpacity
         style={styles.detailButton}
@@ -151,14 +99,7 @@ const AppointmentCard = ({ item }: { item: Appointment }) => {
         onPress={() =>
           router.push({
             pathname: "/doctors/appointments/appointmentDetails",
-            params: {
-              name: item.name,
-              gender: item.gender,
-              age: item.age,
-              date: item.date,
-              time: item.time,
-              avatar: item.avatar,
-            },
+            params: { bookingCode: item.bookingCode },
           })
         }
       >
@@ -202,7 +143,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 22,
   },
-
   item: {
     flexDirection: "row",
     alignItems: "center",
@@ -215,12 +155,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
   },
-  avatar: {
-    width: 55,
-    height: 55,
-    borderRadius: 27.5,
-    borderWidth: 2,
-    borderColor: "#AF93D2",
+  icon: {
     marginRight: 15,
   },
   info: {
@@ -235,16 +170,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#777",
   },
+  price: {
+    fontSize: 14,
+    color: "#555",
+  },
+  status: {
+    fontSize: 14,
+    color: "#444",
+  },
   detailButton: {
     backgroundColor: "#6D5BA5",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    elevation: 2,
-    shadowColor: "#6D5BA5",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
   },
   statusText: {
     color: "white",
