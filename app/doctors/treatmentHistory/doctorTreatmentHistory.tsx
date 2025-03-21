@@ -4,47 +4,75 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import { DoctorHeader } from "../../../component/doctorHeader";
-
-type HistoryRecord = {
-  id: number;
-  patientName: string;
-  symptoms: string;
-  diagnosis: string;
-};
-
-type HistoryRecords = Record<string, HistoryRecord[]>;
-
-const historyRecords: HistoryRecords = {
-  "2025-02-25": [
-    {
-      id: 1,
-      patientName: "Nguyen Van A",
-      symptoms: "Headache, fever",
-      diagnosis: "Migraine",
-    },
-    {
-      id: 2,
-      patientName: "Tran Thi B",
-      symptoms: "Cough, sore throat",
-      diagnosis: "Flu",
-    },
-  ],
-  "2025-02-20": [
-    {
-      id: 3,
-      patientName: "Le Hoang C",
-      symptoms: "Stomach pain",
-      diagnosis: "Gastritis",
-    },
-  ],
-};
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 export default function DoctorHistory() {
+  interface MedicalRecord {
+    id: string;
+    patientProfileId: string;
+    notes: string;
+    createdAt: string;
+  }
+
+  const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
+  const [patientNames, setPatientNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchMedicalRecords = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) throw new Error("Token not found");
+
+        const decoded: any = jwtDecode(token);
+        const doctorId = decoded?.profileId;
+        if (!doctorId) throw new Error("Profile ID not found in token");
+
+        const response = await fetch(
+          `https://psychologysupport-profile.azurewebsites.net/medical-records?DoctorId=${doctorId}&PageIndex=1&PageSize=10&SortBy=CreatedAt&SortOrder=dsc&Status=Done`
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch medical records");
+
+        const result = await response.json();
+        setMedicalRecords(result.medicalRecords.data);
+
+        // Fetch patient names only if patientProfileId is valid
+        result.medicalRecords.data.forEach(async (record: { patientProfileId: string; }) => {
+          if (record.patientProfileId) {
+            try {
+              const patientResponse = await fetch(
+                `https://psychologysupport-profile.azurewebsites.net/patients/${record.patientProfileId}`
+              );
+
+              if (patientResponse.ok) {
+                const patientData = await patientResponse.json();
+                setPatientNames((prev) => ({
+                  ...prev,
+                  [record.patientProfileId]: patientData.patientProfileDto.fullName,
+                }));
+              } else {
+                console.error("Error fetching patient name: Invalid response", patientResponse.status);
+              }
+            } catch (err) {
+              console.error("Error fetching patient name:", err);
+            }
+          }
+        });
+      } catch (error) {
+        Alert.alert("Error", error instanceof Error ? error.message : "An unknown error occurred");
+        console.error("Fetch Error:", error);
+      }
+    };
+
+    fetchMedicalRecords();
+  }, []);
+
   return (
     <>
       <View style={styles.headerContainer}>
@@ -60,36 +88,31 @@ export default function DoctorHistory() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {Object.entries(historyRecords).map(([date, records]) => (
-          <View key={date} style={styles.historySection}>
-            <Text style={styles.date}>{date}</Text>
-            {records.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.historyItem}
-                activeOpacity={0.7}
-                onPress={() =>
-                  router.push({
-                    pathname: "/doctors/medicalRecords/medicalRecordDetails",
-                    params: { id: item.id.toString() },
-                  })
-                }
-              >
-                <View style={styles.iconContainer}>
-                  <MaterialIcons name="person" size={30} color="#6C63FF" />
-                </View>
-                <View style={styles.infoContainer}>
-                  <Text style={styles.patientName}>{item.patientName}</Text>
-                  <Text style={styles.symptoms}>
-                    🩺 Symptoms: {item.symptoms}
-                  </Text>
-                  <Text style={styles.diagnosis}>
-                    📋 Diagnosis: {item.diagnosis}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+        {medicalRecords.map((record) => (
+          <TouchableOpacity
+            key={record.id}
+            style={styles.historyItem}
+            activeOpacity={0.7}
+            onPress={() =>
+              router.push({
+                pathname: "/doctors/medicalRecords/medicalRecordDetails",
+                params: { id: record.id },
+              })
+            }
+          >
+            <View style={styles.iconContainer}>
+              <MaterialIcons name="person" size={30} color="#6C63FF" />
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.patientName}>
+                {patientNames[record.patientProfileId] || "Unknown Patient"}
+              </Text>
+              <Text style={styles.notes}>📝 Notes: {record.notes}</Text>
+              <Text style={styles.createdAt}>
+                📅 Date: {new Date(record.createdAt).toLocaleDateString()}
+              </Text>
+            </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </>
@@ -103,11 +126,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 15,
     marginTop: 10,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#f9f9f9",
-    padding: 20,
   },
   scrollContainer: {
     paddingBottom: 100,
@@ -133,16 +151,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 22,
-  },
-  historySection: {
-    marginBottom: 15,
-  },
-  date: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#444",
-    marginBottom: 10,
-    marginLeft: 5,
   },
   historyItem: {
     flexDirection: "row",
@@ -175,11 +183,11 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 2,
   },
-  symptoms: {
+  notes: {
     fontSize: 14,
     color: "#666",
   },
-  diagnosis: {
+  createdAt: {
     fontSize: 14,
     color: "#666",
     fontStyle: "italic",
