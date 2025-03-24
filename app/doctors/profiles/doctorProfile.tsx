@@ -149,6 +149,10 @@ export default function DoctorProfile() {
           >
             <Text style={styles.buttonText}>✏️ Edit Profile</Text>
           </TouchableOpacity>
+
+          {/* Add spacing between buttons */}
+          <View style={styles.buttonSpacing} />
+
           <TouchableOpacity
             style={styles.logoutButton}
             onPress={() => {
@@ -156,7 +160,7 @@ export default function DoctorProfile() {
               router.push("/login");
             }}
           >
-            <Text style={styles.buttonText}>🔓 Logout</Text>
+            <Text style={styles.buttonText}>🚪 Logout</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -206,17 +210,23 @@ const styles = StyleSheet.create({
   iconRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   info: { fontSize: 16, marginLeft: 10, color: "#333" },
   editButton: {
-    backgroundColor: "#6A8CAF",
+    backgroundColor: "#6A8CAF", // Keep the same color for Edit Profile
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
   },
   logoutButton: {
-    backgroundColor: "#6A8CAF",
+    backgroundColor: "#D9534F", // Change to a red color for Logout
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
   },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  statText: { fontSize: 16, color: "#555" },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  buttonSpacing: {
+    height: 10, // Add vertical spacing between buttons
+  },
 });
