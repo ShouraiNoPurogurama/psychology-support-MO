@@ -34,9 +34,9 @@ type DayObject = {
 };
 
 const extractBookingCode = (occupiedInfo: string): string | null => {
-  if (!occupiedInfo) return null; // Kiểm tra nếu occupiedInfo không tồn tại
+  if (!occupiedInfo) return null; // Check if occupiedInfo does not exist
   const parts = occupiedInfo.split("BookingCode: ");
-  return parts.length > 1 ? parts[1].trim() : null; // Lấy phần sau "BookingCode: "
+  return parts.length > 1 ? parts[1].trim() : null; // Get the part after "BookingCode: "
 };
 
 export default function DoctorSchedule() {
@@ -91,32 +91,32 @@ export default function DoctorSchedule() {
       const token = await AsyncStorage.getItem("authToken");
       if (!token) throw new Error("No token found");
 
-      // Decode token để lấy doctorId
+      // Decode token to get doctorId
       const decoded: any = jwtDecode(token);
       const doctorId = decoded.profileId;
 
-      // Lọc các slot hợp lệ (cách ngày hiện tại dưới 3 ngày)
+      // Filter valid slots (at least 7 days from the current date)
       const today = new Date();
       const validSlots = selectedSlots.filter((slot) => {
         const slotDate = new Date(selectedDate);
         const diffInDays = Math.ceil(
           (slotDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
         );
-        return diffInDays >= 3; // Chỉ giữ các slot cách ngày hiện tại ít nhất 3 ngày
+        return diffInDays >= 7; // Only keep slots at least 7 days from the current date
       });
 
       if (validSlots.length === 0) {
         Alert.alert(
           "Invalid Selection",
-          "You can only change the status of slots at least 3 days in advance."
+          "You can only request leave for slots at least 7 days in advance."
         );
         return;
       }
 
-      // Lấy danh sách startTimes từ các slot hợp lệ
+      // Get the list of startTimes from valid slots
       const startTimes = validSlots.map((slot) => slot.startTime);
 
-      // Gửi yêu cầu API mới
+      // Send the new API request
       const response = await fetch(
         "https://psychologysupport-scheduling.azurewebsites.net/doctor-availabilities",
         {
@@ -136,7 +136,7 @@ export default function DoctorSchedule() {
       );
 
       if (!response.ok) {
-        const errorText = await response.text(); // Lấy chi tiết lỗi từ phản hồi
+        const errorText = await response.text(); // Get detailed error from the response
         console.error("Failed to update availability:", errorText);
         throw new Error(`Failed to update availability: ${errorText}`);
       }
@@ -205,12 +205,12 @@ export default function DoctorSchedule() {
             ? `Unavailable time slots on ${formatDate(selectedDate)}`
             : `No unavailable time slots on ${formatDate(selectedDate)}`}
         </Text>
-        {/* Hiển thị nút Stop Booking chỉ khi có slot được chọn */}
+        {/* Show Stop Booking button only when slots are selected */}
         {selectedSlots.length > 0 && (
           <TouchableOpacity
             style={styles.stopBookingButton}
             onPress={stopBooking}
-            activeOpacity={0.7} // Hiệu ứng khi nhấn
+            activeOpacity={0.7} // Effect when pressed
           >
             <Text style={styles.stopBookingButtonText}>Stop Booking</Text>
           </TouchableOpacity>
@@ -231,7 +231,7 @@ export default function DoctorSchedule() {
               return (
                 <Pressable
                   style={[styles.timeSlotItem, { backgroundColor }]}
-                  onPress={() => toggleSlotSelection(item)} // Chọn hoặc bỏ chọn slot
+                  onPress={() => toggleSlotSelection(item)} // Select or deselect slot
                 >
                   <View style={styles.slotContent}>
                     <Text style={styles.timeSlotText}>
@@ -253,6 +253,7 @@ export default function DoctorSchedule() {
               );
             }}
             nestedScrollEnabled={true}
+            contentContainerStyle={{ paddingBottom: 80 }} // Add padding to avoid footer overlap
           />
         </View>
       </View>
@@ -269,11 +270,12 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    marginTop: 70, // Tạo khoảng trống phía trên để không bị nút che
+    marginTop: 70, // Create space above to avoid overlapping with the button
+    paddingBottom: 80, // Add padding to avoid being covered by the footer
   },
   stopBookingButton: {
-    position: "absolute", // Cố định phía trên danh sách
-    top: 300, // Đặt nút cố định phía trên danh sách
+    position: "absolute", // Fixed above the list
+    top: 300, // Position the button above the list
     left: "10%",
     right: "10%",
     backgroundColor: "#D9534F",
@@ -284,11 +286,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // Hiệu ứng nổi trên Android
-    zIndex: 10, // Đảm bảo nút nằm trên danh sách
+    elevation: 5, // Elevation effect on Android
+    zIndex: 10, // Ensure the button is above the list
   },
   stopBookingButtonDisabled: {
-    backgroundColor: "rgba(217, 83, 79, 0.5)", // Màu mờ khi bị vô hiệu hóa
+    backgroundColor: "rgba(217, 83, 79, 0.5)", // Dimmed color when disabled
   },
   stopBookingButtonText: {
     color: "#fff",
@@ -301,7 +303,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   buttonContainer: {
-    marginBottom: 20, // Tạo khoảng trống giữa nút và Footer
+    marginBottom: 20, // Create space between the button and the footer
   },
   headerContainer: {
     flexDirection: "row",
@@ -348,7 +350,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5, // Giảm khoảng cách bên dưới
+    marginBottom: 5, // Reduce bottom margin
     textAlign: "center",
     color: "#6A8CAF",
   },
