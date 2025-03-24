@@ -71,7 +71,7 @@ export default function PatientProfile() {
       if (!id) return;
       try {
         const response = await fetch(
-          `https://psychologysupport-profile.azurewebsites.net/patients/${id}/medical-records?PageIndex=1&PageSize=10&SortBy=CreateAt&SortOrder=asc&Status=Processing`
+          `https://psychologysupport-profile.azurewebsites.net/medical-records?PatientId=${id}&PageIndex=1&PageSize=10&Search=&SortBy=CreatedAt&SortOrder=asc&Status=Processing`
         );
         if (!response.ok) throw new Error("Failed to fetch medical records");
 
