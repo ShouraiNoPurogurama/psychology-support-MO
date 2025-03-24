@@ -14,7 +14,16 @@ import { jwtDecode } from "jwt-decode";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 export default function DoctorAppointments() {
-  const [appointments, setAppointments] = useState<{ bookingCode: string; date: string; startTime: string; duration: number; price: number; status: string }[]>([]);
+  const [appointments, setAppointments] = useState<
+    {
+      bookingCode: string;
+      date: string;
+      startTime: string;
+      duration: number;
+      price: number;
+      status: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -27,7 +36,7 @@ export default function DoctorAppointments() {
         if (!doctorId) throw new Error("Profile ID not found in token");
 
         const response = await fetch(
-          `https://psychologysupport-scheduling.azurewebsites.net/bookings?PageIndex=1&SortBy=time&PageSize=10&SortOrder=desc&DoctorId=${doctorId}&Status=Pending`,
+          `https://psychologysupport-scheduling.azurewebsites.net/bookings?PageIndex=1&SortBy=time&PageSize=10&SortOrder=desc&DoctorId=${doctorId}&Status=Awaiting Meeting`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -48,7 +57,10 @@ export default function DoctorAppointments() {
   return (
     <>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.backButton}
+        >
           <View style={styles.backButtonContent}>
             <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
           </View>
@@ -69,11 +81,25 @@ export default function DoctorAppointments() {
   );
 }
 
-const AppointmentCard = ({ item }: { item: { bookingCode: string; date: string; startTime: string; duration: number; price: number; status: string } }) => {
+const AppointmentCard = ({
+  item,
+}: {
+  item: {
+    bookingCode: string;
+    date: string;
+    startTime: string;
+    duration: number;
+    price: number;
+    status: string;
+  };
+}) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
-    Animated.spring(scaleValue, { toValue: 0.97, useNativeDriver: true }).start();
+    Animated.spring(scaleValue, {
+      toValue: 0.97,
+      useNativeDriver: true,
+    }).start();
   };
 
   const handlePressOut = () => {
@@ -81,8 +107,15 @@ const AppointmentCard = ({ item }: { item: { bookingCode: string; date: string; 
   };
 
   return (
-    <Animated.View style={[styles.item, { transform: [{ scale: scaleValue }] }]}>
-      <MaterialIcons name="event" size={40} color="#6D5BA5" style={styles.icon} />
+    <Animated.View
+      style={[styles.item, { transform: [{ scale: scaleValue }] }]}
+    >
+      <MaterialIcons
+        name="event"
+        size={40}
+        color="#6D5BA5"
+        style={styles.icon}
+      />
       <View style={styles.info}>
         <Text style={styles.name}>Booking Code: {item.bookingCode}</Text>
         <Text style={styles.time}>

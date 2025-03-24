@@ -49,7 +49,10 @@ export default function AppointmentDetails() {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        if (!params.bookingCode) return;
+        if (!params.bookingCode) {
+          console.error("No booking code provided");
+          return;
+        }
 
         const bookingResponse = await fetch(
           `https://psychologysupport-scheduling.azurewebsites.net/bookings/${params.bookingCode}`
@@ -103,7 +106,8 @@ export default function AppointmentDetails() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#4B3F72" />
+        <ActivityIndicator size="large" color="#6A8CAF" />
+        <Text>Loading appointment details...</Text>
       </View>
     );
   }
@@ -258,7 +262,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#4B3F72",
   },
-  //
   backButtonContent: {
     width: 44,
     height: 44,

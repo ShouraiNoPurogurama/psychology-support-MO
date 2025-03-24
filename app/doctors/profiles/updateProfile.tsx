@@ -29,7 +29,9 @@ export default function UpdateProfile() {
     Array.isArray(params.email) ? params.email[0] : params.email || ""
   );
   const [phone, setPhone] = useState<string>(
-    Array.isArray(params.phoneNumber) ? params.phoneNumber[0] : params.phoneNumber || ""
+    Array.isArray(params.phoneNumber)
+      ? params.phoneNumber[0]
+      : params.phoneNumber || ""
   );
   const [address, setAddress] = useState<string>(
     Array.isArray(params.address) ? params.address[0] : params.address || ""
@@ -94,7 +96,8 @@ export default function UpdateProfile() {
       ]);
     } catch (error) {
       console.error("Error during profile update:", error);
-      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
+      const errorMessage =
+        error instanceof Error ? error.message : "Something went wrong";
       Alert.alert("Error", errorMessage);
     }
   };
@@ -132,7 +135,11 @@ export default function UpdateProfile() {
         />
 
         <Text style={styles.label}>Address</Text>
-        <TextInput style={styles.input} value={address} onChangeText={setAddress} />
+        <TextInput
+          style={styles.input}
+          value={address}
+          onChangeText={setAddress}
+        />
 
         <Text style={styles.label}>Certificates</Text>
         <TextInput

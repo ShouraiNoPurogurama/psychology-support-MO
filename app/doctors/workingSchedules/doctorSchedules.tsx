@@ -6,14 +6,16 @@ import {
   StyleSheet,
   Pressable,
   TouchableOpacity,
+  Button,
+  Alert,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { DoctorHeader } from "../../../component/doctorHeader";
 import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, FontAwesome } from "@expo/vector-icons"; // Import FontAwesome
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 type TimeSlot = {
   status: string;
@@ -31,10 +33,17 @@ type DayObject = {
   timestamp: number;
 };
 
+const extractBookingCode = (occupiedInfo: string): string | null => {
+  if (!occupiedInfo) return null; // Kiểm tra nếu occupiedInfo không tồn tại
+  const parts = occupiedInfo.split("BookingCode: ");
+  return parts.length > 1 ? parts[1].trim() : null; // Lấy phần sau "BookingCode: "
+};
+
 export default function DoctorSchedule() {
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>([]);
 
   useEffect(() => {
     const fetchTimeSlots = async () => {
@@ -69,20 +78,86 @@ export default function DoctorSchedule() {
     return `${day}-${month}-${year}`;
   };
 
-  const extractBookingCode = (occupiedInfo: string) => {
-    const match = occupiedInfo.match(/BookingCode:\s?(\S+)/i);
-    return match ? match[1] : null;
+  const toggleSlotSelection = (slot: TimeSlot) => {
+    if (selectedSlots.includes(slot)) {
+      setSelectedSlots(selectedSlots.filter((s) => s !== slot));
+    } else {
+      setSelectedSlots([...selectedSlots, slot]);
+    }
   };
 
-  const navigateToDetails = (bookingCode: string) => {
-    router.push(
-      `/doctors/appointments/scheduleAppointmentDetails?bookingCode=${bookingCode}`
-    );
+  const stopBooking = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) throw new Error("No token found");
+
+      // Decode token để lấy doctorId
+      const decoded: any = jwtDecode(token);
+      const doctorId = decoded.profileId;
+
+      // Lọc các slot hợp lệ (cách ngày hiện tại dưới 3 ngày)
+      const today = new Date();
+      const validSlots = selectedSlots.filter((slot) => {
+        const slotDate = new Date(selectedDate);
+        const diffInDays = Math.ceil(
+          (slotDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        return diffInDays >= 3; // Chỉ giữ các slot cách ngày hiện tại ít nhất 3 ngày
+      });
+
+      if (validSlots.length === 0) {
+        Alert.alert(
+          "Invalid Selection",
+          "You can only change the status of slots at least 3 days in advance."
+        );
+        return;
+      }
+
+      // Lấy danh sách startTimes từ các slot hợp lệ
+      const startTimes = validSlots.map((slot) => slot.startTime);
+
+      // Gửi yêu cầu API mới
+      const response = await fetch(
+        "https://psychologysupport-scheduling.azurewebsites.net/doctor-availabilities",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            doctorAvailabilityCreate: {
+              doctorId: doctorId,
+              date: selectedDate,
+              startTimes: startTimes,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text(); // Lấy chi tiết lỗi từ phản hồi
+        console.error("Failed to update availability:", errorText);
+        throw new Error(`Failed to update availability: ${errorText}`);
+      }
+
+      Alert.alert("Success", "Selected slots have been marked as unavailable.");
+      setSelectedSlots([]);
+      // Refresh the time slots
+      const refreshedResponse = await fetch(
+        `https://psychologysupport-scheduling.azurewebsites.net/doctor-schedule/${doctorId}/${selectedDate}`
+      );
+      const refreshedData = await refreshedResponse.json();
+      setTimeSlots(refreshedData.timeSlots || []);
+    } catch (error) {
+      console.error("Error updating availability:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      Alert.alert("Error", `Failed to update availability: ${errorMessage}`);
+    }
   };
 
   return (
     <>
-      <DoctorHeader />
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
@@ -93,13 +168,12 @@ export default function DoctorSchedule() {
               <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
             </View>
           </TouchableOpacity>
-
           <Text style={styles.headerTitle}>Working Schedule</Text>
         </View>
-
         <View style={styles.calendarContainer}>
           <Calendar
             current={today}
+            minDate={today}
             markedDates={{
               [selectedDate]: {
                 selected: true,
@@ -126,37 +200,55 @@ export default function DoctorSchedule() {
             }}
           />
         </View>
-
-        <Text style={styles.title}>
+        <Text style={[styles.title, { marginBottom: 5 }]}>
           {timeSlots.filter((slot) => slot.status === "Unavailable").length > 0
             ? `Unavailable time slots on ${formatDate(selectedDate)}`
             : `No unavailable time slots on ${formatDate(selectedDate)}`}
         </Text>
-
+        {/* Hiển thị nút Stop Booking chỉ khi có slot được chọn */}
+        {selectedSlots.length > 0 && (
+          <TouchableOpacity
+            style={styles.stopBookingButton}
+            onPress={stopBooking}
+            activeOpacity={0.7} // Hiệu ứng khi nhấn
+          >
+            <Text style={styles.stopBookingButtonText}>Stop Booking</Text>
+          </TouchableOpacity>
+        )}
         <View style={styles.listContainer}>
           <FlatList
-            data={timeSlots.filter((slot) => slot.status === "Unavailable")}
+            data={timeSlots}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => {
-              const bookingCode = extractBookingCode(item.occupiedInfo);
+              const isSelected = selectedSlots.includes(item);
+              const backgroundColor =
+                item.status === "Unavailable"
+                  ? "rgba(217, 83, 79, 0.7)"
+                  : isSelected
+                  ? "rgba(92, 184, 92, 0.5)" // Highlight selected slots
+                  : "rgba(92, 184, 92, 0.7)";
+
               return (
                 <Pressable
-                  style={[styles.timeSlotItem, { backgroundColor: "#9B59B6" }]}
-                  disabled={!bookingCode}
-                  onPress={() => bookingCode && navigateToDetails(bookingCode)}
+                  style={[styles.timeSlotItem, { backgroundColor }]}
+                  onPress={() => toggleSlotSelection(item)} // Chọn hoặc bỏ chọn slot
                 >
-                  <Text
-                    style={styles.timeSlotText}
-                  >{`${item.startTime} - ${item.endTime}`}</Text>
-                  {bookingCode ? (
-                    <Text
-                      style={styles.occupiedInfo}
-                    >{`Booking Code: ${bookingCode}`}</Text>
-                  ) : item.occupiedInfo ? (
-                    <Text
-                      style={styles.occupiedInfo}
-                    >{`Patient: ${item.occupiedInfo}`}</Text>
-                  ) : null}
+                  <View style={styles.slotContent}>
+                    <Text style={styles.timeSlotText}>
+                      {`${item.startTime} - ${item.endTime}`}
+                    </Text>
+                    {isSelected && (
+                      <FontAwesome
+                        name="check"
+                        size={20}
+                        color="#fff"
+                        style={styles.checkIcon}
+                      />
+                    )}
+                  </View>
+                  {item.occupiedInfo && (
+                    <Text style={styles.occupiedInfo}>{`Details: ${item.occupiedInfo}`}</Text>
+                  )}
                 </Pressable>
               );
             }}
@@ -169,12 +261,47 @@ export default function DoctorSchedule() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
+  },
+  listContainer: {
+    flex: 1,
+    marginTop: 70, // Tạo khoảng trống phía trên để không bị nút che
+  },
+  stopBookingButton: {
+    position: "absolute", // Cố định phía trên danh sách
+    top: 300, // Đặt nút cố định phía trên danh sách
+    left: "10%",
+    right: "10%",
+    backgroundColor: "#D9534F",
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // Hiệu ứng nổi trên Android
+    zIndex: 10, // Đảm bảo nút nằm trên danh sách
+  },
+  stopBookingButtonDisabled: {
+    backgroundColor: "rgba(217, 83, 79, 0.5)", // Màu mờ khi bị vô hiệu hóa
+  },
+  stopBookingButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
+  buttonContainer: {
+    marginBottom: 20, // Tạo khoảng trống giữa nút và Footer
   },
   headerContainer: {
     flexDirection: "row",
@@ -213,9 +340,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 20,
   },
-  listContainer: {
-    maxHeight: 300,
-  },
   timeSlotItem: {
     padding: 15,
     marginVertical: 5,
@@ -224,7 +348,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 5, // Giảm khoảng cách bên dưới
     textAlign: "center",
     color: "#6A8CAF",
   },
@@ -236,5 +360,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#fff",
     marginTop: 5,
+  },
+  slotContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  checkIcon: {
+    marginLeft: 10,
   },
 });

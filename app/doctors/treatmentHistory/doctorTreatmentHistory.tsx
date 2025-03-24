@@ -43,29 +43,38 @@ export default function DoctorHistory() {
         setMedicalRecords(result.medicalRecords.data);
 
         // Fetch patient names only if patientProfileId is valid
-        result.medicalRecords.data.forEach(async (record: { patientProfileId: string; }) => {
-          if (record.patientProfileId) {
-            try {
-              const patientResponse = await fetch(
-                `https://psychologysupport-profile.azurewebsites.net/patients/${record.patientProfileId}`
-              );
+        result.medicalRecords.data.forEach(
+          async (record: { patientProfileId: string }) => {
+            if (record.patientProfileId) {
+              try {
+                const patientResponse = await fetch(
+                  `https://psychologysupport-profile.azurewebsites.net/patients/${record.patientProfileId}`
+                );
 
-              if (patientResponse.ok) {
-                const patientData = await patientResponse.json();
-                setPatientNames((prev) => ({
-                  ...prev,
-                  [record.patientProfileId]: patientData.patientProfileDto.fullName,
-                }));
-              } else {
-                console.error("Error fetching patient name: Invalid response", patientResponse.status);
+                if (patientResponse.ok) {
+                  const patientData = await patientResponse.json();
+                  setPatientNames((prev) => ({
+                    ...prev,
+                    [record.patientProfileId]:
+                      patientData.patientProfileDto.fullName,
+                  }));
+                } else {
+                  console.error(
+                    "Error fetching patient name: Invalid response",
+                    patientResponse.status
+                  );
+                }
+              } catch (err) {
+                console.error("Error fetching patient name:", err);
               }
-            } catch (err) {
-              console.error("Error fetching patient name:", err);
             }
           }
-        });
+        );
       } catch (error) {
-        Alert.alert("Error", error instanceof Error ? error.message : "An unknown error occurred");
+        Alert.alert(
+          "Error",
+          error instanceof Error ? error.message : "An unknown error occurred"
+        );
         console.error("Fetch Error:", error);
       }
     };
