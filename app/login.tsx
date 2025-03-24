@@ -50,6 +50,7 @@ export default function Login(): React.JSX.Element {
   const [identifier, setIdentifier] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchFcmToken = async () => {
       try {
@@ -57,7 +58,7 @@ export default function Login(): React.JSX.Element {
         if (storedToken) {
           setFcmToken(storedToken);
           console.log("Retrieved FCM Token:", storedToken);
-        }else {
+        } else {
           console.log("no fcm token")
         }
       } catch (error) {
@@ -91,11 +92,11 @@ export default function Login(): React.JSX.Element {
 
     // Lấy FCM token từ state
     const deviceToken = fcmToken;
-    
-    let loginData: any = { 
+
+    let loginData: any = {
       password,
-      deviceToken: deviceToken || "", 
-      deviceType: "Android" 
+      deviceToken: deviceToken || "",
+      deviceType: "Android"
     };
 
     if (isValidEmail(identifier)) {
@@ -139,7 +140,9 @@ export default function Login(): React.JSX.Element {
           const decoded: any = jwtDecode(token);
           console.log("Decoded Token:", decoded);
 
-          const userRole = decoded.role;
+          const roleKey = Object.keys(decoded).find(key => key.toLowerCase().includes("role"));
+
+          const userRole = roleKey ? decoded[roleKey] : null;
 
           Alert.alert("Success", "Login successful");
 

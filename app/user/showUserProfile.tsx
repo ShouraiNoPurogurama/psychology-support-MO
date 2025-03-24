@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f8f8",
     padding: 20,
     alignItems: "center",
-    marginTop: 70,
+    marginTop: 90,
   },
   title: {
     fontSize: 28,
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 8,
     elevation: 3,
-    marginBottom: 60,
+    marginBottom: 120,
   },
   buttonText: {
     color: "#fff",

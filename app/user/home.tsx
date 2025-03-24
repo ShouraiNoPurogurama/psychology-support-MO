@@ -5,6 +5,8 @@ import { Student_Header } from '../../component/Student_Header';
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { Ionicons } from '@expo/vector-icons'; // Thêm thư viện icon
+import { LinearGradient } from 'expo-linear-gradient'; // Thêm gradient
 
 const { width: screenWidth } = Dimensions.get('window');
 const HomeScreenImage = require("../../assets/images/HomeScreen.png");
@@ -14,13 +16,9 @@ export default function Home() {
     useEffect(() => {
         const getTokenAndDecode = async () => {
             try {
-                // Lấy token từ AsyncStorage
                 const token = await AsyncStorage.getItem('authToken');
-                
                 if (token) {
-                    // Giải mã token
-                    const decode:any = jwtDecode(token);
-                    // In profileId ra console
+                    const decode: any = jwtDecode(token);
                     console.log("decode.profileId:", decode.profileId);
                 } else {
                     console.log("No token found");
@@ -29,32 +27,54 @@ export default function Home() {
                 console.error("Error decoding token:", error);
             }
         };
-
         getTokenAndDecode();
-    }, []); 
+    }, []);
+
     return (
         <>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
+                {/* Section 1: Test */}
                 <View style={styles.section}>
                     <Image source={HomeScreenImage} style={styles.image} resizeMode="cover" />
-                    <View style={styles.bannerContainer}>
-                        <Text style={styles.bannerText}>
-                            Proceed to assess your current condition with the first test
-                        </Text>
-                        <TouchableOpacity style={styles.testButton} onPress={() => router.push("/user/studentTest")}>
-                            <Text style={styles.testButtonText}>Do the test</Text>
+                    <LinearGradient
+                        colors={['rgba(0, 0, 0, 0.7)', 'rgba(0, 0, 0, 0.3)']}
+                        style={styles.bannerContainer}
+                    >
+                        <View style={styles.iconTextContainer}>
+                            <Ionicons name="fitness-outline" size={24} color="white" />
+                            <Text style={styles.bannerText}>
+                                Assess Your Condition
+                            </Text>
+                        </View>
+                        <TouchableOpacity
+                            style={styles.testButton}
+                            onPress={() => router.push("/user/studentTest")}
+                        >
+                            <Ionicons name="play-circle-outline" size={20} color="white" />
+                            <Text style={styles.testButtonText}>Start Test</Text>
                         </TouchableOpacity>
-                    </View>
+                    </LinearGradient>
                 </View>
 
+                {/* Section 2: Doctor */}
                 <View style={styles.section}>
                     <Image source={DoctorImage} style={styles.image} resizeMode="cover" />
-                    <View style={styles.bannerContainer}>
-                        <Text style={styles.bannerText}>Need help from a doctor?</Text>
-                        <TouchableOpacity style={styles.testButton} onPress={() => router.push("/user/doctorList")}>
-                            <Text style={styles.testButtonText}>Contact our doctor</Text>
+                    <LinearGradient
+                        colors={['rgba(0, 0, 0, 0.7)', 'rgba(0, 0, 0, 0.3)']}
+                        style={styles.bannerContainer}
+                    >
+                        <View style={styles.iconTextContainer}>
+                            <Ionicons name="medkit-outline" size={24} color="white" />
+                            <Text style={styles.bannerText}>Doctor’s Advice</Text>
+                        </View>
+                        <TouchableOpacity
+                            style={styles.testButton}
+                            onPress={() => router.push("/user/doctorList")}
+                        >
+                            <Ionicons name="chatbubble-ellipses-outline" size={20} color="white" />
+                            <Text style={styles.testButtonText}>Contact Doctor</Text>
                         </TouchableOpacity>
-                    </View>
+                    </LinearGradient>
                 </View>
             </ScrollView>
 
@@ -67,43 +87,60 @@ export default function Home() {
 const styles = StyleSheet.create({
     scrollContainer: {
         paddingBottom: 100,
-        paddingTop:120
+        paddingTop: 120,
+        backgroundColor: '#F5F7FA', // Nền nhẹ nhàng
     },
     section: {
         position: "relative",
         alignItems: "center",
-        marginVertical: 10, 
+        marginVertical: 20, // Tăng khoảng cách giữa các section
+        marginHorizontal: 15,
+        borderRadius: 20,
+        overflow: 'hidden',
+        elevation: 5, // Đổ bóng
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
     },
     image: {
-        width: screenWidth * 0.9,  
-        height: 320,  
-        borderRadius: 15,
+        width: screenWidth * 0.9,
+        height: 320,
+        borderRadius: 20,
     },
     bannerContainer: {
         position: "absolute",
-        bottom: 20,  
-        backgroundColor: "rgba(0, 0, 0, 0.5)",  
-        padding: 15,
-        borderRadius: 10,
-        width: "80%",
+        bottom: 20,
+        padding: 20,
+        borderRadius: 15,
+        width: "90%", // Tăng chiều rộng
         alignItems: "center",
+    },
+    iconTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
     },
     bannerText: {
         color: "white",
-        fontSize: 18,
-        fontWeight: "bold",
+        fontSize: 22, // Tăng kích thước chữ
+        fontWeight: "700", // Đậm hơn
         textAlign: "center",
-        marginBottom: 8,
+        marginLeft: 10,
     },
     testButton: {
-        backgroundColor: "#AF93D2",
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#6B48FF', // Màu tím đậm hơn
         paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
+        paddingHorizontal: 30,
+        borderRadius: 25,
+        elevation: 3,
     },
     testButtonText: {
         color: "white",
         fontSize: 16,
         fontWeight: "bold",
+        marginLeft: 8,
     },
 });
