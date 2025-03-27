@@ -7,45 +7,45 @@ import { Footer } from "../../component/Footer";
 const products = [
   {
     id: 1,
-    name: "Tinh dầu oải hương",
+    name: "Lavender Essential Oil",
     price: 150000,
-    description: "Giúp thư giãn, giảm căng thẳng và cải thiện giấc ngủ.",
+    description: "Helps relax, reduce stress, and improve sleep quality.",
     rating: 4.8,
     purchases: 320,
     image: "https://fujispacenter.vn/wp-content/uploads/2024/07/thumb-14.jpg",
   },
   {
     id: 2,
-    name: "Nến thơm vani",
+    name: "Vanilla Scented Candle",
     price: 120000,
-    description: "Mang đến hương thơm dịu nhẹ, tạo không gian ấm áp.",
+    description: "Brings a gentle fragrance, creating a warm atmosphere.",
     rating: 4.7,
     purchases: 210,
     image: "https://product.hstatic.net/200000485529/product/nen-thom-vanilla_44441940e88b45e7b8a67afe1fc636df_master.jpg",
   },
   {
     id: 3,
-    name: "Tinh dầu bạc hà",
+    name: "Peppermint Essential Oil",
     price: 130000,
-    description: "Giúp thông mũi, giảm đau đầu và tăng sự tỉnh táo.",
+    description: "Helps clear nasal congestion, relieve headaches, and boost alertness.",
     rating: 4.6,
     purchases: 150,
     image: "https://cdn.nhathuoclongchau.com.vn/unsafe/800x0/https://cms-prod.s3-sgn09.fptcloud.com/giai_dap_tinh_dau_bac_ha_co_nhung_cong_dung_gi_1_acb07379cc.jpg",
   },
   {
     id: 4,
-    name: "Nến thơm hoa nhài",
+    name: "Jasmine Scented Candle",
     price: 140000,
-    description: "Tạo cảm giác dễ chịu, giảm căng thẳng và lo âu.",
+    description: "Creates a pleasant feeling, reduces stress and anxiety.",
     rating: 4.9,
     purchases: 180,
     image: "https://thegioihoahong.com/wp-content/uploads/2022/06/nen-thom-hoa-nhai-2.jpg",
   },
   {
     id: 5,
-    name: "Tinh dầu cam ngọt",
+    name: "Sweet Orange Essential Oil",
     price: 160000,
-    description: "Mùi hương tươi mát, giúp cải thiện tâm trạng.",
+    description: "Fresh scent that helps boost mood.",
     rating: 4.8,
     purchases: 260,
     image: "https://file.hstatic.net/200000055530/file/tinh-dau-cam-ngot_1_276a4363028b41c2a542cb8eb1dec1bc_grande.png",
@@ -55,31 +55,30 @@ const products = [
 export default function Shop() {
   return (
     <>
-    <Student_Header/>
-        <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>🛍️ Cửa hàng tinh dầu & nến thơm</Text>
+      <Student_Header />
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.header}>🛍️ Essential Oils & Scented Candles Shop</Text>
 
-      {products.map((item) => (
-        <View key={item.id} style={styles.card}>
-          <Image source={{ uri: item.image }} style={styles.image} />
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.price}>{item.price.toLocaleString()} VNĐ</Text>
-          <Text style={styles.description}>{item.description}</Text>
-          <View style={styles.ratingRow}>
-            <Text style={styles.rating}>
-              <Ionicons name="star" size={16} color="#FFD700" /> {item.rating}
-            </Text>
-            <Text style={styles.purchases}>{item.purchases} lượt mua</Text>
+        {products.map((item) => (
+          <View key={item.id} style={styles.card}>
+            <Image source={{ uri: item.image }} style={styles.image} />
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.price}>{item.price.toLocaleString()} VNĐ</Text>
+            <Text style={styles.description}>{item.description}</Text>
+            <View style={styles.ratingRow}>
+              <Text style={styles.rating}>
+                <Ionicons name="star" size={16} color="#FFD700" /> {item.rating}
+              </Text>
+              <Text style={styles.purchases}>{item.purchases} purchases</Text>
+            </View>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Add to Cart</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Thêm vào giỏ</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-    </ScrollView>
-    <Footer/>
+        ))}
+      </ScrollView>
+      <Footer />
     </>
-
   );
 }
 

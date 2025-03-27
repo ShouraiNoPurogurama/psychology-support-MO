@@ -14,10 +14,12 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import BookingModal from "../../../component/BookingModal";
 import React from "react";
+import axios from 'axios';
 import { LinearGradient } from "expo-linear-gradient"; // Thêm gradient cho nút
 
 type Doctor = {
   id: string;
+  userId: string;  // Added userId
   name: string;
   specialty: string;
   address: string;
@@ -41,6 +43,19 @@ export default function DoctorDetail() {
   const [showMore, setShowMore] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
+
+  const IMAGE_API_URL = "https://psychologysupport-image.azurewebsites.net/image/get";
+
+  const fetchDoctorImage = async (userId: string): Promise<string> => {
+    try {
+      const response = await axios.get(`${IMAGE_API_URL}?ownerType=User&ownerId=${userId}`);
+      return response.data.url || "https://via.placeholder.com/150"; // Fallback image if API fails
+    } catch (error) {
+      console.error(`Error fetching image for userId ${userId}:`, error);
+      return "https://via.placeholder.com/150"; // Fallback image on error
+    }
+  };
+
   useEffect(() => {
     const fetchDoctorDetail = async () => {
       try {
@@ -48,9 +63,11 @@ export default function DoctorDetail() {
         if (!response.ok) throw new Error("Failed to fetch doctor details");
         const data = await response.json();
         const doctorData = data.doctorProfileDto;
+        const imageUrl = await fetchDoctorImage(doctorData.userId); // Assuming userId exists in the response
 
         const formattedDoctor: Doctor = {
           id: doctorData.id,
+          userId: doctorData.userId, // Add userId to the formatted doctor object
           name: doctorData.fullName,
           specialty: (doctorData.specialties as { name: string }[]).map((s) => s.name).join(", "),
           address: doctorData.contactInfo.address,
@@ -58,7 +75,7 @@ export default function DoctorDetail() {
           email: doctorData.contactInfo.email,
           gender: doctorData.gender,
           rating: doctorData.rating,
-          image: doctorData.image || "https://kenh14cdn.com/203336854389633024/2022/5/6/f04d70b1f6e140338a7d2f27ebe67685-1651808959048730170550.png",
+          image: imageUrl|| "https://kenh14cdn.com/203336854389633024/2022/5/6/f04d70b1f6e140338a7d2f27ebe67685-1651808959048730170550.png",
           bio: doctorData.bio,
           yearsOfExperience: doctorData.yearsOfExperience,
           qualifications: doctorData.qualifications,
