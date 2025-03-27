@@ -6,50 +6,49 @@ import { Footer } from "../../component/Footer";
 
 const workshopData = [
     {
-        id:"1",
-        text: "📢 Chia sẻ từ chuyên gia tâm lý",
+        id: "1",
+        text: "📢 Sharing from a Psychology Expert",
         image: "https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg",
-        date: "Thứ Hai, 21/07/2025",
+        date: "Monday, 07/21/2025",
         time: "10:00 - 12:00",
-        location: "Phòng họp A, Trung tâm Hội nghị ABC, Quận 1, TP. HCM",
-        detail: "Buổi chia sẻ từ chuyên gia tâm lý giúp bạn hiểu rõ hơn về cách kiểm soát căng thẳng, tăng cường sức khỏe tinh thần và cải thiện các mối quan hệ cá nhân."
+        location: "Room A, ABC Conference Center, District 1, Ho Chi Minh City",
+        detail: "A sharing session from a psychology expert to help you better understand how to manage stress, enhance mental health, and improve personal relationships."
     },
     {
-        id:"2",
-        text: "🤝 Trò chuyện và hỗ trợ nhóm",
+        id: "2",
+        text: "🤝 Group Conversation and Support",
         image: "https://images.pexels.com/photos/3184396/pexels-photo-3184396.jpeg",
-        date: "Thứ Ba, 22/07/2025",
+        date: "Tuesday, 07/22/2025",
         time: "14:00 - 16:00",
-        location: "Phòng họp B, Trung tâm Hội nghị ABC, Quận 1, TP. HCM",
-        detail: "Một không gian mở để bạn có thể chia sẻ câu chuyện của mình, lắng nghe và nhận được sự hỗ trợ từ những người có cùng trải nghiệm."
+        location: "Room B, ABC Conference Center, District 1, Ho Chi Minh City",
+        detail: "An open space where you can share your story, listen, and receive support from others with similar experiences."
     },
     {
-        id:"3",
-        text: "🧘‍♂️ Thiền và thực hành chánh niệm",
+        id: "3",
+        text: "🧘‍♂️ Meditation and Mindfulness Practice",
         image: "https://images.pexels.com/photos/3822621/pexels-photo-3822621.jpeg",
-        date: "Thứ Tư, 23/07/2025",
+        date: "Wednesday, 07/23/2025",
         time: "08:00 - 10:00",
-        location: "Sân vườn, Trung tâm Hội nghị ABC, Quận 1, TP. HCM",
-        detail: "Buổi thực hành chánh niệm và thiền định giúp bạn thư giãn, tập trung vào hiện tại và cải thiện sức khỏe tâm lý tổng thể."
+        location: "Garden Area, ABC Conference Center, District 1, Ho Chi Minh City",
+        detail: "A mindfulness and meditation practice session to help you relax, focus on the present, and improve overall mental well-being."
     },
     {
-        id:"4",
-        text: "🎨 Hoạt động sáng tạo giúp giảm căng thẳng",
+        id: "4",
+        text: "🎨 Creative Activities to Reduce Stress",
         image: "https://images.pexels.com/photos/3817587/pexels-photo-3817587.jpeg",
-        date: "Thứ Năm, 24/07/2025",
+        date: "Thursday, 07/24/2025",
         time: "16:00 - 18:00",
-        location: "Phòng nghệ thuật, Trung tâm Hội nghị ABC, Quận 1, TP. HCM",
-        detail: "Tham gia vào các hoạt động sáng tạo như vẽ tranh, viết lách giúp bạn giải tỏa căng thẳng, thể hiện cảm xúc và cải thiện tinh thần."
+        location: "Art Room, ABC Conference Center, District 1, Ho Chi Minh City",
+        detail: "Join creative activities like painting and writing to relieve stress, express emotions, and boost your mental state."
     }
 ];
 
 export default function Workshop() {
-
     return (
         <>
             <Student_Header />
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={styles.header}>Workshop: Cùng nhau chăm sóc sức khỏe tâm lý</Text>
+                <Text style={styles.header}>Workshop: Together for Mental Health Care</Text>
 
                 {workshopData.map((event) => (
                     <View key={event.id} style={styles.card}>
@@ -68,12 +67,11 @@ export default function Workshop() {
                     </View>
                 ))}
                 <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Đăng ký ngay</Text>
+                    <Text style={styles.buttonText}>Register Now</Text>
                 </TouchableOpacity>
             </ScrollView>
             <Footer />
         </>
-
     );
 }
 
@@ -130,10 +128,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 20,
         marginBottom: 30,
-      },
-      buttonText: {
+    },
+    buttonText: {
         color: "white",
         fontSize: 16,
         fontWeight: "bold",
-      },
+    },
 });

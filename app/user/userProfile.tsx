@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     formContainer: { marginBottom: 30 },
     label: { fontWeight: "bold", marginBottom: 5, fontSize: 18 },
     input: { borderWidth: 1, padding: 10, borderRadius: 5, marginBottom: 10 },
-    buttonRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 10, marginBottom: 100 },
+    buttonRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 10, marginBottom: 170 },
     cancelButton: { padding: 10, borderWidth: 1, borderRadius: 5, paddingHorizontal: 80, marginTop: 6 },
     saveButton: { backgroundColor: "#D4B5FF", padding: 10, borderRadius: 5, paddingHorizontal: 50 },
     saveText: { color: "white", fontWeight: "bold" },
