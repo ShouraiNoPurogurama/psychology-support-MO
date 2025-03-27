@@ -5,123 +5,316 @@ import { Footer } from '../../component/Footer';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import axios from 'axios';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
+interface Specialty {
+  id: string;
+  name: string;
+}
 
 interface Doctor {
   id: string;
+  userId: string;  // Added userId
   name: string;
   fee: number;
   rating: number;
   image: string;
+  specialties: Specialty[];
+  startDate: string;
+  endDate: string;
 }
-const doctors = [
-  { id: "1", name: "Dr. Nguyen Anh", fee: 250000, rating: 4.4, image: ("https://images2.thanhnien.vn/thumb_w/686/528068263637045248/2024/3/7/41498385661961282804899348165590311304931596n-17098051418122006775403-0-286-2048-1822-crop-1709805739243640175866.jpg") },
-  { id: "2", name: "Dr. Le Minh", fee: 180000, rating: 4.5, image: ("https://hthaostudio.com/wp-content/uploads/2022/03/Anh-bac-si-nam-7-min.jpg.webp") },
-  { id: "3", name: "Dr. Tran Duy", fee: 170000, rating: 4.7, image: ("https://bizweb.dktcdn.net/100/175/849/files/chup-anh-profile-cho-bac-si-tai-ha-noi-studio-yeu-media-dep-01.jpg?v=1636203347577") },
-  { id: "4", name: "Dr. Pham Tuan", fee: 220000, rating: 4.2, image: ("https://taimuihongsg.com/wp-content/uploads/2023/10/BS-TRUONG-CONG-TRANG-KHOA-CHAN-DOAN-HINH-ANH_taimuihongsg.jpg") },
-  { id: "5", name: "Dr. Minh Trung", fee: 210000, rating: 4.9, image: ("https://taimuihongsg.com/wp-content/uploads/2018/05/Kim-Bun-ThuongE_taimuihongsg.jpg") },
-  { id: "6", name: "Dr. Thanh Dat", fee: 240000, rating: 4.7, image: ("https://luxclinic.vn/wp-content/uploads/2024/07/bac-Phuong-1.jpg") },
-  { id: "7", name: "Dr. Thanh Sang", fee: 150000, rating: 3.5, image: ("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHR00f0tBnxetmeLESBPgKeKMFT2qqj8PZ4Q&s") },
-  { id: "8", name: "Dr. Minh Hieu", fee: 110000, rating: 4.2, image: ("https://cdn2.tuoitre.vn/471584752817336320/2025/2/28/z635975903982367f6f7bbe8fedac7b3c8af5972d78479-17407110210901300008601.jpg") },
-  { id: "9", name: "Dr. Chau Ngan", fee: 400000, rating: 4.7, image: ("https://vcdn1-suckhoe.vnecdn.net/2024/07/18/BS-Va-n-1-jpg-2195-1721273181.png?w=460&h=0&q=100&dpr=2&fit=crop&s=ns32I0w6u4R5J-HvFQ4Ayw") },
-  { id: "10", name: "Dr. Thuy An", fee: 350000, rating: 3.7, image: ("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTx1onekoQK5X6gsPgmSlzcWwfbSFXwYDX5Op9vVuQsmeutmyb-g49YCvbqE2mVz2fuWgA&usqp=CAU") },
-  { id: "11", name: "Dr. Thanh Hai", fee: 200000, rating: 4.8, image: ("https://taimuihongsg.com/wp-content/uploads/2018/05/Kim-Bun-ThuongE_taimuihongsg.jpg") },
 
-];
+const DOCTORS_API_URL = "https://psychologysupport-profile.azurewebsites.net/doctors";
+const SPECIALTIES_API_URL = "https://psychologysupport-profile.azurewebsites.net/specialties?PageIndex=1&PageSize=10";
+const IMAGE_API_URL = "https://psychologysupport-image.azurewebsites.net/image/get";
 
-const API_URL = "https://psychologysupport-profile.azurewebsites.net/doctors?PageIndex=0&PageSize=10";
-
-export default function doctorList() {
-
-  const [doctors, setDoctors] = useState<Doctor[]>([]); 
+export default function DoctorList() {
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [searchText, setSearchText] = useState('');
   const [sortBy, setSortBy] = useState('name');
-  const [modalVisible, setModalVisible] = useState(false);
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [specialtyModalVisible, setSpecialtyModalVisible] = useState(false);
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [doctorsList, setDoctorsList] = useState<Doctor[]>(doctors);
+
+  // Fetch specialties from API
+  const fetchSpecialties = async () => {
+    try {
+      const response = await axios.get(SPECIALTIES_API_URL);
+      const specialtiesData: Specialty[] = response.data.specialties || [];
+      setSpecialties(specialtiesData);
+    } catch (error) {
+      console.error("Error fetching specialties:", error);
+    }
+  };
+
+  // Fetch image for a specific doctor using userId
+  const fetchDoctorImage = async (userId: string): Promise<string> => {
+    try {
+      const response = await axios.get(`${IMAGE_API_URL}?ownerType=User&ownerId=${userId}`);
+      return response.data.url || "https://via.placeholder.com/150"; // Fallback image if API fails
+    } catch (error) {
+      console.error(`Error fetching image for userId ${userId}:`, error);
+      return "https://via.placeholder.com/150"; // Fallback image on error
+    }
+  };
+
+  const formatDateTime = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0, cần +1
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
+
+  const fetchDoctors = async () => {
+    try {
+      setLoading(true);
+
+      const params: any = {
+        PageIndex: 0,
+        PageSize: 10,
+        SortBy: sortBy === 'startDate' || sortBy === 'endDate' ? 'rating' : sortBy,
+        SortOrder: 'asc',
+        Search: searchText,
+        Specialties: selectedSpecialty || undefined,
+      };
+
+      if (startDate && startTime && endDate && endTime) {
+        const startDateTime = new Date(startDate);
+        startDateTime.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+        const endDateTime = new Date(endDate);
+        endDateTime.setHours(endTime.getHours(), endTime.getMinutes(), 0, 0);
+
+        params.StartDate = formatDateTime(startDateTime);
+        params.EndDate = formatDateTime(endDateTime);
+
+        console.log("Params StartDate:", params.StartDate);
+        console.log("Params EndDate:", params.EndDate);
+      }
+
+      const response = await axios.get(DOCTORS_API_URL, { params });
+      console.log("Doctors API Response:", response.data); // Thêm log để xem dữ liệu từ API bác sĩ
+      const apiDoctorsPromises = (response.data?.doctorProfiles?.data || []).map(async (doc: any, index: number) => {
+        const imageUrl = await fetchDoctorImage(doc.userId); // Giả sử userId từ API
+        return {
+          id: doc.id,
+          userId: doc.userId, // Giả sử field này tồn tại trong response
+          name: doc.fullName,
+          fee: 200000,
+          rating: doc.rating || 4.0,
+          image: imageUrl,
+          specialties: doc.specialties || [],
+        };
+      });
+
+      const apiDoctors = await Promise.all(apiDoctorsPromises);
+      console.log("Processed Doctors Data:", apiDoctors); // Thêm log để xem dữ liệu sau khi xử lý
+      setDoctors(apiDoctors);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const response = await axios.get(API_URL);
-        console.log("API Response:", response.data);
-
-        const apiDoctors: Doctor[] = (response.data?.doctorProfiles?.data || []).map((doc: any, index: number) => ({
-          id: doc.id || `unknown-${index}`,
-          name: doc.fullName || `Dr. Unknown ${index + 1}`,
-          fee: doc.fee ?? (150000 + index * 10000),
-          rating: doc.rating || (4.0 + (index % 5) * 0.1),
-          image: doc.image || "https://kenh14cdn.com/203336854389633024/2022/5/6/f04d70b1f6e140338a7d2f27ebe67685-1651808959048730170550.png",
-        }));
-        setDoctors(apiDoctors);
-      } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDoctors();
+    fetchSpecialties();
   }, []);
 
-  const filteredDoctors = doctors
-    .filter(doctor => doctor.name.toLowerCase().includes(searchText.toLowerCase()))
-    .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'fee') return (a.fee ?? 0) - (b.fee ?? 0);
-      if (sortBy === 'rating') return (b.rating ?? 0) - (a.rating ?? 0);
-      return 0;
+  useEffect(() => {
+    fetchDoctors();
+  }, [sortBy, searchText, selectedSpecialty, startDate, startTime, endDate, endTime]);
 
-    });
+  const filteredDoctors = doctors.sort((a, b) => {
+    if (sortBy === 'fee') return a.fee - b.fee;
+    return 0;
+  });
 
-   return (
+  const getSortLabel = () => {
+    switch (sortBy) {
+      case 'name': return 'Name';
+      case 'fee': return 'Fee';
+      case 'rating': return 'Rating';
+      case 'specialty': return 'Specialty';
+      case 'startDate': return 'Start Date';
+      case 'endDate': return 'End Date';
+      default: return 'Name';
+    }
+  };
+
+  const getSpecialtyLabel = () => {
+    if (!selectedSpecialty) return 'All Specialties';
+    const specialty = specialties.find(s => s.id === selectedSpecialty);
+    return specialty ? specialty.name : 'All Specialties';
+  };
+
+  return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f4f8' }}>
       <Student_Header />
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search doctors..."
+          placeholder="Search by name..."
           value={searchText}
           onChangeText={setSearchText}
         />
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.sortButton}>
-          <Ionicons name="filter-circle-outline" size={22} color="white" />
-          <Text style={styles.sortText}>Sort By</Text>
-        </TouchableOpacity>
-        <Modal
-          animationType="fade" // Thêm hiệu ứng mượt mà
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <TouchableOpacity onPress={() => { setSortBy('name'); setModalVisible(false); }} style={styles.modalOption}>
-              <Text style={{ fontSize: 16, color: '#374151' }}>Sort by Name</Text>
+        <View style={styles.dateFilterContainer}>
+          <View style={styles.dateRow}>
+            <TouchableOpacity onPress={() => setShowStartDatePicker(true)} style={styles.dateInput}>
+              <Text style={styles.dateText}>
+                {startDate ? startDate.toLocaleDateString() : 'Start Date'}
+              </Text>
+              <Ionicons name="calendar-outline" size={20} color="#374151" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { setSortBy('fee'); setModalVisible(false); }} style={styles.modalOption}>
-              <Text style={{ fontSize: 16, color: '#374151' }}>Sort by Fee</Text>
+            {showStartDatePicker && (
+              <DateTimePicker
+                value={startDate || new Date()}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowStartDatePicker(false);
+                  if (selectedDate) setStartDate(selectedDate);
+                }}
+              />
+            )}
+            <TouchableOpacity onPress={() => setShowStartTimePicker(true)} style={styles.timeInput}>
+              <Text style={styles.dateText}>
+                {startTime ? startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Start Time'}
+              </Text>
+              <Ionicons name="time-outline" size={20} color="#374151" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { setSortBy('rating'); setModalVisible(false); }} style={styles.modalOption}>
-              <Text style={{ fontSize: 16, color: '#374151' }}>Sort by Rating</Text>
-            </TouchableOpacity>
+            {showStartTimePicker && (
+              <DateTimePicker
+                value={startTime || new Date()}
+                mode="time"
+                display="default"
+                onChange={(event, selectedTime) => {
+                  setShowStartTimePicker(false);
+                  if (selectedTime) setStartTime(selectedTime);
+                }}
+              />
+            )}
           </View>
+          <View style={styles.dateRow}>
+            <TouchableOpacity onPress={() => setShowEndDatePicker(true)} style={styles.dateInput}>
+              <Text style={styles.dateText}>
+                {endDate ? endDate.toLocaleDateString() : 'End Date'}
+              </Text>
+              <Ionicons name="calendar-outline" size={20} color="#374151" />
+            </TouchableOpacity>
+            {showEndDatePicker && (
+              <DateTimePicker
+                value={endDate || new Date()}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowEndDatePicker(false);
+                  if (selectedDate) setEndDate(selectedDate);
+                }}
+              />
+            )}
+            <TouchableOpacity onPress={() => setShowEndTimePicker(true)} style={styles.timeInput}>
+              <Text style={styles.dateText}>
+                {endTime ? endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'End Time'}
+              </Text>
+              <Ionicons name="time-outline" size={20} color="#374151" />
+            </TouchableOpacity>
+            {showEndTimePicker && (
+              <DateTimePicker
+                value={endTime || new Date()}
+                mode="time"
+                display="default"
+                onChange={(event, selectedTime) => {
+                  setShowEndTimePicker(false);
+                  if (selectedTime) setEndTime(selectedTime);
+                }}
+              />
+            )}
+          </View>
+        </View>
+        <View style={styles.filterContainer}>
+          <TouchableOpacity onPress={() => setSortModalVisible(true)} style={styles.sortButton}>
+            <Ionicons name="filter-circle-outline" size={22} color="white" />
+            <Text style={styles.sortText}>Sort By</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setSpecialtyModalVisible(true)} style={styles.specialtyButton}>
+            <Ionicons name="list-outline" size={22} color="white" />
+            <Text style={styles.sortText}>Filter Specialty</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.sortInfo}>
+          Sorted by: {getSortLabel()}, Filtered by: {getSpecialtyLabel()}
+        </Text>
+
+        <Modal animationType="fade" transparent={true} visible={sortModalVisible} onRequestClose={() => setSortModalVisible(false)}>
+          <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPressOut={() => setSortModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <TouchableOpacity onPress={() => { setSortBy('name'); setSortModalVisible(false); }} style={styles.modalOption}>
+                <Text style={styles.modalText}>Sort by Name</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { setSortBy('fee'); setSortModalVisible(false); }} style={styles.modalOption}>
+                <Text style={styles.modalText}>Sort by Fee</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { setSortBy('rating'); setSortModalVisible(false); }} style={styles.modalOption}>
+                <Text style={styles.modalText}>Sort by Rating</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
+        <Modal animationType="fade" transparent={true} visible={specialtyModalVisible} onRequestClose={() => setSpecialtyModalVisible(false)}>
+          <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPressOut={() => setSpecialtyModalVisible(false)}>
+            <View style={styles.modalContainer}>
+              <TouchableOpacity onPress={() => { setSelectedSpecialty(null); setSpecialtyModalVisible(false); }} style={styles.modalOption}>
+                <Text style={styles.modalText}>All Specialties</Text>
+              </TouchableOpacity>
+              {specialties.map((specialty) => (
+                <TouchableOpacity
+                  key={specialty.id}
+                  onPress={() => { setSelectedSpecialty(specialty.id); setSpecialtyModalVisible(false); }}
+                  style={styles.modalOption}
+                >
+                  <Text style={styles.modalText}>{specialty.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </TouchableOpacity>
         </Modal>
 
         <View style={styles.container}>
-          {filteredDoctors.map((doctor, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.card}
-              onPress={() => router.push(`/user/doctorDetail/${doctor.id}`)}
-              activeOpacity={0.8} // Hiệu ứng nhấn
-            >
-              <Image source={{ uri: doctor.image }} style={styles.image} />
-              <View style={styles.infoContainer}>
-                <Text style={styles.name}>{doctor.name}</Text>
-                <Text style={styles.fee}>Fee: {doctor.fee.toLocaleString()} đ</Text>
-                <Text style={styles.rating}>Rating: {doctor.rating} ⭐</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+          {loading ? (
+            <Text>Loading...</Text>
+          ) : (
+            filteredDoctors.map((doctor) => (
+              <TouchableOpacity
+                key={doctor.id}
+                style={styles.card}
+                onPress={() => router.push(`/user/doctorDetail/${doctor.id}`)}
+                activeOpacity={0.8}
+              >
+                <Image source={{ uri: doctor.image }} style={styles.image} />
+                <View style={styles.infoContainer}>
+                  <Text style={styles.name}>{doctor.name}</Text>
+                  <Text style={styles.specialty}>
+                    {doctor.specialties.map(s => s.name).join(', ') || "No specialties"}
+                  </Text>
+                  <Text style={styles.fee}>Fee: {doctor.fee.toLocaleString()} đ</Text>
+                  <Text style={styles.rating}>Rating: {doctor.rating} ⭐</Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </ScrollView>
       <Footer />
@@ -129,19 +322,63 @@ export default function doctorList() {
   );
 }
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f8', // Màu nền nhẹ nhàng hơn
+    backgroundColor: '#f0f4f8',
     paddingHorizontal: 20,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+    marginBottom: 10,
+  },
+  dateFilterContainer: {
+    marginHorizontal: 10,
+    marginBottom: 20,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  dateInput: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginRight: 10,
+  },
+  timeInput: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dateText: {
+    fontSize: 14,
+    color: '#374151',
   },
   searchInput: {
     borderWidth: 1,
-    borderColor: '#d1d5db', // Xám nhạt
-    borderRadius: 12, // Bo góc mềm mại hơn
+    borderColor: '#d1d5db',
+    borderRadius: 12,
     padding: 12,
     marginBottom: 20,
-    marginTop: 90, // Đẩy xuống để tránh header
+    marginTop: 90,
     marginHorizontal: 10,
     backgroundColor: '#fff',
     fontSize: 16,
@@ -149,18 +386,30 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3, // Bóng đổ nhẹ
+    elevation: 3,
   },
   sortButton: {
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#60a5fa', // Xanh dương nhẹ
+    backgroundColor: '#60a5fa',
     borderRadius: 10,
-    marginLeft: 'auto', // Đẩy sang phải
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  specialtyButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#10b981',
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -172,23 +421,35 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
+  sortInfo: {
+    fontSize: 14,
+    color: '#374151',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   modalContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     padding: 20,
-    position: 'absolute',
-    top: '25%',
-    left: '50%',
-    transform: [{ translateX: -100 }, { translateY: -50 }],
     borderRadius: 15,
     elevation: 10,
     borderWidth: 1,
     borderColor: '#e5e7eb',
-    width: 200, // Giới hạn chiều rộng
+    width: 200,
   },
   modalOption: {
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#374151',
   },
   card: {
     flexDirection: 'row',
@@ -201,32 +462,42 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 5,
-    elevation: 6, // Bóng đổ nổi bật hơn
+    elevation: 6,
   },
   image: {
-    width: 60, // Tăng kích thước ảnh
+    width: 60,
     height: 60,
     borderRadius: 30,
     marginRight: 15,
     borderWidth: 2,
-    borderColor: '#60a5fa', // Viền xanh nhẹ
+    borderColor: '#60a5fa',
   },
   infoContainer: {
     flex: 1,
   },
   name: {
-    fontSize: 18, // Tăng kích thước chữ
-    fontWeight: '700', // Đậm hơn
-    color: '#1f2937', // Màu xám đậm
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  specialty: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 4,
   },
   fee: {
     fontSize: 15,
-    color: '#16a34a', // Xanh lá đậm hơn
+    color: '#16a34a',
     marginTop: 6,
   },
   rating: {
     fontSize: 15,
-    color: '#f59e0b', // Vàng đậm
+    color: '#f59e0b',
     marginTop: 6,
+  },
+  date: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 4,
   },
 });
