@@ -13,6 +13,7 @@ import { Student_Header } from "../../component/Student_Header";
 import { Footer } from "../../component/Footer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios"; // Add this import
 
 const ShowUserProfile = () => {
   const router = useRouter();
@@ -28,6 +29,7 @@ const ShowUserProfile = () => {
       email: string;
     };
   } | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>(""); // Add state for avatar URL
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,13 +40,23 @@ const ShowUserProfile = () => {
 
         const decoded: any = jwtDecode(token);
         const patientId = decoded.profileId;
-        const response = await fetch(
+        const userId = decoded.userId;
+
+        // Fetch user profile data
+        const profileResponse = await fetch(
           `https://psychologysupport-profile.azurewebsites.net/patients/${patientId}`
         );
-        const data = await response.json();
-        setUser(data.patientProfileDto);
+        const profileData = await profileResponse.json();
+        setUser(profileData.patientProfileDto);
+
+        // Fetch avatar image using axios
+        const IMAGE_API_URL = "https://psychologysupport-image.azurewebsites.net/image/get";
+        const imageResponse = await axios.get(`${IMAGE_API_URL}?ownerType=User&ownerId=${userId}`);
+        setAvatarUrl(imageResponse.data.url || "https://via.placeholder.com/150");
+
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setAvatarUrl("https://via.placeholder.com/150"); // Fallback image on error
       } finally {
         setLoading(false);
       }
@@ -74,13 +86,13 @@ const ShowUserProfile = () => {
       <Student_Header />
       <ScrollView contentContainerStyle={styles.container}>
         <View>
-          <Text style={styles.title}>User Information</Text>
+          <Text style={styles.title}>Profile</Text>
         </View>
 
         {/* User Avatar */}
         <View style={styles.avatarContainer}>
           <Image
-            source={{ uri: user.avatarUrl || "https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg" }}
+            source={{ uri: avatarUrl }} // Use the fetched avatarUrl
             style={styles.avatar}
           />
         </View>
@@ -178,7 +190,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 8,
     elevation: 3,
-    marginBottom: 120,
+    marginBottom: 150,
   },
   buttonText: {
     color: "#fff",
