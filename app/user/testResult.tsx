@@ -46,7 +46,48 @@ export default function testResult() {
     }
   }, [testResultId]);
 
+  const getCategoryFromScore = (score: number, type: EvaluationType): string => {
+    if (type === 'stress') {
+      if (score <= 14) return 'Normal';
+      if (score <= 18) return 'Mild';
+      if (score <= 25) return 'Moderate';
+      if (score <= 33) return 'Severe';
+      return 'Extremely Severe';
+    }
+    if (type === 'anxiety') {
+      if (score <= 7) return 'Normal';
+      if (score <= 9) return 'Mild';
+      if (score <= 14) return 'Moderate';
+      if (score <= 19) return 'Severe';
+      return 'Extremely Severe';
+    }
+    if (type === 'depression') {
+      if (score <= 9) return 'Normal';
+      if (score <= 13) return 'Mild';
+      if (score <= 20) return 'Moderate';
+      if (score <= 27) return 'Severe';
+      return 'Extremely Severe';
+    }
+    return 'Normal';
+  };
+  
+  const getColorForCategory = (category: string) => {
+    switch (category) {
+      case "Normal":
+        return "green";
+      case "Mild":
+        return "#FFD700";
 
+      case "Moderate":
+        return "orange";
+      case "Severe":
+        return "red";
+      case "Extremely Severe":
+        return "purple";
+      default:
+        return "gray";
+    }
+  };
   const getEvaluation = (score: number, type: EvaluationType): string => {
     if (type === 'stress') {
       if (score <= 14) return 'You show no signs of stress disorder (Normal).';
@@ -75,35 +116,53 @@ export default function testResult() {
     <>
       <Student_Header />
       <ScrollView style={styles.scrollContainer}>
-
         <View style={styles.container}>
           <Text style={styles.title}>MENTAL HEALTH TEST RESULT</Text>
+          
           <View style={styles.resultBox}>
             <Text style={styles.sectionTitle}>Stress Score:</Text>
-            <Text style={styles.score}>{scores.stress}</Text>
+            <Text style={[
+              styles.score,
+              { color: getColorForCategory(getCategoryFromScore(scores.stress, 'stress')) }
+            ]}>
+              {scores.stress}
+            </Text>
             <Text style={styles.description}>{getEvaluation(scores.stress, 'stress')}</Text>
           </View>
+  
           <View style={styles.resultBox}>
             <Text style={styles.sectionTitle}>Anxiety Score:</Text>
-            <Text style={styles.score}>{scores.anxiety}</Text>
+            <Text style={[
+              styles.score,
+              { color: getColorForCategory(getCategoryFromScore(scores.anxiety, 'anxiety')) }
+            ]}>
+              {scores.anxiety}
+            </Text>
             <Text style={styles.description}>{getEvaluation(scores.anxiety, 'anxiety')}</Text>
           </View>
+  
           <View style={styles.resultBox}>
             <Text style={styles.sectionTitle}>Depression Score:</Text>
-            <Text style={styles.score}>{scores.depression}</Text>
+            <Text style={[
+              styles.score,
+              { color: getColorForCategory(getCategoryFromScore(scores.depression, 'depression')) }
+            ]}>
+              {scores.depression}
+            </Text>
             <Text style={styles.description}>{getEvaluation(scores.depression, 'depression')}</Text>
           </View>
-          <TouchableOpacity style={styles.unlockButton} onPress={() => router.push("/user/Services")}>
-          <Ionicons name="lock-open" size={24} color="white" />
+  
+          <TouchableOpacity 
+            style={styles.unlockButton} 
+            onPress={() => router.push("/user/Services")}
+          >
+            <Ionicons name="lock-open" size={24} color="white" />
             <Text style={styles.unlockText}>Unlock Full Treatment Course</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-
       <Footer />
     </>
-
-
   );
 }
 
@@ -127,7 +186,7 @@ const styles = StyleSheet.create({
   },
   resultBox: {
     width: '100%',
-    backgroundColor: '#E9D5FF',
+    backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
     marginBottom: 15,
@@ -138,7 +197,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#6B21A8',
+    color: 'Black',
   },
   score: {
     fontSize: 28,
@@ -158,7 +217,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 50,
-    marginTop: 20,
+    marginTop: 5,
+    marginBottom:50
   },
   unlockText: {
     color: 'white',

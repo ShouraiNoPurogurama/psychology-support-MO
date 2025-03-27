@@ -6,6 +6,7 @@ import { router, usePathname } from "expo-router";
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 type User = {
     fullName: string;
@@ -16,19 +17,21 @@ export const Student_Header: React.FC = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [avatarUrl, setAvatarUrl] = useState<string>("https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg"); // Default placeholder
     const pathname = usePathname();
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                // Lấy patientId từ token
+                // Lấy patientId và userId từ token
                 const token = await AsyncStorage.getItem("authToken");
                 if (!token) {
                     throw new Error("No authentication token found");
                 }
                 const decoded: any = jwtDecode(token);
                 const patientId = decoded.profileId;
-
+                const userId = decoded.userId; // Thêm userId để lấy hình ảnh
+    
                 // Fetch thông tin user từ API
                 const response = await fetch(`https://psychologysupport-profile.azurewebsites.net/patients/${patientId}`);
                 if (!response.ok) {
@@ -36,19 +39,26 @@ export const Student_Header: React.FC = () => {
                 }
                 const data = await response.json();
                 const patientProfile = data.patientProfileDto;
-
+    
                 const userData: User = {
                     fullName: patientProfile.fullName,
                     phoneNumber: patientProfile.contactInfo.phoneNumber,
                 };
                 setUser(userData);
+    
+                // Fetch avatar image từ API
+                const IMAGE_API_URL = "https://psychologysupport-image.azurewebsites.net/image/get";
+                const imageResponse = await axios.get(`${IMAGE_API_URL}?ownerType=User&ownerId=${userId}`);
+                setAvatarUrl(imageResponse.data.url || "https://via.placeholder.com/150");
+    
             } catch (error) {
-                console.error("Error fetching user data:", error);
+                console.error("Error fetching user data or image:", error);
+                setAvatarUrl("https://via.placeholder.com/150"); // Fallback nếu lỗi
             } finally {
                 setLoading(false);
             }
         };
-
+    
         fetchUserData();
     }, []);
 
@@ -77,7 +87,7 @@ export const Student_Header: React.FC = () => {
                             <View style={styles.drawer}>
                             <View style={styles.userInfo}>
                                     <Image 
-                                        source={{ uri: 'https://www.fashionbeans.com/wp-content/uploads/2022/02/Medium-Length-Layered-Hair_zeno_vic.jpg' }} 
+                                        source={{ uri: avatarUrl }} 
                                         style={styles.avatar} 
                                     />
                                     {loading ? (
@@ -101,6 +111,18 @@ export const Student_Header: React.FC = () => {
                                 >
                                     <Ionicons name="person" size={24} color="white" />
                                     <Text style={styles.drawerText}>My Profile</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/Meeting");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
+                                    <Ionicons name="videocam" size={24} color="white" />
+                                    <Text style={styles.drawerText}>Meetings</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -159,12 +181,15 @@ export const Student_Header: React.FC = () => {
                                     <Text style={styles.drawerText}>Services</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.drawerItem}>
-                                    <Ionicons name="settings" size={24} color="white" />
-                                    <Text style={styles.drawerText}>Setting</Text>
-                                </TouchableOpacity>
-
-                                <TouchableOpacity style={styles.drawerItem}>
+   
+                                <TouchableOpacity
+                                    style={styles.drawerItem}
+                                    onPress={() => {
+                                        router.push("/user/AboutUs");
+                                        setIsDrawerOpen(false)
+                                    }
+                                    }
+                                >
                                     <Ionicons name="information-circle" size={24} color="white" />
                                     <Text style={styles.drawerText}>About Us</Text>
                                 </TouchableOpacity>
