@@ -82,7 +82,7 @@ export default function Home() {
               }
             >
               <MaterialIcons name="event" size={32} color="#AF93D2" />
-              <Text style={styles.cardText}>Appointment Request</Text>
+              <Text style={styles.cardText}>Appointment Requests</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
