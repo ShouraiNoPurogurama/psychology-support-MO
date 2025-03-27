@@ -62,6 +62,7 @@ export default function MedicalRecordDetails() {
 
   return (
     <>
+      <DoctorHeader />
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}

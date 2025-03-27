@@ -151,13 +151,15 @@ export default function DoctorSchedule() {
       setTimeSlots(refreshedData.timeSlots || []);
     } catch (error) {
       console.error("Error updating availability:", error);
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
       Alert.alert("Error", `Failed to update availability: ${errorMessage}`);
     }
   };
 
   return (
     <>
+      <DoctorHeader />
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
@@ -223,15 +225,20 @@ export default function DoctorSchedule() {
               const isSelected = selectedSlots.includes(item);
               const backgroundColor =
                 item.status === "Unavailable"
-                  ? "rgba(217, 83, 79, 0.7)"
+                  ? "rgba(217, 83, 79, 0.7)" // Màu cho slot không khả dụng
                   : isSelected
-                  ? "rgba(92, 184, 92, 0.5)" // Highlight selected slots
-                  : "rgba(92, 184, 92, 0.7)";
+                  ? "rgba(92, 184, 92, 0.5)" // Màu cho slot được chọn
+                  : "rgba(92, 184, 92, 0.7)"; // Màu cho slot khả dụng
 
               return (
                 <Pressable
                   style={[styles.timeSlotItem, { backgroundColor }]}
-                  onPress={() => toggleSlotSelection(item)} // Select or deselect slot
+                  onPress={() => {
+                    if (item.status !== "Unavailable") {
+                      toggleSlotSelection(item); // Chỉ xử lý nếu slot khả dụng
+                    }
+                  }}
+                  disabled={item.status === "Unavailable"} // Vô hiệu hóa nếu slot không khả dụng
                 >
                   <View style={styles.slotContent}>
                     <Text style={styles.timeSlotText}>

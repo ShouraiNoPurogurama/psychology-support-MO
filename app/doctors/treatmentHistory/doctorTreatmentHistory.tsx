@@ -5,12 +5,16 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  TextInput,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
+import { DoctorHeader } from "../../../component/doctorHeader";
 
 export default function DoctorHistory() {
   interface MedicalRecord {
@@ -22,6 +26,12 @@ export default function DoctorHistory() {
 
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
   const [patientNames, setPatientNames] = useState<Record<string, string>>({});
+  const [searchText, setSearchText] = useState(""); // State cho thanh tìm kiếm
+  const [statusFilter, setStatusFilter] = useState<"Processing" | "Done">(
+    "Processing"
+  ); // State cho bộ lọc trạng thái
+  const [isSortModalVisible, setSortModalVisible] = useState(false); // State cho modal sort
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc"); // State cho thứ tự sắp xếp
 
   useEffect(() => {
     const fetchMedicalRecords = async () => {
@@ -34,7 +44,7 @@ export default function DoctorHistory() {
         if (!doctorId) throw new Error("Profile ID not found in token");
 
         const response = await fetch(
-          `https://psychologysupport-profile.azurewebsites.net/medical-records?DoctorId=${doctorId}&PageIndex=1&PageSize=10&SortBy=CreatedAt&SortOrder=dsc&Status=Done`
+          `https://psychologysupport-profile.azurewebsites.net/medical-records?DoctorId=${doctorId}&PageIndex=1&PageSize=10&SortBy=CreatedAt&SortOrder=${sortOrder}&Status=${statusFilter}`
         );
 
         if (!response.ok) throw new Error("Failed to fetch medical records");
@@ -80,10 +90,11 @@ export default function DoctorHistory() {
     };
 
     fetchMedicalRecords();
-  }, []);
+  }, [statusFilter, sortOrder]); // Gọi lại API khi trạng thái hoặc thứ tự sắp xếp thay đổi
 
   return (
     <>
+      <DoctorHeader />
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -93,36 +104,112 @@ export default function DoctorHistory() {
             <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
           </View>
         </TouchableOpacity>
-        <Text style={styles.header}>Treatment History</Text>
+        <Text style={styles.header}>Patient Medical Records</Text>
       </View>
 
+      {/* Thanh tìm kiếm */}
+      <View style={styles.searchSortContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search by patient name"
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+        <TouchableOpacity
+          style={styles.sortIconButton}
+          onPress={() => setSortModalVisible(true)} // Hiển thị modal sort
+        >
+          <MaterialIcons name="sort" size={24} color="#6C63FF" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Nút lọc trạng thái */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() =>
+            setStatusFilter((prev) =>
+              prev === "Processing" ? "Done" : "Processing"
+            )
+          }
+        >
+          <Text style={styles.filterText}>
+            {statusFilter === "Processing" ? "Show Done" : "Show Processing"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Modal Sort */}
+      <Modal
+        visible={isSortModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setSortModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setSortModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Sort By</Text>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => {
+                  setSortOrder("asc");
+                  setSortModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalOptionText}>
+                  Created At (Ascending)
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalOption}
+                onPress={() => {
+                  setSortOrder("desc");
+                  setSortModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalOptionText}>
+                  Created At (Descending)
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {medicalRecords.map((record) => (
-          <TouchableOpacity
-            key={record.id}
-            style={styles.historyItem}
-            activeOpacity={0.7}
-            onPress={() =>
-              router.push({
-                pathname: "/doctors/medicalRecords/medicalRecordDetails",
-                params: { id: record.id },
-              })
-            }
-          >
-            <View style={styles.iconContainer}>
-              <MaterialIcons name="person" size={30} color="#6C63FF" />
-            </View>
-            <View style={styles.infoContainer}>
-              <Text style={styles.patientName}>
-                {patientNames[record.patientProfileId] || "Unknown Patient"}
-              </Text>
-              <Text style={styles.notes}>📝 Notes: {record.notes}</Text>
-              <Text style={styles.createdAt}>
-                📅 Date: {new Date(record.createdAt).toLocaleDateString()}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {medicalRecords
+          .filter((record) =>
+            (patientNames[record.patientProfileId] || "Unknown Patient")
+              .toLowerCase()
+              .includes(searchText.toLowerCase())
+          )
+          .map((record) => (
+            <TouchableOpacity
+              key={record.id}
+              style={styles.historyItem}
+              activeOpacity={0.7}
+              onPress={() =>
+                router.push({
+                  pathname: "/doctors/medicalRecords/medicalRecordDetails",
+                  params: { id: record.id },
+                })
+              }
+            >
+              <View style={styles.iconContainer}>
+                <MaterialIcons name="person" size={30} color="#6C63FF" />
+              </View>
+              <View style={styles.infoContainer}>
+                <Text style={styles.patientName}>
+                  {patientNames[record.patientProfileId] || "Unknown Patient"}
+                </Text>
+                <Text style={styles.notes}>📝 Notes: {record.notes}</Text>
+                <Text style={styles.createdAt}>
+                  📅 Date: {new Date(record.createdAt).toLocaleDateString()}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
       </ScrollView>
     </>
   );
@@ -200,5 +287,79 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     fontStyle: "italic",
+  },
+  searchSortContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 15,
+    marginBottom: 10,
+  },
+  searchBar: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#CCC",
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    backgroundColor: "#FFF",
+  },
+  sortIconButton: {
+    marginLeft: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#E3E1FD", // Màu tím nhạt
+  },
+  filterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 15,
+    marginBottom: 10,
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    backgroundColor: "#E3E1FD", // Màu tím nhạt
+  },
+  filterText: {
+    color: "#FFF", // Màu trắng
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: 300,
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  modalOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEE",
+    width: "100%",
+    alignItems: "center",
+    backgroundColor: "#E3E1FD", // Màu tím nhạt
+    borderRadius: 10,
+  },
+  modalOptionText: {
+    fontSize: 16,
+    color: "#FFF", // Màu trắng
   },
 });

@@ -47,6 +47,7 @@ export default function DoctorNotification() {
 
   return (
     <>
+      <DoctorHeader />
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity

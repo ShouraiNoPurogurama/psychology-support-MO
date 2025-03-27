@@ -10,6 +10,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Footer } from "../../../component/doctorFooter";
+import { DoctorHeader } from "../../../component/doctorHeader";
 
 export default function AppointmentDetails() {
   const params = useLocalSearchParams();
@@ -121,73 +122,80 @@ export default function AppointmentDetails() {
   }
 
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
+    <>
+      <DoctorHeader />
+      <View style={styles.wrapper}>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <FontAwesome5 name="arrow-left" size={24} color="#4B3F72" />
+          </TouchableOpacity>
+          <Text style={styles.header}>Schedule Information</Text>
+        </View>
+
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
-          <FontAwesome5 name="arrow-left" size={24} color="#4B3F72" />
-        </TouchableOpacity>
-        <Text style={styles.header}>Schedule Information</Text>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.header}>Patient Information</Text>
+            <InfoRow
+              icon="person-outline"
+              label="Name"
+              value={patientDetails.fullName}
+            />
+            <InfoRow
+              icon={getGenderIcon(patientDetails.gender)}
+              label="Gender"
+              value={patientDetails.gender}
+            />
+            <InfoRow
+              icon="phone"
+              label="Phone"
+              value={patientDetails.contactInfo.phoneNumber}
+            />
+            <InfoRow
+              icon="email"
+              label="Email"
+              value={patientDetails.contactInfo.email}
+            />
+            <InfoRow
+              icon="home"
+              label="Address"
+              value={patientDetails.contactInfo.address}
+            />
+          </View>
+
+          <View style={styles.sectionContainer}>
+            <Text style={styles.header}>Booking Information</Text>
+            <InfoRow
+              icon="date-range"
+              label="Date"
+              value={bookingDetails.date}
+            />
+            <InfoRow
+              icon="access-time"
+              label="Start Time"
+              value={bookingDetails.startTime}
+            />
+            <InfoRow
+              icon="timer"
+              label="Duration"
+              value={`${bookingDetails.duration} minutes`}
+            />
+            <InfoRow
+              icon="check-circle"
+              label="Status"
+              value={bookingDetails.status}
+            />
+          </View>
+        </ScrollView>
+
+        <Footer />
       </View>
-
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
-        <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Patient Information</Text>
-          <InfoRow
-            icon="person-outline"
-            label="Name"
-            value={patientDetails.fullName}
-          />
-          <InfoRow
-            icon={getGenderIcon(patientDetails.gender)}
-            label="Gender"
-            value={patientDetails.gender}
-          />
-          <InfoRow
-            icon="phone"
-            label="Phone"
-            value={patientDetails.contactInfo.phoneNumber}
-          />
-          <InfoRow
-            icon="email"
-            label="Email"
-            value={patientDetails.contactInfo.email}
-          />
-          <InfoRow
-            icon="home"
-            label="Address"
-            value={patientDetails.contactInfo.address}
-          />
-        </View>
-
-        <View style={styles.sectionContainer}>
-          <Text style={styles.header}>Booking Information</Text>
-          <InfoRow icon="date-range" label="Date" value={bookingDetails.date} />
-          <InfoRow
-            icon="access-time"
-            label="Start Time"
-            value={bookingDetails.startTime}
-          />
-          <InfoRow
-            icon="timer"
-            label="Duration"
-            value={`${bookingDetails.duration} minutes`}
-          />
-          <InfoRow
-            icon="check-circle"
-            label="Status"
-            value={bookingDetails.status}
-          />
-        </View>
-      </ScrollView>
-
-      <Footer />
-    </View>
+    </>
   );
 }
 

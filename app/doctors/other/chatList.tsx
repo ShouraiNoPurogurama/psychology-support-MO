@@ -11,6 +11,7 @@ import { Footer } from "../../../component/doctorFooter";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import { DoctorHeader } from "../../../component/doctorHeader";
 
 const chatData = [
   {
@@ -38,6 +39,7 @@ export default function ChatList() {
 
   return (
     <>
+      <DoctorHeader />
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity

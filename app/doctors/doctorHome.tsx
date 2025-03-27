@@ -12,7 +12,7 @@ import { Footer } from "../../component/doctorFooter";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const topBannerImage =
   "https://file.hstatic.net/200000256325/article/auc1576544994_a7cc6e2aaa604d3c86351b929f853a9e.jpg";
@@ -27,9 +27,9 @@ export default function Home() {
         const token = await AsyncStorage.getItem("authToken");
         if (!token) throw new Error("Token not found");
 
-       const decoded: any = jwtDecode(token);
-               const profileId = decoded?.profileId;
-               if (!profileId) throw new Error("Profile ID not found in token");
+        const decoded: any = jwtDecode(token);
+        const profileId = decoded?.profileId;
+        if (!profileId) throw new Error("Profile ID not found in token");
 
         const response = await fetch(
           `https://psychologysupport-profile.azurewebsites.net/doctors/${profileId}`
@@ -62,11 +62,10 @@ export default function Home() {
 
   return (
     <>
-      <DoctorHeader/>
+      <DoctorHeader />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.profileSection}>
-            <FontAwesome5 name="user-md" size={90} color="#AF93D2" />
             <Text style={styles.title}>Welcome, {doctorName}</Text>
           </View>
 
@@ -89,15 +88,6 @@ export default function Home() {
             <TouchableOpacity
               style={styles.card}
               activeOpacity={0.8}
-              onPress={handleMyPatientsPress}
-            >
-              <MaterialIcons name="group" size={32} color="#AF93D2" />
-              <Text style={styles.cardText}>My Patients</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.card}
-              activeOpacity={0.8}
               onPress={() =>
                 router.push("/doctors/workingSchedules/doctorSchedules")
               }
@@ -110,13 +100,11 @@ export default function Home() {
               style={styles.card}
               activeOpacity={0.8}
               onPress={() =>
-                router.push(
-                  "/doctors/treatmentHistory/doctorTreatmentHistory"
-                )
+                router.push("/doctors/treatmentHistory/doctorTreatmentHistory")
               }
             >
               <MaterialIcons name="history" size={32} color="#AF93D2" />
-              <Text style={styles.cardText}>Treatment History</Text>
+              <Text style={styles.cardText}>Patient Medical Records</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -162,18 +150,19 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     width: "90%",
-    flexDirection: "row",
+    flexDirection: "column",
+    alignItems: "center",
     justifyContent: "space-between",
-    flexWrap: "wrap",
+    height: 400,
+    marginTop: 40,
   },
   card: {
-    width: "45%",
+    width: "100%",
     backgroundColor: "white",
     borderRadius: 15,
-    paddingVertical: 20,
+    paddingVertical: 25,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 15,
     elevation: 5,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
@@ -182,7 +171,7 @@ const styles = StyleSheet.create({
   },
   cardText: {
     marginTop: 10,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#4B3F72",
   },
