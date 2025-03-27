@@ -63,7 +63,7 @@ export default function Home() {
   return (
     <>
       <DoctorHeader />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={[styles.scrollContainer]}>
         <View style={styles.container}>
           <View style={styles.profileSection}>
             <Text style={styles.title}>Welcome, {doctorName}</Text>
@@ -116,7 +116,7 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flexGrow: 1,
+    flexGrow: 1, // Đảm bảo nội dung có thể cuộn
     alignItems: "center",
     paddingBottom: 20,
   },
@@ -153,7 +153,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-between",
-    height: 400,
     marginTop: 40,
   },
   card: {
@@ -168,6 +167,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     transform: [{ scale: 1 }],
+    marginBottom: 20, // Thêm khoảng cách giữa các thẻ
   },
   cardText: {
     marginTop: 10,
