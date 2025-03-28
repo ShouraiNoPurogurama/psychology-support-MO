@@ -96,7 +96,7 @@ const ServicePackagesScreen = () => {
   useEffect(() => {
     const fetchServicePackages = async () => {
       if (!profileId) return;
-
+  
       try {
         const response = await axios.get(
           `https://psychologysupport-subscription.azurewebsites.net/service-packages?patientId=${profileId}&PageIndex=1&PageSize=10`
@@ -109,8 +109,10 @@ const ServicePackagesScreen = () => {
               ...pkg,
               features: matchedPackage ? matchedPackage.features : [],
             };
-          });
-
+          })
+          // Sắp xếp theo giá từ thấp đến cao
+          .sort((a: ServicePackage, b: ServicePackage) => a.price - b.price);
+  
         setServicePackages(activePackages);
         setPromoCodes(activePackages.reduce((acc, pkg) => ({ ...acc, [pkg.id]: '' }), {}));
         setLoadingStates(activePackages.reduce((acc, pkg) => ({ ...acc, [pkg.id]: false }), {}));
@@ -265,7 +267,7 @@ const ServicePackagesScreen = () => {
 
   const renderItem = ({ item }: { item: ServicePackage }) => {
     const isCurrentPlan = item.isPurchased === true;
-
+  
     return (
       <LinearGradient colors={['#2E0249', '#570A57']} style={styles.packageContainer}>
         <Text style={styles.packageName}>{item.name}</Text>
@@ -293,11 +295,20 @@ const ServicePackagesScreen = () => {
           editable={!isCurrentPlan}
         />
         <TouchableOpacity
-          style={[styles.button, (loadingStates[item.id] || isCurrentPlan) && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            loadingStates[item.id] && styles.buttonDisabled,
+            isCurrentPlan && styles.buttonPurchased, // Thêm kiểu cho gói đã mua
+          ]}
           onPress={() => !isCurrentPlan && handleBuyService(item.id)}
           disabled={loadingStates[item.id] || isCurrentPlan}
         >
-          <Text style={styles.buttonText}>
+          <Text
+            style={[
+              styles.buttonText,
+              isCurrentPlan && styles.buttonTextPurchased, // Thêm kiểu chữ trắng
+            ]}
+          >
             {loadingStates[item.id]
               ? 'Đang xử lý...'
               : isCurrentPlan
@@ -436,10 +447,16 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     backgroundColor: '#ccc',
   },
+  buttonPurchased: {
+    backgroundColor: '#00cc00', // Nền xanh cho nút của gói đã mua
+  },
   buttonText: {
     color: '#2E0249',
     fontWeight: '700',
     fontSize: 16,
+  },
+  buttonTextPurchased: {
+    color: '#fff', // Chữ trắng cho nút của gói đã mua
   },
   closeButton: {
     backgroundColor: '#2E0249',
@@ -451,6 +468,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-});
+}); 
 
 export default ServicePackagesScreen;
