@@ -63,7 +63,10 @@ export default function Home() {
   return (
     <>
       <DoctorHeader />
-      <ScrollView contentContainerStyle={[styles.scrollContainer]}>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }} // Thêm paddingBottom để tránh bị che bởi Footer
+      >
         <View style={styles.container}>
           <View style={styles.profileSection}>
             <Text style={styles.title}>Welcome, {doctorName}</Text>
@@ -116,13 +119,11 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flexGrow: 1, // Đảm bảo nội dung có thể cuộn
-    alignItems: "center",
-    paddingBottom: 20,
+    flex: 1, // Đảm bảo ScrollView chiếm toàn bộ không gian còn lại
+    backgroundColor: "#F7F6FB", // Màu nền
   },
   container: {
     width: "100%",
-    backgroundColor: "#F7F6FB",
     alignItems: "center",
     justifyContent: "flex-start",
     paddingTop: 20,

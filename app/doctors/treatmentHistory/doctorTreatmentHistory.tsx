@@ -96,14 +96,6 @@ export default function DoctorHistory() {
     <>
       <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <View style={styles.backButtonContent}>
-            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-          </View>
-        </TouchableOpacity>
         <Text style={styles.header}>Patient Medical Records</Text>
       </View>
 
@@ -233,20 +225,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#6C63FF",
     textAlign: "center",
-  },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    top: "50%",
-    transform: [{ translateY: -22 }],
-    zIndex: 10,
-  },
-  backButtonContent: {
-    width: 44,
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 22,
   },
   historyItem: {
     flexDirection: "row",

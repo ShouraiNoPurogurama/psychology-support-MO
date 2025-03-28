@@ -44,7 +44,8 @@ export default function DoctorProfile() {
         const decoded: any = jwtDecode(token);
         const profileId = decoded?.profileId;
         const userId = decoded?.userId; // Lấy userId từ token
-        if (!profileId || !userId) throw new Error("Profile ID or User ID not found in token");
+        if (!profileId || !userId)
+          throw new Error("Profile ID or User ID not found in token");
 
         console.log("Decoded Profile ID:", profileId);
 
@@ -72,123 +73,111 @@ export default function DoctorProfile() {
 
   return (
     <>
-    <DoctorHeader />
-    <View style={styles.wrapper}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
+      <DoctorHeader />
+      <View style={styles.wrapper}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>Doctor Profile</Text>
+        </View>
+
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
-          <View style={styles.backButtonContent}>
-            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-          </View>
-        </TouchableOpacity>
-        <Text style={styles.header}>Doctor Profile</Text>
-      </View>
-
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: 100 }}
-      >
-        <View style={styles.sectionContainer}>
-          <View style={styles.profileContainer}>
-            {avatarUrl ? (
-              <View style={styles.avatarContainer}>
-                <Image
-                  source={{ uri: avatarUrl }}
-                  style={styles.avatar}
+          <View style={styles.sectionContainer}>
+            <View style={styles.profileContainer}>
+              {avatarUrl ? (
+                <View style={styles.avatarContainer}>
+                  <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+                </View>
+              ) : (
+                <FontAwesome
+                  name="user-md"
+                  size={80}
+                  color="#6A8CAF"
+                  style={styles.icon}
                 />
-              </View>
-            ) : (
-              <FontAwesome
-                name="user-md"
-                size={80}
-                color="#6A8CAF"
-                style={styles.icon}
-              />
-            )}
-            <Text style={styles.name}>
-              {doctor.fullName || "Doctor not updated"}
-            </Text>
-            <Text style={styles.specialty}>
-              {doctor.specialties?.map((s) => s.name).join(", ") || "Specialty not updated"}
-            </Text>
-            <Text style={styles.experience}>
-              🧬 {doctor.yearsOfExperience || 0} years of experience
-            </Text>
+              )}
+              <Text style={styles.name}>
+                {doctor.fullName || "Doctor not updated"}
+              </Text>
+              <Text style={styles.specialty}>
+                {doctor.specialties?.map((s) => s.name).join(", ") ||
+                  "Specialty not updated"}
+              </Text>
+              <Text style={styles.experience}>
+                🧬 {doctor.yearsOfExperience || 0} years of experience
+              </Text>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.sectionContainer}>
-          <Text style={styles.headerSection}>Contact Information</Text>
-          <View style={styles.iconRow}>
-            <FontAwesome5 name="envelope" size={20} color="#6A8CAF" />
+          <View style={styles.sectionContainer}>
+            <Text style={styles.headerSection}>Contact Information</Text>
+            <View style={styles.iconRow}>
+              <FontAwesome5 name="envelope" size={20} color="#6A8CAF" />
+              <Text style={styles.info}>
+                {doctor.contactInfo?.email || "Not updated"}
+              </Text>
+            </View>
+            <View style={styles.iconRow}>
+              <FontAwesome5 name="phone" size={20} color="#6A8CAF" />
+              <Text style={styles.info}>
+                {doctor.contactInfo?.phoneNumber || "Not updated"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.sectionContainer}>
+            <Text style={styles.headerSection}>Additional Information</Text>
             <Text style={styles.info}>
-              {doctor.contactInfo?.email || "Not updated"}
+              🎓 {doctor.qualifications || "No qualifications available"}
             </Text>
-          </View>
-          <View style={styles.iconRow}>
-            <FontAwesome5 name="phone" size={20} color="#6A8CAF" />
             <Text style={styles.info}>
-              {doctor.contactInfo?.phoneNumber || "Not updated"}
+              📍 {doctor.contactInfo?.address || "No address provided"}
+            </Text>
+            <Text style={styles.info}>
+              📝 {doctor.bio || "No biography available"}
             </Text>
           </View>
-        </View>
 
-        <View style={styles.sectionContainer}>
-          <Text style={styles.headerSection}>Additional Information</Text>
-          <Text style={styles.info}>
-            🎓 {doctor.qualifications || "No qualifications available"}
-          </Text>
-          <Text style={styles.info}>
-            📍 {doctor.contactInfo?.address || "No address provided"}
-          </Text>
-          <Text style={styles.info}>
-            📝 {doctor.bio || "No biography available"}
-          </Text>
-        </View>
+          <View style={styles.sectionContainer}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() =>
+                router.push({
+                  pathname: "/doctors/profiles/updateProfile",
+                  params: {
+                    id: doctor.profileId || "",
+                    fullName: doctor.fullName || "",
+                    specialties:
+                      doctor.specialties?.map((s) => s.name).join(", ") || "",
+                    yearsOfExperience: String(doctor.yearsOfExperience || 0),
+                    email: doctor.contactInfo?.email || "",
+                    phoneNumber: doctor.contactInfo?.phoneNumber || "",
+                    address: doctor.contactInfo?.address || "",
+                    qualifications: doctor.qualifications || "",
+                    bio: doctor.bio || "",
+                  },
+                })
+              }
+            >
+              <Text style={styles.buttonText}>✏️ Edit Profile</Text>
+            </TouchableOpacity>
 
-        <View style={styles.sectionContainer}>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() =>
-              router.push({
-                pathname: "/doctors/profiles/updateProfile",
-                params: {
-                  id: doctor.profileId || "",
-                  fullName: doctor.fullName || "",
-                  specialties:
-                    doctor.specialties?.map((s) => s.name).join(", ") || "",
-                  yearsOfExperience: String(doctor.yearsOfExperience || 0),
-                  email: doctor.contactInfo?.email || "",
-                  phoneNumber: doctor.contactInfo?.phoneNumber || "",
-                  address: doctor.contactInfo?.address || "",
-                  qualifications: doctor.qualifications || "",
-                  bio: doctor.bio || "",
-                },
-              })
-            }
-          >
-            <Text style={styles.buttonText}>✏️ Edit Profile</Text>
-          </TouchableOpacity>
+            <View style={styles.buttonSpacing} />
 
-          <View style={styles.buttonSpacing} />
-
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={() => {
-              AsyncStorage.removeItem("authToken");
-              router.push("/login");
-            }}
-          >
-            <Text style={styles.buttonText}>🚪 Logout</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      
-    </View>
-    <Footer />
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={() => {
+                AsyncStorage.removeItem("authToken");
+                router.push("/login");
+              }}
+            >
+              <Text style={styles.buttonText}>🚪 Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+      <Footer />
     </>
   );
 }
@@ -204,8 +193,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
   },
-  backButton: { padding: 10 },
-  backButtonContent: { flexDirection: "row", alignItems: "center" },
   header: {
     flex: 1,
     textAlign: "center",

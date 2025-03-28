@@ -32,9 +32,13 @@ export default function DoctorAppointments() {
   const [searchText, setSearchText] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isSortModalVisible, setSortModalVisible] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<"AwaitMeeting" | "Cancelled">("AwaitMeeting");
+  const [statusFilter, setStatusFilter] = useState<
+    "AwaitMeeting" | "Cancelled"
+  >("AwaitMeeting");
   const [selectedDate, setSelectedDate] = useState(new Date()); // Ngày được chọn
-  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date())); // Bắt đầu tuần hiện tại
+  const [currentWeekStart, setCurrentWeekStart] = useState(
+    startOfWeek(new Date())
+  ); // Bắt đầu tuần hiện tại
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -91,14 +95,16 @@ export default function DoctorAppointments() {
           key={day.toISOString()}
           style={[
             styles.dateButton,
-            selectedDate.toDateString() === day.toDateString() && styles.selectedDateButton,
+            selectedDate.toDateString() === day.toDateString() &&
+              styles.selectedDateButton,
           ]}
           onPress={() => handleDateSelect(day)}
         >
           <Text
             style={[
               styles.dateText,
-              selectedDate.toDateString() === day.toDateString() && styles.selectedDateText,
+              selectedDate.toDateString() === day.toDateString() &&
+                styles.selectedDateText,
             ]}
           >
             {format(day, "EEE")}
@@ -106,7 +112,8 @@ export default function DoctorAppointments() {
           <Text
             style={[
               styles.dateNumber,
-              selectedDate.toDateString() === day.toDateString() && styles.selectedDateText,
+              selectedDate.toDateString() === day.toDateString() &&
+                styles.selectedDateText,
             ]}
           >
             {format(day, "d")}
@@ -124,16 +131,8 @@ export default function DoctorAppointments() {
 
   return (
     <>
-    <DoctorHeader />
+      <DoctorHeader />
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <View style={styles.backButtonContent}>
-            <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-          </View>
-        </TouchableOpacity>
         <Text style={styles.header}>Appointment Requests</Text>
       </View>
 
@@ -154,7 +153,10 @@ export default function DoctorAppointments() {
 
       {/* Lịch tuần */}
       <View style={styles.weekContainer}>
-        <TouchableOpacity onPress={handlePreviousWeek} style={styles.arrowButton}>
+        <TouchableOpacity
+          onPress={handlePreviousWeek}
+          style={styles.arrowButton}
+        >
           <AntDesign name="left" size={20} color="#6A8CAF" />
         </TouchableOpacity>
         <View style={styles.weekDaysContainer}>{renderWeekDays()}</View>
@@ -212,7 +214,9 @@ export default function DoctorAppointments() {
       <View style={styles.container}>
         <FlatList
           data={appointments.filter((appointment) =>
-            appointment.bookingCode.toLowerCase().includes(searchText.toLowerCase())
+            appointment.bookingCode
+              .toLowerCase()
+              .includes(searchText.toLowerCase())
           )}
           keyExtractor={(item) => item.bookingCode}
           renderItem={({ item }) => <AppointmentCard item={item} />}
@@ -305,20 +309,7 @@ const styles = StyleSheet.create({
     color: "#4B3F72",
     marginLeft: 35,
   },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    top: "50%",
-    transform: [{ translateY: -22 }],
-    zIndex: 10,
-  },
-  backButtonContent: {
-    width: 44,
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 22,
-  },
+  
   searchSortContainer: {
     flexDirection: "row",
     alignItems: "center",

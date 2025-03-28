@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Image,
 } from "react-native";
 import { Footer } from "../../../component/doctorFooter";
 import { router, useLocalSearchParams } from "expo-router";
@@ -16,6 +17,7 @@ export default function AppointmentDetails() {
   const params = useLocalSearchParams();
   const [bookingDetails, setBookingDetails] = useState<any>({});
   const [patientDetails, setPatientDetails] = useState<any>({});
+  const [patientImage, setPatientImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -49,6 +51,25 @@ export default function AppointmentDetails() {
 
           const patientData = await patientResponse.json();
           setPatientDetails(patientData.patientProfileDto);
+
+          if (!patientData.patientProfileDto.userId) {
+            console.error("User ID is missing for the patient");
+          } else {
+            const imageResponse = await fetch(
+              `https://psychologysupport-image.azurewebsites.net/image/get?ownerType=User&ownerId=${patientData.patientProfileDto.userId}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            if (!imageResponse.ok) {
+              console.error("Failed to fetch patient image");
+            } else {
+              const imageData = await imageResponse.json();
+              console.log("Patient Image URL:", imageData.url); // Kiểm tra URL ảnh
+              setPatientImage(imageData.url); // Lưu URL ảnh vào state
+            }
+          }
         }
       } catch (error) {
         console.error("Error fetching details:", error);
@@ -65,15 +86,6 @@ export default function AppointmentDetails() {
       <DoctorHeader />
       <View style={styles.wrapper}>
         <View style={styles.headerContainer}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <View style={styles.backButtonContent}>
-              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-            </View>
-          </TouchableOpacity>
-
           <Text style={styles.header}>Appointment Details</Text>
         </View>
 
@@ -83,26 +95,25 @@ export default function AppointmentDetails() {
         >
           <View style={styles.sectionContainer}>
             <View style={styles.detailsContainer}>
-              <MaterialIcons
-                name="person"
-                size={100}
-                color="#AF93D2"
-                style={styles.avatarIcon}
-              />
+              {patientImage ? (
+                <Image
+                  source={{ uri: patientImage }}
+                  style={styles.avatar}
+                  onError={(error) => {
+                    console.error("Error loading image:", error.nativeEvent);
+                    setPatientImage(null); // Đặt lại ảnh về null nếu lỗi
+                  }}
+                />
+              ) : (
+                <MaterialIcons
+                  name="person"
+                  size={100}
+                  color="#AF93D2"
+                  style={styles.avatarIcon}
+                />
+              )}
               <Text style={styles.name}>
                 {patientDetails.fullName || "Unknown Patient"}
-              </Text>
-              <Text style={styles.label}>Gender</Text>
-              <Text style={styles.info}>
-                {patientDetails.gender || "Unknown"}
-              </Text>
-              <Text style={styles.label}>Allergies</Text>
-              <Text style={styles.info}>
-                {patientDetails.allergies || "None"}
-              </Text>
-              <Text style={styles.label}>Personality Traits</Text>
-              <Text style={styles.info}>
-                {patientDetails.personalityTraits || "Not specified"}
               </Text>
             </View>
           </View>
@@ -175,22 +186,6 @@ const styles = StyleSheet.create({
     color: "#4B3F72",
     marginLeft: 55,
   },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    top: "50%",
-    transform: [{ translateY: -22 }],
-    zIndex: 10,
-    marginBottom: 50,
-  },
-  backButtonContent: {
-    marginBottom: 50,
-    width: 44,
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 22,
-  },
   detailsContainer: {
     alignItems: "center",
     marginBottom: 20,
@@ -207,12 +202,13 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120, // Chiều rộng ảnh
+    height: 120, // Chiều cao ảnh
+    borderRadius: 60, // Hiển thị ảnh dưới dạng hình tròn
     borderWidth: 2,
     borderColor: "#AF93D2",
     marginBottom: 10,
+    resizeMode: "cover", // Đảm bảo ảnh được cắt đúng tỷ lệ
   },
   label: {
     fontSize: 16,

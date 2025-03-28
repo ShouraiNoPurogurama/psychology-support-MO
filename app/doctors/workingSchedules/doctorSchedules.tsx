@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Button,
   Alert,
+  ScrollView,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { DoctorHeader } from "../../../component/doctorHeader";
@@ -16,6 +17,10 @@ import { router } from "expo-router";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons"; // Import FontAwesome
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
+import { format, toZonedTime } from "date-fns-tz";
+
+const timeZone = "Asia/Ho_Chi_Minh"; // Múi giờ Việt Nam
+const today = format(toZonedTime(new Date(), timeZone), "yyyy-MM-dd"); // Ngày hiện tại theo múi giờ Việt Nam
 
 type TimeSlot = {
   status: string;
@@ -40,28 +45,32 @@ const extractBookingCode = (occupiedInfo: string): string | null => {
 };
 
 export default function DoctorSchedule() {
-  const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedSlots, setSelectedSlots] = useState<TimeSlot[]>([]);
 
   useEffect(() => {
     const fetchTimeSlots = async () => {
+      if (!selectedDate || isNaN(new Date(selectedDate).getTime())) {
+        console.error("Invalid selectedDate:", selectedDate);
+        return;
+      }
+  
       try {
         const token = await AsyncStorage.getItem("authToken");
         if (!token) throw new Error("No token found");
-
+  
         const decoded: any = jwtDecode(token);
         const doctorId = decoded.profileId;
-
+  
         const response = await fetch(
           `https://psychologysupport-scheduling.azurewebsites.net/doctor-schedule/${doctorId}/${selectedDate}`
         );
-
+  
         if (!response.ok) {
           throw new Error("Failed to fetch time slots");
         }
-
+  
         const data = await response.json();
         setTimeSlots(data.timeSlots || []);
       } catch (error) {
@@ -69,7 +78,7 @@ export default function DoctorSchedule() {
         setTimeSlots([]);
       }
     };
-
+  
     fetchTimeSlots();
   }, [selectedDate]);
 
@@ -157,119 +166,131 @@ export default function DoctorSchedule() {
     }
   };
 
+  const handleDayPress = (day: DayObject) => {
+    if (!day.dateString || isNaN(new Date(day.dateString).getTime())) {
+      console.error("Invalid dateString:", day.dateString);
+      Alert.alert("Error", "Invalid date selected. Please try again.");
+      return;
+    }
+  
+    const zonedDate = toZonedTime(new Date(day.dateString), timeZone); // Chuyển đổi sang múi giờ Việt Nam
+    const formattedDate = format(zonedDate, "yyyy-MM-dd"); // Giữ nguyên định dạng yyyy-MM-dd
+    setSelectedDate(formattedDate);
+  };
+
   return (
     <>
       <DoctorHeader />
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <View style={styles.backButtonContent}>
-              <FontAwesome5 name="arrow-left" size={22} color="#6A8CAF" />
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Working Schedule</Text>
-        </View>
-        <View style={styles.calendarContainer}>
-          <Calendar
-            current={today}
-            minDate={today}
-            markedDates={{
-              [selectedDate]: {
-                selected: true,
-                selectedColor: "rgba(147, 112, 219, 0.5)",
-              },
-              [today]: {
-                selected: true,
-                selectedColor: "#D9534F",
-                textDayFontWeight: "bold",
-                textDayFontSize: 18,
-              },
-            }}
-            onDayPress={(day: DayObject) => setSelectedDate(day.dateString)}
-            theme={{
-              selectedDayBackgroundColor: "rgba(147, 112, 219, 0.5)",
-              todayTextColor: "#D9534F",
-              arrowColor: "#6A8CAF",
-              textMonthFontSize: 20,
-              textMonthFontWeight: "bold",
-              textDayHeaderFontSize: 14,
-              textDayHeaderFontWeight: "bold",
-              textDayHeaderColor: "#000",
-              dayTextColor: "rgba(0,0,0,0.5)",
-            }}
-          />
-        </View>
-        <Text style={[styles.title, { marginBottom: 5 }]}>
-          {timeSlots.filter((slot) => slot.status === "Unavailable").length > 0
-            ? `Unavailable time slots on ${formatDate(selectedDate)}`
-            : `No unavailable time slots on ${formatDate(selectedDate)}`}
-        </Text>
-        {/* Show Stop Booking button only when slots are selected */}
-        {selectedSlots.length > 0 && (
-          <TouchableOpacity
-            style={styles.stopBookingButton}
-            onPress={stopBooking}
-            activeOpacity={0.7} // Effect when pressed
-          >
-            <Text style={styles.stopBookingButtonText}>Stop Booking</Text>
-          </TouchableOpacity>
-        )}
-        <View style={styles.listContainer}>
-          <FlatList
-            data={timeSlots}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => {
-              const isSelected = selectedSlots.includes(item);
-              const backgroundColor =
-                item.status === "Unavailable"
-                  ? "rgba(217, 83, 79, 0.7)" // Màu cho slot không khả dụng
-                  : isSelected
-                  ? "rgba(92, 184, 92, 0.5)" // Màu cho slot được chọn
-                  : "rgba(92, 184, 92, 0.7)"; // Màu cho slot khả dụng
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerTitle}>Working Schedule</Text>
+          </View>
+          <View style={styles.calendarContainer}>
+            <Calendar
+              current={today}
+              minDate={today}
+              markedDates={{
+                [selectedDate]: {
+                  selected: true,
+                  selectedColor: "rgba(147, 112, 219, 0.5)",
+                },
+                [today]: {
+                  selected: true,
+                  selectedColor: "#D9534F",
+                  textDayFontWeight: "bold",
+                  textDayFontSize: 18,
+                },
+              }}
+              onDayPress={handleDayPress}
+              theme={{
+                selectedDayBackgroundColor: "rgba(147, 112, 219, 0.5)",
+                todayTextColor: "#D9534F",
+                arrowColor: "#6A8CAF",
+                textMonthFontSize: 20,
+                textMonthFontWeight: "bold",
+                textDayHeaderFontSize: 14,
+                textDayHeaderFontWeight: "bold",
+                textDayHeaderColor: "#000",
+                dayTextColor: "rgba(0,0,0,0.5)",
+              }}
+            />
+          </View>
+          <Text style={[styles.title, { marginBottom: 0 }]}>
+            {timeSlots.filter((slot) => slot.status === "Unavailable").length > 0
+              ? `Unavailable time slots on ${formatDate(selectedDate)}: ${
+                  timeSlots.filter((slot) => slot.status === "Unavailable").length
+                }`
+              : `No unavailable time slots on ${formatDate(selectedDate)}`}
+          </Text>
+          {selectedSlots.length > 0 && (
+            <TouchableOpacity
+              style={styles.stopBookingButton}
+              onPress={stopBooking}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.stopBookingButtonText}>Stop Booking</Text>
+            </TouchableOpacity>
+          )}
+          <View style={styles.listContainer}>
+            <FlatList
+              data={timeSlots}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => {
+                const isSelected = selectedSlots.includes(item);
+                const backgroundColor =
+                  item.status === "Unavailable"
+                    ? "rgba(217, 83, 79, 0.7)"
+                    : isSelected
+                    ? "rgba(92, 184, 92, 0.5)"
+                    : "rgba(92, 184, 92, 0.7)";
 
-              return (
-                <Pressable
-                  style={[styles.timeSlotItem, { backgroundColor }]}
-                  onPress={() => {
-                    if (item.status !== "Unavailable") {
-                      toggleSlotSelection(item); // Chỉ xử lý nếu slot khả dụng
-                    }
-                  }}
-                  disabled={item.status === "Unavailable"} // Vô hiệu hóa nếu slot không khả dụng
-                >
-                  <View style={styles.slotContent}>
-                    <Text style={styles.timeSlotText}>
-                      {`${item.startTime} - ${item.endTime}`}
-                    </Text>
-                    {isSelected && (
-                      <FontAwesome
-                        name="check"
-                        size={20}
-                        color="#fff"
-                        style={styles.checkIcon}
-                      />
+                return (
+                  <Pressable
+                    style={[styles.timeSlotItem, { backgroundColor }]}
+                    onPress={() => {
+                      if (item.status !== "Unavailable") {
+                        toggleSlotSelection(item);
+                      }
+                    }}
+                    disabled={item.status === "Unavailable"}
+                  >
+                    <View style={styles.slotContent}>
+                      <Text style={styles.timeSlotText}>
+                        {`${item.startTime} - ${item.endTime}`}
+                      </Text>
+                      {isSelected && (
+                        <FontAwesome
+                          name="check"
+                          size={20}
+                          color="#fff"
+                          style={styles.checkIcon}
+                        />
+                      )}
+                    </View>
+                    {item.occupiedInfo && (
+                      <Text style={styles.occupiedInfo}>{`Details: ${item.occupiedInfo}`}</Text>
                     )}
-                  </View>
-                  {item.occupiedInfo && (
-                    <Text style={styles.occupiedInfo}>{`Details: ${item.occupiedInfo}`}</Text>
-                  )}
-                </Pressable>
-              );
-            }}
-            nestedScrollEnabled={true}
-            contentContainerStyle={{ paddingBottom: 80 }} // Add padding to avoid footer overlap
-          />
+                  </Pressable>
+                );
+              }}
+              nestedScrollEnabled={true}
+              contentContainerStyle={{ paddingBottom: 80, marginTop: 0 }} // Đảm bảo không có khoảng cách trên
+            />
+          </View>
         </View>
-      </View>
+      </ScrollView>
       <Footer />
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1, // Đảm bảo nội dung có thể cuộn
+    backgroundColor: "#fff",
+    paddingBottom: 20, // Thêm khoảng cách dưới cùng
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -320,21 +341,6 @@ const styles = StyleSheet.create({
     position: "relative",
     paddingVertical: 10,
   },
-  backButton: {
-    position: "absolute",
-    left: 10,
-    top: "50%",
-    transform: [{ translateY: -22 }],
-    zIndex: 10,
-  },
-  backButtonContent: {
-    width: 44,
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 22,
-    backgroundColor: "rgba(0,0,0,0.05)",
-  },
   headerTitle: {
     flex: 1,
     textAlign: "center",
@@ -357,7 +363,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5, // Reduce bottom margin
+    marginBottom: 2, // Giảm khoảng cách dưới dòng thông báo
     textAlign: "center",
     color: "#6A8CAF",
   },
