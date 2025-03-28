@@ -309,7 +309,6 @@ const styles = StyleSheet.create({
     color: "#4B3F72",
     marginLeft: 35,
   },
-  
   searchSortContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -432,8 +431,8 @@ const styles = StyleSheet.create({
   dateButton: {
     alignItems: "center",
     justifyContent: "center",
-    width: 40, // Tăng chiều rộng để cân đối hơn
-    height: 45, // Chiều cao cố định
+    width: 33, // Tăng chiều rộng để cân đối hơn
+    height: 38, // Chiều cao cố định
     borderRadius: 8,
     backgroundColor: "#F0F0F0",
     marginHorizontal: 2, // Khoảng cách giữa các nút
