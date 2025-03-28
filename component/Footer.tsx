@@ -15,13 +15,13 @@ export const Footer: React.FC = () => {
             >
                 <MaterialIcons name="home" size={30} color={pathname === "/user/home" ? "black" : "white"} />
             </TouchableOpacity>
-            <TouchableOpacity  
+            {/* <TouchableOpacity  
                 onPress={() => pathname!=="/user/userChat" && router.push("/user/userChatList")} 
                 style={styles.button}
                 disabled={pathname === "/user/userChatList"}
                 >
                 <MaterialIcons name="chat" size={30} color={pathname=== "/user/userChatList" ? "black":"white"} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity 
             onPress={() => pathname!=="/user/userTask"&& router.push("/user/userTask")} 
             style={styles.button}

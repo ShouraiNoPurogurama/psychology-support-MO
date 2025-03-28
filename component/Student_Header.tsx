@@ -72,9 +72,9 @@ export const Student_Header: React.FC = () => {
                     <SimpleLineIcons size={24} color="white" name="options-vertical" />
                 </TouchableOpacity>
                 <Text style={styles.title}>EmoEase</Text>
-                <TouchableOpacity style={styles.button}>
+                {/* <TouchableOpacity style={styles.button}>
                     <MaterialCommunityIcons size={28} color="white" name="bell-outline" />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
             <Modal
                 visible={isDrawerOpen}
