@@ -75,6 +75,7 @@ const ServicePackagesScreen = () => {
   const [profileId, setProfileId] = useState<string | null>(null);
   const [webViewVisible, setWebViewVisible] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+  const [upgradeModalVisible, setUpgradeModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchProfileId = async () => {
@@ -96,7 +97,6 @@ const ServicePackagesScreen = () => {
   useEffect(() => {
     const fetchServicePackages = async () => {
       if (!profileId) return;
-  
       try {
         const response = await axios.get(
           `https://psychologysupport-subscription.azurewebsites.net/service-packages?patientId=${profileId}&PageIndex=1&PageSize=10`
@@ -110,9 +110,7 @@ const ServicePackagesScreen = () => {
               features: matchedPackage ? matchedPackage.features : [],
             };
           })
-          // Sắp xếp theo giá từ thấp đến cao
           .sort((a: ServicePackage, b: ServicePackage) => a.price - b.price);
-  
         setServicePackages(activePackages);
         setPromoCodes(activePackages.reduce((acc, pkg) => ({ ...acc, [pkg.id]: '' }), {}));
         setLoadingStates(activePackages.reduce((acc, pkg) => ({ ...acc, [pkg.id]: false }), {}));
@@ -184,13 +182,11 @@ const ServicePackagesScreen = () => {
     console.log('WebView URL:', url);
 
     if (url.includes('http://localhost:5173/payments/callback')) {
-      setWebViewVisible(false); // Đóng WebView
+      setWebViewVisible(false);
 
       try {
-        // Lấy query parameters từ URL
         const queryParams = new URLSearchParams(url.split('?')[1]);
 
-        // Lấy tất cả các tham số từ URL
         const paymentData = {
           amount: queryParams.get("vnp_Amount"),
           bankCode: queryParams.get("vnp_BankCode"),
@@ -206,29 +202,25 @@ const ServicePackagesScreen = () => {
           secureHash: queryParams.get("vnp_SecureHash"),
         };
 
-        // Gửi request tới backend với toàn bộ query params
         await axios.get(
           `https://psychologysupport-payment.azurewebsites.net/payments/callback?${queryParams.toString()}`
         );
 
-        // Kiểm tra kết quả thanh toán
         if (
           paymentData.responseCode === "00" &&
           paymentData.transactionStatus === "00"
         ) {
-          // Chuyển hướng đến trang thành công
           router.replace({
             pathname: "/user/PaymentSuccessScreen",
             params: {
               transactionNo: paymentData.transactionNo,
               amount: paymentData.amount
                 ? (parseInt(paymentData.amount) / 100).toString()
-                : "0", // VNPay trả về amount nhân 100
+                : "0",
               payDate: paymentData.payDate,
             },
           });
         } else {
-          // Chuyển hướng đến trang thất bại
           router.replace({
             pathname: "/user/PaymentFailedScreen",
             params: {
@@ -265,9 +257,20 @@ const ServicePackagesScreen = () => {
     setPromoCodes((prev) => ({ ...prev, [packageId]: value }));
   };
 
+  const handleUpgradePress = () => {
+    setUpgradeModalVisible(true);
+  };
+
+  const hasPurchasedPackage = servicePackages.some((pkg) => pkg.isPurchased);
+  const isPremiumPurchased = servicePackages.some(
+    (pkg) => pkg.isPurchased && pkg.name === 'Premium Plan'
+  );
+
   const renderItem = ({ item }: { item: ServicePackage }) => {
     const isCurrentPlan = item.isPurchased === true;
-  
+    const showUpgradeButton = hasPurchasedPackage && !isCurrentPlan && !isPremiumPurchased;
+    const showBestPlanMessage = isPremiumPurchased && !isCurrentPlan;
+
     return (
       <LinearGradient colors={['#2E0249', '#570A57']} style={styles.packageContainer}>
         <Text style={styles.packageName}>{item.name}</Text>
@@ -298,21 +301,31 @@ const ServicePackagesScreen = () => {
           style={[
             styles.button,
             loadingStates[item.id] && styles.buttonDisabled,
-            isCurrentPlan && styles.buttonPurchased, // Thêm kiểu cho gói đã mua
+            isCurrentPlan && styles.buttonPurchased,
+            showBestPlanMessage && styles.buttonDisabled, // Disable style for "Your plan is the best"
           ]}
-          onPress={() => !isCurrentPlan && handleBuyService(item.id)}
-          disabled={loadingStates[item.id] || isCurrentPlan}
+          onPress={() =>
+            showUpgradeButton
+              ? handleUpgradePress()
+              : !isCurrentPlan && !showBestPlanMessage && handleBuyService(item.id)
+          }
+          disabled={loadingStates[item.id] || isCurrentPlan || showBestPlanMessage}
         >
           <Text
             style={[
               styles.buttonText,
-              isCurrentPlan && styles.buttonTextPurchased, // Thêm kiểu chữ trắng
+              isCurrentPlan && styles.buttonTextPurchased,
+              showBestPlanMessage && styles.buttonTextDisabled, // Optional: style for disabled text
             ]}
           >
             {loadingStates[item.id]
               ? 'Đang xử lý...'
               : isCurrentPlan
               ? 'Your Current Choice'
+              : showBestPlanMessage
+              ? 'Your plan is the best'
+              : showUpgradeButton
+              ? 'Upgrade'
               : 'Get Now'}
           </Text>
         </TouchableOpacity>
@@ -355,6 +368,27 @@ const ServicePackagesScreen = () => {
           >
             <Text style={styles.closeButtonText}>Đóng</Text>
           </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={upgradeModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setUpgradeModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
+              This feature is currently not supported on the current platform
+            </Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setUpgradeModalVisible(false)}
+            >
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </>
@@ -448,7 +482,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   buttonPurchased: {
-    backgroundColor: '#00cc00', // Nền xanh cho nút của gói đã mua
+    backgroundColor: '#00cc00',
   },
   buttonText: {
     color: '#2E0249',
@@ -456,7 +490,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonTextPurchased: {
-    color: '#fff', // Chữ trắng cho nút của gói đã mua
+    color: '#fff',
+  },
+  buttonTextDisabled: {
+    color: '#fff', // Optional: White text for "Your plan is the best"
   },
   closeButton: {
     backgroundColor: '#2E0249',
@@ -468,6 +505,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-}); 
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '80%',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#2E0249',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#2E0249',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
 
 export default ServicePackagesScreen;

@@ -220,7 +220,6 @@ export const Student_Header: React.FC = () => {
 
 const styles = StyleSheet.create({
     HeaderContainer: {
-        paddingTop: Platform.OS === 'ios' ? 44 : StatusBar.currentHeight,  // chỉ dùng khi test expo go
         position: "absolute",
         top: 0,
         width: "100%",

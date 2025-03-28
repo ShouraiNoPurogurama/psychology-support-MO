@@ -150,7 +150,7 @@ const UserHistory: React.FC = () => {
     
                 // Fetch Test Results
                 const testResultsResponse = await fetch(
-                    `https://psychologysupport-test.azurewebsites.net/test-results/${patientId}?PageIndex=0&PageSize=10&SortOrder=asc`,
+                    `https://psychologysupport-test.azurewebsites.net/test-results/${patientId}?PageIndex=0&PageSize=10&SortOrder=des`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 const testResultsData = await testResultsResponse.json();
