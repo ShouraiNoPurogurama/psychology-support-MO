@@ -3,12 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Dimensions } from 'react-native';
 import { DatePickerModal } from 'react-native-paper-dates';
 
-const availableTimes = [
-    "7:00-7:30", "7:30-8:00", "8:00-8:30", "8:30-9:00",
-    "9:00-9:30", "9:30-10:00", "10:00-10:30", "10:30-11:00",
-    "11:00-11:30"
-];
-
 interface BookingModalProps {
     visible: boolean;
     onClose: () => void;
@@ -24,10 +18,15 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
     const [availableTimes, setAvailableTimes] = useState<{ time: string, available: boolean }[]>([]);
     const [loading, setLoading] = useState(false);
 
+    // Ngày hiện tại để so sánh
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Đặt giờ về 00:00 để so sánh chính xác
 
     useEffect(() => {
-        if (selectedDate) {
+        if (selectedDate && selectedDate >= today) {
             fetchAvailableTimes(selectedDate);
+        } else {
+            setAvailableTimes([]); // Nếu ngày không hợp lệ, không hiển thị slot
         }
     }, [selectedDate]);
 
@@ -46,23 +45,19 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
         console.log("Selected Date:", formattedDate);
         console.log("URL:", url);
         try {
-
             const response = await fetch(url);
             const data = await response.json();
 
             if (data?.timeSlots) {
                 const times = data.timeSlots.map((slot: any) => ({
                     time: `${slot.startTime.slice(0, 5)}-${slot.endTime.slice(0, 5)}`,
-                    available: slot.status === "Available" 
+                    available: slot.status === "Available"
                 }));
                 setAvailableTimes(times);
-                
-
                 console.log("data", data);
             } else {
                 setAvailableTimes([]);
             }
-
         } catch (error) {
             console.error("Error fetching available times:", error);
             setAvailableTimes([]);
@@ -70,17 +65,15 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
         setLoading(false);
     };
 
-
     const handleConfirm = () => {
-        if (selectedDate && selectedTime) {
+        if (selectedDate && selectedTime && selectedDate >= today) {
             router.push({
                 pathname: "/user/confirmAppointment",
                 params: { date: selectedDate.toDateString(), time: selectedTime, doctorId }
-
             });
-
         }
-    }
+    };
+
     return (
         <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
             <View style={styles.modalOverlay}>
@@ -89,7 +82,9 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
 
                     {/* Date Picker */}
                     <TouchableOpacity onPress={() => setDatePickerVisible(true)} style={styles.dateButton}>
-                        <Text style={styles.dateText}>{selectedDate ? selectedDate.toDateString() : "Select a Date"}</Text>
+                        <Text style={styles.dateText}>
+                            {selectedDate ? selectedDate.toDateString() : "Select a Date"}
+                        </Text>
                     </TouchableOpacity>
 
                     <DatePickerModal
@@ -100,41 +95,56 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
                         date={selectedDate || new Date()}
                         onConfirm={(params) => {
                             if (params.date) {
-                                setSelectedDate(new Date(params.date));
+                                const newDate = new Date(params.date);
+                                // Chỉ cho phép chọn ngày từ hôm nay trở đi
+                                if (newDate >= today) {
+                                    setSelectedDate(newDate);
+                                } else {
+                                    setSelectedDate(today); // Nếu chọn ngày cũ, mặc định là hôm nay
+                                }
                             }
                             setDatePickerVisible(false);
+                        }}
+                        validRange={{
+                            startDate: today, // Ngày bắt đầu là hôm nay
+                            endDate: undefined, // Không giới hạn ngày kết thúc
                         }}
                     />
 
                     {/* Time Picker */}
                     <Text style={styles.timeTitle}>Available Times</Text>
-                    <FlatList
-                        data={availableTimes}
-                        numColumns={2}
-                        keyExtractor={(item) => item.time}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity
-                                style={[
-                                    styles.timeSlot,
-                                    !item.available && styles.unavailableTimeSlot,
-                                    selectedTime === item.time && styles.selectedTimeSlot
-                                ]}
-                                onPress={() => item.available && setSelectedTime(item.time)}
-                                disabled={!item.available}
-                            >
-                                <Text style={[
-                                    styles.timeText,
-                                    !item.available && styles.unavailableTimeText,
-                                    selectedTime === item.time && styles.selectedTimeText
-                                ]}>
-                                    {item.time}
-                                </Text>
-                            </TouchableOpacity>
-                            
-                        )}
-                        contentContainerStyle={{ paddingBottom: 20 }}
-                        style={{ flexGrow: 0, width: '100%' }}
-                    />
+                    {loading ? (
+                        <Text>Loading...</Text>
+                    ) : availableTimes.length > 0 ? (
+                        <FlatList
+                            data={availableTimes}
+                            numColumns={2}
+                            keyExtractor={(item) => item.time}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.timeSlot,
+                                        !item.available && styles.unavailableTimeSlot,
+                                        selectedTime === item.time && styles.selectedTimeSlot
+                                    ]}
+                                    onPress={() => item.available && setSelectedTime(item.time)}
+                                    disabled={!item.available}
+                                >
+                                    <Text style={[
+                                        styles.timeText,
+                                        !item.available && styles.unavailableTimeText,
+                                        selectedTime === item.time && styles.selectedTimeText
+                                    ]}>
+                                        {item.time}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                            contentContainerStyle={{ paddingBottom: 20 }}
+                            style={{ flexGrow: 0, width: '100%' }}
+                        />
+                    ) : (
+                        <Text>No available times for this date</Text>
+                    )}
 
                     {/* Buttons */}
                     <View style={styles.buttonContainer}>
@@ -144,12 +154,12 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
                         <TouchableOpacity
                             style={[styles.confirmButton, (!selectedDate || !selectedTime) && styles.disabledButton]}
                             onPress={() => {
-                                if (selectedDate && selectedTime) {
+                                if (selectedDate && selectedTime && selectedDate >= today) {
                                     onConfirm(selectedDate.toDateString(), selectedTime);
                                     handleConfirm();
                                 }
                             }}
-                            disabled={!selectedDate || !selectedTime}
+                            disabled={!selectedDate || !selectedTime || selectedDate < today}
                         >
                             <Text style={styles.buttonText}>Confirm</Text>
                         </TouchableOpacity>
@@ -160,6 +170,7 @@ const BookingModal = ({ visible, onClose, onConfirm, doctorId }: BookingModalPro
     );
 };
 
+// Styles giữ nguyên như code gốc
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
@@ -196,12 +207,11 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     timeSlot: {
-        // Tính toán chiều rộng động: chiều rộng modal (90% màn hình) trừ padding, chia cho 2 cột
         flex: 1,
         backgroundColor: '#f0f0f0',
         paddingVertical: 15,
-        paddingHorizontal: 10, // Giảm padding ngang để tránh tràn
-        minWidth: (width * 0.9 - 60) / 2, // 60 là tổng padding ngang của modalContainer (20 * 2) + margin giữa các slot
+        paddingHorizontal: 10,
+        minWidth: (width * 0.9 - 60) / 2,
         margin: 5,
         borderRadius: 8,
         alignItems: 'center',
