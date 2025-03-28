@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
         <MaterialIcons name="home" size={30} color={pathname === "/doctors/doctorHome" ? "black" : "white"} />
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => {
           if (pathname !== "/doctors/other/chatList") {
             router.push("/doctors/other/chatList");
@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
         accessibilityLabel="Chat"
       >
         <MaterialIcons name="chat" size={30} color={pathname === "/doctors/other/chatList" ? "black" : "white"} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity
         onPress={() => {
